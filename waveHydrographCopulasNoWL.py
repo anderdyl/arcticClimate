@@ -26,7 +26,7 @@ import pickle
 import xarray as xr
 
 
-with open(r"normalizedWaveHydrographsHope2Dist.pickle", "rb") as input_file:
+with open(r"normalizedWaveHydrographsHope4Dist.pickle", "rb") as input_file:
    normalizedWaveHydrographs = pickle.load(input_file)
 normalizedHydros = normalizedWaveHydrographs['normalizedHydros']
 bmuDataMin = normalizedWaveHydrographs['bmuDataMin']
@@ -35,15 +35,15 @@ bmuDataStd = normalizedWaveHydrographs['bmuDataStd']
 bmuDataNormalized = normalizedWaveHydrographs['bmuDataNormalized']
 
 
-with open(r"waveHydrographsHope2Dist.pickle", "rb") as input_file:
+with open(r"waveHydrographsHope4Dist.pickle", "rb") as input_file:
    waveHydrographs = pickle.load(input_file)
 hydros = waveHydrographs['hydros']
 
-with open(r"hydrographCopulaDataHope2Dist.pickle", "rb") as input_file:
+with open(r"hydrographCopulaDataHope4Dist.pickle", "rb") as input_file:
    hydrographCopulaData = pickle.load(input_file)
 copulaData = hydrographCopulaData['copulaData']
 
-with open(r"historicalDataHope2Dist.pickle", "rb") as input_file:
+with open(r"historicalDataHope4Dist.pickle", "rb") as input_file:
    historicalData = pickle.load(input_file)
 grouped = historicalData['grouped']
 groupLength = historicalData['groupLength']
@@ -577,26 +577,30 @@ def CopulaSimulation(U_data, kernels, num_sim):
 gevCopulaSims = list()
 for i in range(len(np.unique(bmuGroup))):
     tempCopula = np.asarray(copulaData[i])
-    dataHs = np.array([sub[0] for sub in copulaData[i]])
-    data = tempCopula[~np.isnan(dataHs)]
-    data2 = data[~np.isnan(data[:,1])]
+    if len(tempCopula) == 0:
+        data2 = [[np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]]
+        data = data2
+    else:
+        dataHs = np.array([sub[0] for sub in copulaData[i]])
+        data = tempCopula[~np.isnan(dataHs)]
+        data2 = data[~np.isnan(data[:,1])]
 
     print('{} hydrographs of {} in DWT {}'.format(len(data2),len(data),i))
 
-    if len(data2) > 50:
+    if len(data2) > 40:
         # # if i == 59 or i == 55 or i == 65 or i == 47 or i == 66 or i == 53 or i == 56:
         # if i == 47 or i == 66 or i == 53 or i == 56:
         #
         #     kernels = ['KDE', 'KDE', 'KDE', 'KDE', 'KDE', 'KDE', ]
         # else:
         kernels = ['GEV','KDE','KDE','KDE','KDE','KDE']
-    elif len(data2) <= 3:
+    elif len(data2) == 3 or len(data2) == 2:
         kernels = ['KDE','KDE','KDE','KDE','KDE','KDE']
         data2 = np.vstack((data2,data2+data2*0.1))
     else:
         kernels = ['KDE','KDE','KDE','KDE','KDE','KDE']
 
-    if len(data2) == 0:
+    if len(data2) <= 1:
         samples5 = np.zeros((100000,5))
     else:
         samples = CopulaSimulation(data2[:,0:5],kernels,100000)
@@ -656,7 +660,7 @@ for i in range(len(np.unique(bmuGroup))):
 
 
 
-gevCopulaSimsPickle = 'gevCopulaSims1000002Dist.pickle'
+gevCopulaSimsPickle = 'gevCopulaSims1000004Dist.pickle'
 outputgevCopulaSims = {}
 outputgevCopulaSims['gevCopulaSims'] = gevCopulaSims
 

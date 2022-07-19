@@ -171,11 +171,13 @@ zNArray = []
 ciArray = []
 for hh in range(100):
    # file = r"/home/dylananderson/projects/atlanticClimate/Sims/simulation{}.pickle".format(hh)
-   file = r"/media/dylananderson/Elements/historicSims/simulation{}.pickle".format(hh)
+   file = r"/media/dylananderson/Elements/historicSims/simulationOnlyWaves{}.pickle".format(hh)
 
    with open(file, "rb") as input_file:
       simsInput = pickle.load(input_file)
-   simulationData = simsInput['futureSimulationData']
+   # simulationData = simsInput['futureSimulationData']
+   simulationData = simsInput['simulationData']
+
    df = simsInput['df']
 
    df.loc[df['hs'] == 0, 'hs'] = np.nan

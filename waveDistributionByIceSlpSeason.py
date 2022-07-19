@@ -213,6 +213,48 @@ for hh in range(numDWTs):
 
 
 
+
+numDWTs=49
+waveHieghtsDWT = []
+for hh in range(numDWTs):
+    waveHieghtsIce = []
+    for yy in range(2):
+
+        dwtInd = np.where((bmusDWTs==hh) & (bmus_corrected==yy))
+        waveBin = []
+        waveBin2 = []
+        if len(dwtInd[0])>0:
+            for qq in range(len(dwtInd[0])):
+                if timeArrayDWTs[dwtInd[0][qq]].month > 8:
+                    dayInd = np.where((tWave >= dt.datetime(timeArrayDWTs[dwtInd[0][qq]].year, timeArrayDWTs[dwtInd[0][qq]].month,timeArrayDWTs[dwtInd[0][qq]].day,0,0,0)) &
+                                    (tWave <= dt.datetime(timeArrayDWTs[dwtInd[0][qq]].year, timeArrayDWTs[dwtInd[0][qq]].month,
+                                                        timeArrayDWTs[dwtInd[0][qq]].day,23,0,0)))
+                    waveBin.append(hsCombined[dayInd[0]])
+                else:
+                    dayInd = np.where((tWave >= dt.datetime(timeArrayDWTs[dwtInd[0][qq]].year, timeArrayDWTs[dwtInd[0][qq]].month,timeArrayDWTs[dwtInd[0][qq]].day,0,0,0)) &
+                                    (tWave <= dt.datetime(timeArrayDWTs[dwtInd[0][qq]].year, timeArrayDWTs[dwtInd[0][qq]].month,
+                                                        timeArrayDWTs[dwtInd[0][qq]].day,23,0,0)))
+                    waveBin2.append(hsCombined[dayInd[0]])
+            if len(waveBin) > 0:
+                waveHieghtsIce.append(np.concatenate(waveBin, axis=0))
+            else:
+                waveHieghtsIce.append(np.array([np.nan]))
+            if len(waveBin2) > 0:
+                waveHieghtsIce.append(np.concatenate(waveBin2, axis=0))
+            else:
+                waveHieghtsIce.append(np.array([np.nan]))
+
+        else:
+            waveHieghtsIce.append(np.array([np.nan]))
+            waveHieghtsIce.append(np.array([np.nan]))
+
+
+    waveHieghtsDWT.append(waveHieghtsIce)
+
+
+asdfg
+
+
 dwtcolors = cm.rainbow(np.linspace(0, 1, 49))
 #plt.style.use('dark_background')
 
@@ -248,10 +290,10 @@ for xx in range(49):
     if len(data) > 1:
         kde = gaussian_kde(data)
         colorparam[counter] = np.nanmean(data)
-        colormap1 = cm.Purples
+        colormap1 = cm.Oranges
         color = colormap1(normalize(colorparam[counter]))
         # ax.plot(dist_space, kde(dist_space), linewidth=1, color=color)
-        ax.plot(dist_space, kde(dist_space), linewidth=1, color='b')
+        ax.plot(dist_space, kde(dist_space), linewidth=1, color='green')
 
         ax.spines['bottom'].set_color([0.5, 0.5, 0.5])
         ax.spines['top'].set_color([0.5, 0.5, 0.5])
@@ -276,7 +318,7 @@ for xx in range(49):
         colormap2 = cm.Oranges
         color = colormap2(normalize(colorparam[counter]))
         # ax.plot(dist_space, kde(dist_space), linewidth=1, color=color)
-        ax.plot(dist_space, kde(dist_space), linewidth=1, color='g')
+        ax.plot(dist_space, kde(dist_space), linewidth=1, color='lightgreen')
 
         ax.spines['bottom'].set_color([0.5, 0.5, 0.5])
         ax.spines['top'].set_color([0.5, 0.5, 0.5])
@@ -291,6 +333,51 @@ for xx in range(49):
         ax.spines['left'].set_color([0.3, 0.3, 0.3])
 
 
+    data2 = waveHieghtsDWT[xx][2]
+    data = data2[~np.isnan(data2)]
+
+    if len(data) > 1:
+        kde = gaussian_kde(data)
+        colorparam[counter] = np.nanmean(data)
+        colormap1 = cm.Purples
+        color = colormap1(normalize(colorparam[counter]))
+        # ax.plot(dist_space, kde(dist_space), linewidth=1, color=color)
+        ax.plot(dist_space, kde(dist_space), linewidth=1, color='blue')
+
+        ax.spines['bottom'].set_color([0.5, 0.5, 0.5])
+        ax.spines['top'].set_color([0.5, 0.5, 0.5])
+        ax.spines['right'].set_color([0.5, 0.5, 0.5])
+        ax.spines['left'].set_color([0.5, 0.5, 0.5])
+        # ax.text(1.8, 1, np.round(colorparam*100)/100, fontweight='bold')
+
+    else:
+        ax.spines['bottom'].set_color([0.3, 0.3, 0.3])
+        ax.spines['top'].set_color([0.3, 0.3, 0.3])
+        ax.spines['right'].set_color([0.3, 0.3, 0.3])
+        ax.spines['left'].set_color([0.3, 0.3, 0.3])
+
+    data2 = waveHieghtsDWT[xx][3]
+    data = data2[~np.isnan(data2)]
+
+    if len(data) > 1:
+        kde = gaussian_kde(data)
+        colorparam[counter] = np.nanmean(data)
+        colormap1 = cm.Purples
+        color = colormap1(normalize(colorparam[counter]))
+        # ax.plot(dist_space, kde(dist_space), linewidth=1, color=color)
+        ax.plot(dist_space, kde(dist_space), linewidth=1, color='lightblue')
+
+        ax.spines['bottom'].set_color([0.5, 0.5, 0.5])
+        ax.spines['top'].set_color([0.5, 0.5, 0.5])
+        ax.spines['right'].set_color([0.5, 0.5, 0.5])
+        ax.spines['left'].set_color([0.5, 0.5, 0.5])
+        # ax.text(1.8, 1, np.round(colorparam*100)/100, fontweight='bold')
+
+    else:
+        ax.spines['bottom'].set_color([0.3, 0.3, 0.3])
+        ax.spines['top'].set_color([0.3, 0.3, 0.3])
+        ax.spines['right'].set_color([0.3, 0.3, 0.3])
+        ax.spines['left'].set_color([0.3, 0.3, 0.3])
 
     # data2 = waveHieghtsDWT[xx][2]
     # data = data2[~np.isnan(data2)]

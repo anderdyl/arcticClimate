@@ -25,6 +25,7 @@ import pickle
 from scipy.io.matlab.mio5_params import mat_struct
 from datetime import datetime, date, timedelta
 import scipy.io as sio
+import cmocean
 
 
 #
@@ -121,7 +122,85 @@ order = historicalDWTs['kma_order']
 bmus = historicalDWTs['bmus_corrected']
 time = historicalDWTs['dayTime']
 timeArray = np.array(time)
+kma_order = historicalDWTs['kma_order']
+kmSorted = historicalDWTs['kmSorted']
+xFlat = historicalDWTs['xFlat']
+points = historicalDWTs['points']
+group_size = historicalDWTs['group_size']
+x = historicalDWTs['x']
+y = historicalDWTs['y']
 
+
+from matplotlib import gridspec
+import cartopy.crs as ccrs
+from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
+
+
+# plotting the EOF patterns
+fig2 = plt.figure(figsize=(10,10))
+gs1 = gridspec.GridSpec(5, 5)
+gs1.update(wspace=0.00, hspace=0.00) # set the spacing between axes.
+c1 = 0
+c2 = 0
+counter = 0
+plotIndx = 0
+plotIndy = 0
+for hh in range(25):
+    #p1 = plt.subplot2grid((6,6),(c1,c2))
+    ax = plt.subplot(gs1[hh],projection=ccrs.NorthPolarStereo(central_longitude=-45))
+    num = kma_order[hh]
+    # num = kma_orderOG[hh]
+
+    # spatialField = kmOG[(hh - 1), :]# / 100 - np.nanmean(SLP_C, axis=0) / 100
+    spatialField = kmSorted[(hh), :]# / 100 - np.nanmean(SLP_C, axis=0) / 100
+    linearField = np.ones((np.shape(xFlat))) * np.nan
+    linearField[points] = spatialField
+    rectField = linearField.reshape(75, 85)
+
+    # ax.set_extent([-180, 180, 50, 90], crs=ccrs.PlateCarree())
+    # gl = ax.gridlines(draw_labels=True)
+    # extent = [-9.97, 168.35, 30.98, 34.35]
+
+    # ax.pcolormesh(x[25:155], y[125:235], rectField, cmap=cmocean.cm.ice)
+    # ax.pcolormesh(x[40:135], y[140:230], rectField, cmap=cmocean.cm.ice)
+    # ax.pcolormesh(x[45:135], y[140:230], rectField, cmap=cmocean.cm.ice)
+
+    # #  this is the proper orientation
+    # ax.pcolormesh(x[65:150], y[160:235], rectField, cmap=cmocean.cm.ice)
+    # ax.set_xlim([-2323000, 0])
+    # ax.set_ylim([0, 2330000])
+    # ax.text(-2323000/3*2,2100000,'{} days'.format(group_size[num]))
+
+    # Inverted orientation
+    ax.pcolormesh(y[160:235],x[65:150], np.fliplr(rectField.T), cmap=cmocean.cm.ice)
+    ax.set_ylim([-2323000, 300000])
+    ax.set_xlim([-200000, 2130000])
+    ax.text(1230000/3,30000,'{} days'.format(group_size[num]))
+
+
+    temp = np.fliplr(rectField.T)
+    tempInd = np.where((np.isnan(temp)))
+    temp = temp*np.nan
+    temp[tempInd] = 0.5
+    temp2 = temp
+    temp[64:,0:25] = np.nan
+    ax.pcolormesh(y[160:235],x[65:150], temp, vmin=0, vmax=1, cmap='Greys')
+
+    # gl.xlabels_top = False
+    # gl.ylabels_left = False
+    # gl.xformatter = LONGITUDE_FORMATTER
+    # gl.yformatter = LATITUDE_FORMATTER
+    # ax.set_title('EOF {} = {}%'.format(hh+1,np.round(nPercent[hh]*10000)/100))
+    # ax.set_title('{} days'.format(group_size[num]))
+
+    c2 += 1
+    if c2 == 6:
+        c1 += 1
+        c2 = 0
+
+
+
+asdfg
 
 numDWTs=25
 waveHieghts = []

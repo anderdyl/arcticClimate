@@ -38,7 +38,7 @@ evbmus_sim = dwtFutureSimulations['evbmus_sim']
 dates_sim = dwtFutureSimulations['dates_sim']
 
 # with open(r"iceTempWithNAO36DWTsSimulations100.pickle", "rb") as input_file:
-with open(r"iceFutureSimulations100.pickle", "rb") as input_file:
+with open(r"iceFutureSimulations1000.pickle", "rb") as input_file:
     iceSimulations = pickle.load(input_file)
 iceSims = iceSimulations['evbmus_sim']
 iceDates = iceSimulations['dates_sim']
@@ -49,15 +49,74 @@ with open(r"processedWaveWaterLevels49DWTs25IWTs2022.pickle", "rb") as input_fil
 percentWaves = onOffData['percentWaves']
 percentIce = onOffData['percentIce']
 
-with open(r"iceData36ClustersMin60.pickle", "rb") as input_file:
+
+# with open(r"iceData36ClustersMin60.pickle", "rb") as input_file:
+#    iceDWTs = pickle.load(input_file)
+with open(r"iceData25ClustersMediumishMin150withDayNumRG.pickle", "rb") as input_file:
    iceDWTs = pickle.load(input_file)
 
+
+#
+# iceOnOff = []
+# years = np.arange(1979,2022)
+# # lets start in January and assume that we are always beginning with an iced ocean
+# for hh in range(100):
+#     simOfIce = iceSims[:,hh]
+#     yearsStitched = []
+#     timeStitched = []
+#     tempControl = 0
+#
+#     for tt in range(len(years)):
+#         yearInd = np.where((np.array(iceDates) >= datetime(years[tt],1,1)) & (np.array(iceDates) < datetime(years[tt]+1,1,1)))
+#         timeSubset = np.array(iceDates)[yearInd]
+#         tempOfSim = simOfIce[yearInd]
+#         groupTemp = [[e[0] for e in d[1]] for d in
+#                             itertools.groupby(enumerate(tempOfSim), key=operator.itemgetter(1))]
+#         timeGroupTemp = [timeSubset[d] for d in groupTemp]
+#         bmuGroupIce = (np.asarray([tempOfSim[i[0]] for i in groupTemp]))
+#
+#         # lets a
+#         wavesStitched = []
+#         for qq in range(len(groupTemp)):
+#             tempRand = np.random.uniform(size=len(groupTemp[qq]))
+#             if tempControl == 0:
+#                 # lets enter the next group assuming that waves were previously off
+#                 sortedRand = np.sort(tempRand)            # so we have a bunch of probabilities between 0 and 1
+#                 finder = np.where((sortedRand > percentIce[int(bmuGroupIce[qq]-1)]))     # if greater than X then waves are ON
+#                 # arbitrary, but lets say waves have to be turned on for 3 days before we say, sure the ocean broke up
+#                 waveDays = np.zeros((len(sortedRand),))
+#                 if timeGroupTemp[qq][0].month > 4:
+#                     if len(finder[0]) > 3:
+#                         waveDays[finder[0]] = np.ones((len(finder[0])))       # flip those days that are waves to ON
+#                         tempControl = 1
+#                 if timeGroupTemp[qq][0].month > 7 and timeGroupTemp[qq][-1].month < 9:
+#                     waveDays = np.ones((len(sortedRand),))
+#                     tempControl = 1
+#                 wavesStitched.append(waveDays)
+#             else:
+#                 # now we're entering with waves ON and want to turn them OFF
+#                 sortedRand = np.sort(tempRand)#[::-1]        # again a bunch of probabilities between 0 and 1
+#                 finder = np.where((sortedRand > percentWaves[int(bmuGroupIce[qq]-1)]))  # if greater than X then waves are OFF
+#                 # arbitrary, but again, waves need to be off for 3 days to really freeze up the ocean
+#                 waveDays = np.ones((len(sortedRand),))
+#                 if timeGroupTemp[qq][-1].month < 8 or timeGroupTemp[qq][0].month > 9:
+#
+#                     if len(finder[0]) > 3:
+#                         waveDays[finder[0]] = np.zeros((len(finder[0])))
+#                         tempControl = 0
+#                 if timeGroupTemp[qq][0].month > 0 and timeGroupTemp[qq][-1].month < 5:
+#                     waveDays = np.zeros((len(sortedRand),))
+#                     tempControl = 0
+#                 wavesStitched.append(waveDays)
+#         yearsStitched.append(wavesStitched)
+#     iceOnOff.append(np.concatenate([x for xs in yearsStitched for x in xs]).ravel())
+#
 
 
 iceOnOff = []
 years = np.arange(1979,2022)
 # lets start in January and assume that we are always beginning with an iced ocean
-for hh in range(10):
+for hh in range(100):
     simOfIce = iceSims[:,hh]
     yearsStitched = []
     timeStitched = []
@@ -71,6 +130,7 @@ for hh in range(10):
                             itertools.groupby(enumerate(tempOfSim), key=operator.itemgetter(1))]
         timeGroupTemp = [timeSubset[d] for d in groupTemp]
         bmuGroupIce = (np.asarray([tempOfSim[i[0]] for i in groupTemp]))
+        withinYear = 0
 
         # lets a
         wavesStitched = []
@@ -82,13 +142,29 @@ for hh in range(10):
                 finder = np.where((sortedRand > percentIce[int(bmuGroupIce[qq]-1)]))     # if greater than X then waves are ON
                 # arbitrary, but lets say waves have to be turned on for 3 days before we say, sure the ocean broke up
                 waveDays = np.zeros((len(sortedRand),))
-                if timeGroupTemp[qq][0].month > 4:
+                if timeGroupTemp[qq][0].month > 3:
                     if len(finder[0]) > 3:
-                        waveDays[finder[0]] = np.ones((len(finder[0])))       # flip those days that are waves to ON
+                        if timeGroupTemp[qq][0].month > 10:
+                            if (len(finder[0])/len(sortedRand))>0.7:
+                                waveDays[finder[0]] = np.ones((len(finder[0])))  # flip those days that are waves to ON
+                                tempControl = 1
+                            else:
+                                print('prevented wave from turning on Sim {}'.format(hh))
+                        else:
+                            waveDays[finder[0]] = np.ones((len(finder[0])))       # flip those days that are waves to ON
+                            tempControl = 1
+                    if timeGroupTemp[qq][0].month > 7 and timeGroupTemp[qq][-1].month < 9:
+                        waveDays = np.ones((len(sortedRand),))
                         tempControl = 1
-                if timeGroupTemp[qq][0].month > 7 and timeGroupTemp[qq][-1].month < 9:
-                    waveDays = np.ones((len(sortedRand),))
-                    tempControl = 1
+                # if len(wavesStitched) > 0:
+                    # arrayOfWavesStitched = np.abs(np.concatenate(wavesStitched,axis=0)-1)
+                    # whereDidTheyTurnOff = np.where(np.diff(arrayOfWavesStitched) == 1)
+                    # if len(whereDidTheyTurnOff[0]) > 0:
+                    #     timeSince = len(arrayOfWavesStitched)-whereDidTheyTurnOff[0][-1]
+                    # if timeGroupTemp[qq][0].month > 10 and timeSince > 7:
+                    #         waveDays = np.zeros((len(sortedRand),))
+                    #         tempControl = 0
+
                 wavesStitched.append(waveDays)
             else:
                 # now we're entering with waves ON and want to turn them OFF
@@ -97,17 +173,21 @@ for hh in range(10):
                 # arbitrary, but again, waves need to be off for 3 days to really freeze up the ocean
                 waveDays = np.ones((len(sortedRand),))
                 if timeGroupTemp[qq][-1].month < 8 or timeGroupTemp[qq][0].month > 9:
-
-                    if len(finder[0]) > 3:
+                    if len(finder[0]) > 1:
                         waveDays[finder[0]] = np.zeros((len(finder[0])))
                         tempControl = 0
-                if timeGroupTemp[qq][0].month > 0 and timeGroupTemp[qq][-1].month < 5:
+                if timeGroupTemp[qq][0].month > 1 and timeGroupTemp[qq][-1].month < 5:
                     waveDays = np.zeros((len(sortedRand),))
                     tempControl = 0
+
+                if len(wavesStitched) > 0:
+                    countOfStitched = np.sum(np.concatenate(wavesStitched,axis=0))
+                    if timeGroupTemp[qq][0].month > 5 and countOfStitched > 7:
+                        waveDays = np.ones((len(sortedRand),))
+
                 wavesStitched.append(waveDays)
         yearsStitched.append(wavesStitched)
     iceOnOff.append(np.concatenate([x for xs in yearsStitched for x in xs]).ravel())
-
 
 
 
@@ -171,38 +251,40 @@ monthsFmt = mdates.DateFormatter('%b')
 ax.set_xlim(list_pyear[0], list_pyear[-1])
 ax.xaxis.set_major_locator(months)
 ax.xaxis.set_major_formatter(monthsFmt)
-
-
-num_simulations = 100
-histDates = iceDates#[214:]#onOffData['iceDateTimes']
-bmus_dates_months = np.array([d.month for d in histDates])
-bmus_dates_days = np.array([d.day for d in histDates])
-yearsOfHist= np.arange(1980,2021)
-stacked = np.zeros((len(yearsOfHist),365))
-for qq in range(len(yearsOfHist)):
-    index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq], 1, 1)) & (
-                np.array(histDates) < datetime(yearsOfHist[qq], 12, 31)))
-    yearlyStacked = np.zeros((num_simulations,len(index[0])))
-    for tt in range(num_simulations):
-        # index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq],6,1)) & (np.array(histDates) < datetime(yearsOfHist[qq]+1,5,31)))
-        yearlyStacked[tt,0:len(index[0])] = iceOnOff[tt][index]
-    stacked[qq,0:len(index[0])] = np.nanmean(yearlyStacked,axis=0)
-
-
-fig = plt.figure(figsize=(10,4))
-ax = plt.subplot2grid((1,1),(0,0))
-X,Y = np.meshgrid(list_pyear,np.arange(1980,2022))
-ax.pcolormesh(X,Y,stacked,cmap=cmocean.cm.ice_r,vmin=0,vmax=2)
-# customize  axis
-months = mdates.MonthLocator()
-monthsFmt = mdates.DateFormatter('%b')
-ax.set_xlim(list_pyear[0], list_pyear[-1])
-ax.xaxis.set_major_locator(months)
-ax.xaxis.set_major_formatter(monthsFmt)
-
+#
+#
+# num_simulations = 100
+# histDates = iceDates#[214:]#onOffData['iceDateTimes']
+# bmus_dates_months = np.array([d.month for d in histDates])
+# bmus_dates_days = np.array([d.day for d in histDates])
+# yearsOfHist= np.arange(1980,2021)
+# stacked = np.zeros((len(yearsOfHist),365))
+# for qq in range(len(yearsOfHist)):
+#     index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq], 1, 1)) & (
+#                 np.array(histDates) < datetime(yearsOfHist[qq], 12, 31)))
+#     yearlyStacked = np.zeros((num_simulations,len(index[0])))
+#     for tt in range(num_simulations):
+#         # index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq],6,1)) & (np.array(histDates) < datetime(yearsOfHist[qq]+1,5,31)))
+#         yearlyStacked[tt,0:len(index[0])] = iceOnOff[tt][index]
+#     stacked[qq,0:len(index[0])] = np.nanmean(yearlyStacked,axis=0)
+#
+#
+# fig = plt.figure(figsize=(10,4))
+# ax = plt.subplot2grid((1,1),(0,0))
+# X,Y = np.meshgrid(list_pyear,np.arange(1980,2022))
+# ax.pcolormesh(X,Y,stacked,cmap=cmocean.cm.ice_r,vmin=0,vmax=2)
+# # customize  axis
+# months = mdates.MonthLocator()
+# monthsFmt = mdates.DateFormatter('%b')
+# ax.set_xlim(list_pyear[0], list_pyear[-1])
+# ax.xaxis.set_major_locator(months)
+# ax.xaxis.set_major_formatter(monthsFmt)
+#
 
 
 asdfg
+
+newOrderIce = np.array([0,0,0,1,1,1,0,1,0,0,0,1,0,1,1,0,1,1,1,1,1,1,1,1,1])
 
 
 
@@ -221,18 +303,29 @@ groupedList = list()
 groupLengthList = list()
 bmuGroupList = list()
 iceOnOffGroupList = list()
+iceSlpGroupList = list()
 #timeGroupList = list()
 for hh in range(100):
     print('breaking up hydrogrpahs for simulation {}'.format(hh))
     bmus = evbmus_sim[:,hh]
     iceBmus = iceOnOff[hh]
+    actualIceBmus = iceSims[:,hh]
     tempBmusGroup = [[e[0] for e in d[1]] for d in itertools.groupby(enumerate(bmus), key=operator.itemgetter(1))]
+
+    bmusICESLP = np.zeros((len(actualIceBmus),), ) * np.nan
+    for i in range(2):
+        posc = np.where(newOrderIce == i)
+        for hh in range(len(posc[0])):
+            posc2 = np.where(actualIceBmus == posc[0][hh])
+            bmusICESLP[posc2] = i
 
     groupedList.append(tempBmusGroup)
     groupLengthList.append(np.asarray([len(i) for i in tempBmusGroup]))
     bmuGroupList.append(np.asarray([bmus[i[0]] for i in tempBmusGroup]))
     # iceOnOffGroupList.append(np.asarray([iceBmus[i] for i in tempBmusGroup]))
     iceOnOffGroupList.append([iceBmus[i] for i in tempBmusGroup])
+
+    iceSlpGroupList.append([bmusICESLP[i] for i in tempBmusGroup])
 
     #timeGroupList.append([np.asarray(midnightTime)[i] for i in tempBmusGroup])
 
@@ -249,6 +342,7 @@ simBmuChopped = []
 simBmuLengthChopped = []
 simBmuGroupsChopped = []
 simIceGroupsChopped = []
+simIceSlpGroupsChopped = []
 for pp in range(numRealizations):
 
     print('working on realization #{}'.format(pp))
@@ -256,23 +350,29 @@ for pp in range(numRealizations):
     groupLength = groupLengthList[pp]
     grouped = groupedList[pp]
     iceGroup = iceOnOffGroupList[pp]
+    iceSlpGroup = iceSlpGroupList[pp]
+
     simGroupLength = []
     simGrouped = []
     simBmu = []
     simIceGroupLength = []
     simIceGrouped = []
     simIceBmu = []
+    simIceSlpGrouped = []
+
     for i in range(len(groupLength)):
         # if np.remainder(i,10000) == 0:
         #     print('done with {} hydrographs'.format(i))
         tempGrouped = grouped[i]
         tempBmu = int(bmuGroup[i])
         tempIceGrouped = iceGroup[i]
+        tempIceSlpGrouped = iceSlpGroup[i]
         remainingDays = groupLength[i] - 5
         if groupLength[i] < 5:
             simGroupLength.append(int(groupLength[i]))
             simGrouped.append(grouped[i])
             simIceGrouped.append(iceGroup[i])
+            simIceSlpGrouped.append(iceSlpGroup[i])
             simBmu.append(tempBmu)
         else:
             counter = 0
@@ -286,7 +386,7 @@ for pp in range(numRealizations):
                 # print('should be adding {}'.format(grouped[i][counter:counter+randLength]))
                 simGrouped.append(grouped[i][counter:counter+randLength])
                 simIceGrouped.append(iceGroup[i][counter:counter+randLength])
-
+                simIceSlpGrouped.append(iceSlpGroup[i][counter:counter+randLength])
                 simBmu.append(tempBmu)
                 # remove those from the next step
                 # tempGrouped = np.delete(tempGrouped,np.arange(0,randLength))
@@ -299,22 +399,25 @@ for pp in range(numRealizations):
                 # simGrouped.append(tempGrouped[0:])
                 simGrouped.append(grouped[i][counter:])
                 simIceGrouped.append(iceGroup[i][counter:])
+                simIceSlpGrouped.append(iceSlpGroup[i][counter:])
                 simBmu.append(tempBmu)
     simBmuLengthChopped.append(np.asarray(simGroupLength))
     simBmuGroupsChopped.append(simGrouped)
     simIceGroupsChopped.append(simIceGrouped)
     simBmuChopped.append(np.asarray(simBmu))
+    simIceSlpGroupsChopped.append(simIceSlpGrouped)
 
 
 
 
 
-simsChoppedPickle = 'simulations100Chopped49.pickle'
+simsChoppedPickle = 'simulations100Chopped49_2Dist.pickle'
 outputSimsChopped = {}
 outputSimsChopped['simBmuLengthChopped'] = simBmuLengthChopped
 outputSimsChopped['simBmuGroupsChopped'] = simBmuGroupsChopped
 outputSimsChopped['simBmuChopped'] = simBmuChopped
 outputSimsChopped['simIceGroupsChopped'] = simIceGroupsChopped
+outputSimsChopped['simIceSlpGroupsChopped'] = simIceSlpGroupsChopped
 
 with open(simsChoppedPickle,'wb') as f:
     pickle.dump(outputSimsChopped, f)

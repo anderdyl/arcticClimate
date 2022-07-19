@@ -66,7 +66,7 @@ Y_in = historicalDWTs['Y_in']
 sea_nodes = historicalDWTs['sea_nodes']
 group_size = historicalDWTs['group_size']
 numDWTs=49
-plt.style.use('dark_background')
+# plt.style.use('dark_background')
 
 dwtcolors = cm.rainbow(np.linspace(0, 1, 49))
 from mpl_toolkits.basemap import Basemap
