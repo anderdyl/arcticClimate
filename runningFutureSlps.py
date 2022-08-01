@@ -58,8 +58,10 @@ def dateDay2datetime(d_vec):
 
 
 import pickle
-with open(r"dwts49ClustersArctic2y2022.pickle", "rb") as input_file:
-   slpDWTs = pickle.load(input_file)
+# with open(r"dwts49ClustersArctic2y2022.pickle", "rb") as input_file:
+
+with open(r"dwts64ClustersArcticRGy2022.pickle", "rb") as input_file:
+    slpDWTs = pickle.load(input_file)
 
 
 timeDWTs = slpDWTs['SLPtime']
@@ -344,7 +346,7 @@ xds_bmus_fit = xds_KMA_fit.sel(
 
 
 # Autoregressive logistic wrapper
-num_clusters = 49
+num_clusters = 64
 fit_and_save = True # False for loading
 p_test_ALR = '/media/dylananderson/Elements/NC_climate/testALR/'
 
@@ -545,7 +547,8 @@ for simIndex in range(diffSims):
 #         [d.day for d in dates_sim])).T
 #
 
-samplesPickle = 'dwtFutureSimulations500.pickle'
+# samplesPickle = 'dwtFutureSimulations500.pickle'
+samplesPickle = 'dwt64FutureSimulations500.pickle'
 outputSamples = {}
 outputSamples['evbmus_sim'] = evbmus_sim
 # outputSamples['evbmus_probcum'] = evbmus_probcum
@@ -591,7 +594,7 @@ import matplotlib.pyplot as plt
 bmus_dates_months = np.array([d.month for d in mjoDatesSim[0:10226]])
 bmus_dates_days = np.array([d.day for d in mjoDatesSim[0:10226]])
 
-num_clusters = 49
+num_clusters = 64
 
 # generate perpetual year list
 list_pyear = GenOneYearDaily(month_ini=6)

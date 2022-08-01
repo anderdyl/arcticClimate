@@ -131,9 +131,9 @@ nanInd = np.where((dmCombined==0))
 dmCombined[nanInd] = np.nan * np.ones((len(nanInd)))
 
 waveNorm = wavesInput['waveNorm']
-wlFRF = wavesInput['wlFRF']
-tFRF = wavesInput['tWl']
-resFRF = wavesInput['res']
+# wlFRF = wavesInput['wlFRF']
+# tFRF = wavesInput['tWl']
+# resFRF = wavesInput['res']
 
 data = np.array([hsCombined,tpCombined,dmCombined])
 ogdf = pd.DataFrame(data=data.T, index=tC, columns=["hs", "tp", "dm"])
@@ -244,6 +244,29 @@ for hh in range(100):
 #    simYearlyMaxNotInterped[hh,:] = simdf.groupby('year').max()['hs']
 #
 
+hh = 19
+file = r"/media/dylananderson/Elements/historicSims/simulationOnlyWaves{}.pickle".format(hh)
+
+with open(file, "rb") as input_file:
+   simsInput = pickle.load(input_file)
+   # simulationData = simsInput['futureSimulationData']
+simulationData = simsInput['simulationData']
+
+df = simsInput['df']
+
+df.loc[df['hs'] == 0, 'hs'] = np.nan
+df.loc[df['tp'] == 0, 'tp'] = np.nan
+df.loc[df['dm'] == 0, 'dm'] = np.nan
+
+time = simsInput['time']
+year = np.array([tt.year for tt in time])
+df['year'] = year
+month = np.array([tt.month for tt in time])
+df['month'] = month
+
+# plt.figure()
+# plt.plot(time,df['hs'])
+
 dt = datetime(2022, 1, 1)
 end = datetime(2023, 1, 1)
 step = relativedelta(months=1)
@@ -252,16 +275,23 @@ while dt < end:
     plotTime.append(dt)#.strftime('%Y-%m-%d'))
     dt += step
 
+plt.style.use('default')
+plt.style.use('dark_background')
+
 plt.figure()
 ax1 = plt.subplot2grid((1,1),(0,0),rowspan=1,colspan=1)
 ax1.plot(plotTime,seasonalMean['hs'],label='ERA5 record (42 years)')
-ax1.fill_between(plotTime, seasonalMean['hs'] - seasonalStd['hs'], seasonalMean['hs'] + seasonalStd['hs'], color='b', alpha=0.2)
+ax1.fill_between(plotTime, seasonalMean['hs'] - seasonalStd['hs'], seasonalMean['hs'] + seasonalStd['hs'], color='pink', alpha=0.2)
 ax1.plot(plotTime,df.groupby('month').mean()['hs'],label='Synthetic record (100 years)')
 ax1.fill_between(plotTime, df.groupby('month').mean()['hs'] - df.groupby('month').std()['hs'], df.groupby('month').mean()['hs'] + df.groupby('month').std()['hs'], color='orange', alpha=0.2)
 # ax1.fill_between(plotTime, simSeasonalMean['hs'] - simSeasonalStd['hs'], simSeasonalMean['hs'] + simSeasonalStd['hs'], color='orange', alpha=0.2)
 ax1.set_xticks([plotTime[0],plotTime[1],plotTime[2],plotTime[3],plotTime[4],plotTime[5],plotTime[6],plotTime[7],plotTime[8],plotTime[9],plotTime[10],plotTime[11]])
 ax1.set_xticklabels(['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])
 ax1.legend()
+
+
+
+
 
 simMaxHs = np.nan*np.ones((100,43))
 # simMaxHsNotInterped = np.nan*np.ones((50,100))

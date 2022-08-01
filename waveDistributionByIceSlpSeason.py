@@ -146,8 +146,17 @@ timeArrayDWTs = np.array(slpDates)
 
 # kma_order = sort_cluster_gen_corr_end(kma.cluster_centers_, num_clusters)
 # newOrderIce = np.array([0,0,0,1,1,1,0,1,0,1,0,1,0,1,2,1,2,2,2,2,2,2,2,2,2])
-newOrderIce = np.array([0,0,0,1,1,1,0,1,0,0,0,1,0,1,1,0,1,1,1,1,1,1,1,1,1])
+# newOrderIce = np.array([0,0,0,1,1,
+#                         1,0,1,0,0,
+#                         0,1,0,1,1,
+#                         0,1,1,1,1,
+#                         1,1,1,1,1])
 
+newOrderIce = np.array([0,0,0,0,0,
+                        0,0,0,0,0,
+                        0,0,0,1,1,
+                        0,1,1,1,1,
+                        1,1,1,1,1])
 bmus_corrected = np.zeros((len(bmusIce),), ) * np.nan
 for i in range(2):
     posc = np.where(newOrderIce == i)
@@ -158,31 +167,31 @@ for i in range(2):
 
 
 
-numDWTs=49
-waveHieghtsDWT = []
-for hh in range(numDWTs):
-    dwtInd = np.where((bmusDWTs==hh))
-    waveBin = []
-    for qq in range(len(dwtInd[0])):
-        dayInd = np.where((tWave >= dt.datetime(timeArrayDWTs[dwtInd[0][qq]].year, timeArrayDWTs[dwtInd[0][qq]].month,timeArrayDWTs[dwtInd[0][qq]].day,0,0,0)) &
-                          (tWave <= dt.datetime(timeArrayDWTs[dwtInd[0][qq]].year, timeArrayDWTs[dwtInd[0][qq]].month,
-                                               timeArrayDWTs[dwtInd[0][qq]].day,23,0,0)))
-        waveBin.append(hsCombined[dayInd[0]])
-    waveHieghtsDWT.append(np.concatenate(waveBin,axis=0))
+# numDWTs=49
+# waveHieghtsDWT = []
+# for hh in range(numDWTs):
+#     dwtInd = np.where((bmusDWTs==hh))
+#     waveBin = []
+#     for qq in range(len(dwtInd[0])):
+#         dayInd = np.where((tWave >= dt.datetime(timeArrayDWTs[dwtInd[0][qq]].year, timeArrayDWTs[dwtInd[0][qq]].month,timeArrayDWTs[dwtInd[0][qq]].day,0,0,0)) &
+#                           (tWave <= dt.datetime(timeArrayDWTs[dwtInd[0][qq]].year, timeArrayDWTs[dwtInd[0][qq]].month,
+#                                                timeArrayDWTs[dwtInd[0][qq]].day,23,0,0)))
+#         waveBin.append(hsCombined[dayInd[0]])
+#     waveHieghtsDWT.append(np.concatenate(waveBin,axis=0))
+#
 
-
-
-numDWTs=25
-waveHieghts= []
-for hh in range(numDWTs):
-    dwtInd = np.where((bmusIce==hh))
-    waveBin = []
-    for qq in range(len(dwtInd[0])):
-        dayInd = np.where((tWave >= dt.datetime(timeIce[dwtInd[0][qq]].year, timeIce[dwtInd[0][qq]].month,timeIce[dwtInd[0][qq]].day,0,0,0)) &
-                          (tWave <= dt.datetime(timeArrayIce[dwtInd[0][qq]].year, timeArrayIce[dwtInd[0][qq]].month,
-                                               timeArrayIce[dwtInd[0][qq]].day,23,0,0)))
-        waveBin.append(hsCombined[dayInd[0]])
-    waveHieghts.append(np.concatenate(waveBin,axis=0))
+#
+# numDWTs=25
+# waveHieghts= []
+# for hh in range(numDWTs):
+#     dwtInd = np.where((bmusIce==hh))
+#     waveBin = []
+#     for qq in range(len(dwtInd[0])):
+#         dayInd = np.where((tWave >= dt.datetime(timeIce[dwtInd[0][qq]].year, timeIce[dwtInd[0][qq]].month,timeIce[dwtInd[0][qq]].day,0,0,0)) &
+#                           (tWave <= dt.datetime(timeArrayIce[dwtInd[0][qq]].year, timeArrayIce[dwtInd[0][qq]].month,
+#                                                timeArrayIce[dwtInd[0][qq]].day,23,0,0)))
+#         waveBin.append(hsCombined[dayInd[0]])
+#     waveHieghts.append(np.concatenate(waveBin,axis=0))
 
 
 

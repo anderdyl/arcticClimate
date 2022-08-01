@@ -26,7 +26,7 @@ import pickle
 import xarray as xr
 
 
-with open(r"normalizedWaveHydrographsHope4Dist.pickle", "rb") as input_file:
+with open(r"normalizedWaveHydrographsHope2Dist49.pickle", "rb") as input_file:
    normalizedWaveHydrographs = pickle.load(input_file)
 normalizedHydros = normalizedWaveHydrographs['normalizedHydros']
 bmuDataMin = normalizedWaveHydrographs['bmuDataMin']
@@ -35,22 +35,22 @@ bmuDataStd = normalizedWaveHydrographs['bmuDataStd']
 bmuDataNormalized = normalizedWaveHydrographs['bmuDataNormalized']
 
 
-with open(r"waveHydrographsHope4Dist.pickle", "rb") as input_file:
+with open(r"waveHydrographsHope2Dist49.pickle", "rb") as input_file:
    waveHydrographs = pickle.load(input_file)
 hydros = waveHydrographs['hydros']
 
-with open(r"hydrographCopulaDataHope4Dist.pickle", "rb") as input_file:
+with open(r"hydrographCopulaDataHope2Dist49.pickle", "rb") as input_file:
    hydrographCopulaData = pickle.load(input_file)
 copulaData = hydrographCopulaData['copulaData']
 
-with open(r"historicalDataHope4Dist.pickle", "rb") as input_file:
+with open(r"historicalDataHope2Dist49.pickle", "rb") as input_file:
    historicalData = pickle.load(input_file)
 grouped = historicalData['grouped']
 groupLength = historicalData['groupLength']
 bmuGroup = historicalData['bmuGroup']
 timeGroup = historicalData['timeGroup']
 
-
+numClusters = 49
 
 def CDF_Distribution(self, vn, vv, xds_GEV_Par, d_shape, i_wt):
     '''
@@ -570,15 +570,15 @@ def CopulaSimulation(U_data, kernels, num_sim):
 ### TODO: copula simulation using GEV params
 
 
-# asdfg
 
 # plt.hist(np.asarray(copulaData[i])[:,0])
 
+rangeBmus = np.arange(0,numClusters*2)
 gevCopulaSims = list()
-for i in range(len(np.unique(bmuGroup))):
+for i in rangeBmus:#range(len(np.unique(bmuGroup))):
     tempCopula = np.asarray(copulaData[i])
     if len(tempCopula) == 0:
-        data2 = [[np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]]
+        data2 = [[np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]]
         data = data2
     else:
         dataHs = np.array([sub[0] for sub in copulaData[i]])
@@ -587,34 +587,36 @@ for i in range(len(np.unique(bmuGroup))):
 
     print('{} hydrographs of {} in DWT {}'.format(len(data2),len(data),i))
 
-    if len(data2) > 40:
+    if len(data2) > 25:
         # # if i == 59 or i == 55 or i == 65 or i == 47 or i == 66 or i == 53 or i == 56:
         # if i == 47 or i == 66 or i == 53 or i == 56:
         #
         #     kernels = ['KDE', 'KDE', 'KDE', 'KDE', 'KDE', 'KDE', ]
         # else:
-        kernels = ['GEV','KDE','KDE','KDE','KDE','KDE']
+        kernels = ['GEV','KDE','KDE','KDE','KDE','KDE','KDE']
     elif len(data2) == 3 or len(data2) == 2:
-        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE']
-        data2 = np.vstack((data2,data2+data2*0.1))
+        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE']
+        data2 = np.vstack((data2,data2-data2*0.1))
     else:
-        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE']
+        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE']
 
     if len(data2) <= 1:
-        samples5 = np.zeros((100000,5))
+        samples5 = np.zeros((100000,6))
     else:
-        samples = CopulaSimulation(data2[:,0:5],kernels,100000)
+        samples = CopulaSimulation(data2[:,0:6],kernels,100000)
 
-        negIndex1 = np.where(samples[:,0] > 0.25)
+        negIndex1 = np.where(samples[:,0] > 0.05)
         samples2 = samples[negIndex1]
+
         negIndex2 = np.where(samples2[:,1] > 0.05)
         samples3 = samples2[negIndex2]
-        negIndex3 = np.where(samples3[:,2] > 2.5)
+
+        negIndex3 = np.where(samples3[:,2] > 1.5)
         samples4 = samples3[negIndex3]
-        negIndex4 = np.where(samples4[:,3] > 1.5)
+        negIndex4 = np.where(samples4[:,3] > 0.5)
         samples5 = samples4[negIndex4]
 
-        cutoff = 1.25*np.nanmax(tempCopula[:,0])
+        cutoff = 1.5*np.nanmax(tempCopula[:,0])
         toobig = np.where(samples5[:, 0] < cutoff)
         samples5 = samples5[toobig]
 
@@ -660,7 +662,7 @@ for i in range(len(np.unique(bmuGroup))):
 
 
 
-gevCopulaSimsPickle = 'gevCopulaSims1000004Dist.pickle'
+gevCopulaSimsPickle = 'gevCopulaSims1000002Dist81.pickle'
 outputgevCopulaSims = {}
 outputgevCopulaSims['gevCopulaSims'] = gevCopulaSims
 

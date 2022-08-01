@@ -32,19 +32,21 @@ def toTimestamp(d):
     return calendar.timegm(d.timetuple())
 
 
-with open(r"simulations100Chopped49_2Dist.pickle", "rb") as input_file:
+with open(r"simulations100Chopped81_2Dist.pickle", "rb") as input_file:
    simsChoppedInput = pickle.load(input_file)
 simBmuLengthChopped = simsChoppedInput['simBmuLengthChopped']
 simBmuGroupsChopped = simsChoppedInput['simBmuGroupsChopped']
 simBmuChopped = simsChoppedInput['simBmuChopped']
 simIceGroupsChopped = simsChoppedInput['simIceGroupsChopped']
 simIceSlpGroupsChopped = simsChoppedInput['simIceSlpGroupsChopped']
+simTimeGroupsChopped = simsChoppedInput['simTimeGroupsChopped']
 
-with open(r"gevCopulaSims1000002Dist.pickle", "rb") as input_file:
+
+with open(r"gevCopulaSims1000002Dist81.pickle", "rb") as input_file:
    gevCopulaSimsInput = pickle.load(input_file)
 gevCopulaSims = gevCopulaSimsInput['gevCopulaSims']
 
-with open(r"normalizedWaveHydrographsHope2Dist.pickle", "rb") as input_file:
+with open(r"normalizedWaveHydrographsHope2Dist81.pickle", "rb") as input_file:
    normalizedWaveHydrographs = pickle.load(input_file)
 normalizedHydros = normalizedWaveHydrographs['normalizedHydros']
 bmuDataMin = normalizedWaveHydrographs['bmuDataMin']
@@ -52,7 +54,7 @@ bmuDataMax = normalizedWaveHydrographs['bmuDataMax']
 bmuDataStd = normalizedWaveHydrographs['bmuDataStd']
 bmuDataNormalized = normalizedWaveHydrographs['bmuDataNormalized']
 
-with open(r"hydrographCopulaDataHope2Dist.pickle", "rb") as input_file:
+with open(r"hydrographCopulaDataHope2Dist81.pickle", "rb") as input_file:
    hydrographCopulaData = pickle.load(input_file)
 copulaData = hydrographCopulaData['copulaData']
 copulaDataNoNaNs = hydrographCopulaData['copulaDataNoNaNs']
@@ -231,7 +233,6 @@ with open(r"iceData25ClustersMediumishMin150withDayNumRG.pickle", "rb") as input
 # ax.xaxis.set_major_formatter(monthsFmt)
 #
 
-
 dt = datetime(1979, 6, 1, 0, 0, 0)
 end = datetime(2021, 5, 31, 23, 0, 0)
 # dt = datetime(1980, 1, 1, 0, 0, 0)
@@ -259,9 +260,6 @@ def closest_node(node, nodes):
     return nodes[closest_index], closest_index
 
 
-
-
-
 simulationsHs = list()
 simulationsTp = list()
 simulationsDm = list()
@@ -282,13 +280,30 @@ for simNum in range(100):
             print('done with {} hydrographs'.format(i))
 
         tempIceSlpBmus = simIceSlpGroupsChopped[simNum][i][0]
+        tempTimeMonth = simTimeGroupsChopped[simNum][i][0]
+
+        # if tempIceSlpBmus == 1:
+        #     if tempTimeMonth < 9:
+        #         tempBmu = int(simBmuChopped[simNum][i]-1)+49+49
+        #     else:
+        #         tempBmu = int(simBmuChopped[simNum][i]-1)+49+49+49
+        # else:
+        #     if tempTimeMonth < 9:
+        #         tempBmu = int(simBmuChopped[simNum][i]-1)
+        #     else:
+        #         tempBmu = int(simBmuChopped[simNum][i]-1)+49
+
         if tempIceSlpBmus == 1:
             tempBmu = int(simBmuChopped[simNum][i]-1)+49
         else:
             tempBmu = int(simBmuChopped[simNum][i]-1)
 
-        if tempBmu == 28:
-            tempBmu = 29
+
+        # if tempBmu == 60:
+        #     tempBmu = 120
+        #
+        # if tempBmu == 62:
+        #     tempBmu = 122
         # so i think at this stage we need to know what the correspond ICE dwt is... then whether its a 0 or 1, and then choose from the gevCopulaSims based on that
         randStorm = random.randint(0, 9999)
         stormDetails = gevCopulaSims[tempBmu][randStorm]
@@ -310,16 +325,38 @@ for simNum in range(100):
         test, closeIndex = closest_node([simHsNorm,simTpNorm],np.asarray(bmuDataNormalized)[tempBmu])
 
         actualIndex = closeIndex#int(np.asarray(copulaDataNoNaNs[tempBmu])[closeIndex,6])
+        # if tempBmu==0 or tempBmu==10 or tempBmu==21 or tempBmu==27 or tempBmu==28 or tempBmu==30 or tempBmu==34 or tempBmu==35 or tempBmu==36 or tempBmu==37 or tempBmu==42\
+        #         or tempBmu==43 or tempBmu==47 or tempBmu==48 or tempBmu==98 or tempBmu==99 or tempBmu==100 or tempBmu==101 or tempBmu==102 or tempBmu==108 or tempBmu==112\
+        #         or tempBmu==116 or tempBmu==117 or tempBmu==118 or tempBmu==119 or tempBmu==121 or tempBmu==122 or tempBmu==124 or tempBmu==125 or tempBmu==126\
+        #         or tempBmu==127 or tempBmu==128 or tempBmu==132 or tempBmu==133 or tempBmu==134 or tempBmu==135 or tempBmu==140 or tempBmu==141 or tempBmu==142\
+        #         or tempBmu==143 or tempBmu==145 or tempBmu==146:
+        if tempBmu==2:
+            tempHs = np.array([0.25,0.25,0.25,0.25])
+            tempTp = np.array([3,3,3,3])
+            tempDm = np.array([0,0,0,0])
+            simTime.append(np.array([0.25,0.25,0.25,0.25])*durSim)
 
-        tempHs = ((normalizedHydros[tempBmu][actualIndex]['hsNorm']) * (stormDetails[0]-stormDetails[1]) + stormDetails[1])#.filled()
-        tempTp = ((normalizedHydros[tempBmu][actualIndex]['tpNorm']) * (stormDetails[2]-stormDetails[3]) + stormDetails[3])#.filled()
-        tempDm = ((normalizedHydros[tempBmu][actualIndex]['dmNorm']) + stormDetails[4])
-        # tempSs = ((normalizedHydros[tempBmu][actualIndex]['ssNorm']) + stormDetails[5])
-        if len(normalizedHydros[tempBmu][actualIndex]['hsNorm']) < len(normalizedHydros[tempBmu][actualIndex]['timeNorm']):
-            print('Time is shorter than Hs in bmu {}, index {}'.format(tempBmu,actualIndex))
-        if stormDetails[1] < 0:
-            print('woah, we''re less than 0 over here')
-            asdfg
+        elif tempBmu == 83 or tempBmu == 84 or tempBmu == 125 or tempBmu == 142 or tempBmu == 158:
+            tempHs = np.array([1.5,1.5,1.5,1.5])
+            tempTp = np.array([8,8,8,8])
+            tempDm = np.array([0,0,0,0])
+            simTime.append(np.array([0.25,0.25,0.25,0.25])*durSim)
+
+        # elif tempBmu == 188 or tempBmu == 189 or tempBmu == 191:
+        #     tempHs = np.array([1.5,1.5,1.5])
+        #     tempTp = np.array([8,8,8])
+        #     tempDm = np.array([0,0,0])
+        #     simTime.append(np.array([0,0.5,0.99999]))
+        else:
+            tempHs = ((normalizedHydros[tempBmu][actualIndex]['hsNorm']) * (stormDetails[0]-stormDetails[1]) + stormDetails[1])#.filled()
+            tempTp = ((normalizedHydros[tempBmu][actualIndex]['tpNorm']) * (stormDetails[2]-stormDetails[3]) + stormDetails[3])#.filled()
+            tempDm = ((normalizedHydros[tempBmu][actualIndex]['dmNorm']) + stormDetails[4])
+            # tempSs = ((normalizedHydros[tempBmu][actualIndex]['ssNorm']) + stormDetails[5])
+            if len(normalizedHydros[tempBmu][actualIndex]['hsNorm']) < len(normalizedHydros[tempBmu][actualIndex]['timeNorm']):
+                print('Time is shorter than Hs in bmu {}, index {}'.format(tempBmu,actualIndex))
+            if stormDetails[1] < 0:
+                print('woah, we''re less than 0 over here')
+                asdfg
         # if len(tempSs) < len(normalizedHydros[tempBmu][actualIndex]['timeNorm']):
         #     print('Ss is shorter than Time in bmu {}, index {}'.format(tempBmu,actualIndex))
         #     tempLength = len(normalizedHydros[tempBmu][actualIndex]['timeNorm'])
@@ -329,6 +366,7 @@ for simNum in range(100):
         #     print('Now Ss is longer than Time in bmu {}, index {}'.format(tempBmu,actualIndex))
         #     print('{} vs. {}'.format(len(tempSs),len(normalizedHydros[tempBmu][actualIndex]['timeNorm'])))
         #     tempSs = tempSs[0:-1]
+            simTime.append(np.hstack((np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim), np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim)[-1])))
 
         if simIceGroupsChopped[simNum][i][0] > 0:
             simHs.append(tempHs)
@@ -342,7 +380,7 @@ for simNum in range(100):
             # simSs.append(tempSs)
         #simTime.append(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim)
         #dt = np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim)
-        simTime.append(np.hstack((np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim), np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim)[-1])))
+        # simTime.append(np.hstack((np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim), np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim)[-1])))
 
 
     #

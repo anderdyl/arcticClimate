@@ -130,9 +130,17 @@ bmusIce = historicalICEs['bmus_corrected'][31:]
 timeIce = historicalICEs['dayTime'][31:]
 timeArrayIce = np.array(timeIce)#
 
+bmus_dates_months = np.array([d.month for d in timeArrayIce])
 
 
-with open(r"dwts49ClustersArctic2y2022.pickle", "rb") as input_file:
+
+
+
+
+
+# with open(r"dwts49ClustersArctic2y2022.pickle", "rb") as input_file:
+with open(r"dwts36ClustersArcticRGy2022.pickle", "rb") as input_file:
+# with open(r"dwts64ClustersArcticRGy2022.pickle", "rb") as input_file:
    historicalDWTs = pickle.load(input_file)
 
 
@@ -141,57 +149,79 @@ SLPtime = historicalDWTs['SLPtime']
 slpDates = dateDay2datetime(SLPtime)
 timeArrayDWTs = np.array(slpDates)
 
+numDWTs=36
 
 
 
 # kma_order = sort_cluster_gen_corr_end(kma.cluster_centers_, num_clusters)
 # newOrderIce = np.array([0,0,0,1,1,1,0,1,0,1,0,1,0,1,2,1,2,2,2,2,2,2,2,2,2])
-newOrderIce = np.array([0,0,0,1,1,1,0,1,0,0,0,1,0,1,1,0,1,1,1,1,1,1,1,1,1])
-
+# newOrderIce = np.array([0,0,0,1,1,1,0,1,0,0,0,1,0,1,1,0,1,1,1,1,1,1,1,1,1])
+# newOrderIce = np.array([0,0,0,1,1,
+#                         2,0,1,0,1,
+#                         1,2,0,1,3,
+#                         1,3,2,2,2,
+#                         3,3,3,3,3])
+# newOrderIce = np.array([0,0,0,0,0,
+#                         0,0,0,0,0,
+#                         0,0,0,1,1,
+#                         0,1,1,1,1,
+#                         1,1,1,1,1])
+# newOrderIce = np.array([0,0,0,1,1,
+#                         1,0,1,0,0,
+#                         0,1,0,1,2,
+#                         1,2,2,2,2,
+#                         2,2,2,2,2])
+newOrderIce = np.array([0,0,0,1,1,
+                        2,0,1,0,1,
+                        1,2,0,2,3,
+                        1,2,2,2,2,
+                        3,3,3,3,3])
 bmus_corrected = np.zeros((len(bmusIce),), ) * np.nan
-for i in range(2):
+for i in range(4):
     posc = np.where(newOrderIce == i)
     for hh in range(len(posc[0])):
         posc2 = np.where(bmusIce == posc[0][hh])
         bmus_corrected[posc2] = i
 
+monthsICE = []
+for hhh in np.unique(bmusIce):
+    posc = np.where(bmusIce == hhh)
+    monthsICE.append(bmus_dates_months[posc])
+
+#
+# numDWTs=64
+# waveHieghtsDWT = []
+# for hh in range(numDWTs):
+#     dwtInd = np.where((bmusDWTs==hh))
+#     waveBin = []
+#     for qq in range(len(dwtInd[0])):
+#         dayInd = np.where((tWave >= dt.datetime(timeArrayDWTs[dwtInd[0][qq]].year, timeArrayDWTs[dwtInd[0][qq]].month,timeArrayDWTs[dwtInd[0][qq]].day,0,0,0)) &
+#                           (tWave <= dt.datetime(timeArrayDWTs[dwtInd[0][qq]].year, timeArrayDWTs[dwtInd[0][qq]].month,
+#                                                timeArrayDWTs[dwtInd[0][qq]].day,23,0,0)))
+#         waveBin.append(hsCombined[dayInd[0]])
+#     waveHieghtsDWT.append(np.concatenate(waveBin,axis=0))
+#
+#
+#
+# numDWTs=25
+# waveHieghts= []
+# for hh in range(numDWTs):
+#     dwtInd = np.where((bmusIce==hh))
+#     waveBin = []
+#     for qq in range(len(dwtInd[0])):
+#         dayInd = np.where((tWave >= dt.datetime(timeIce[dwtInd[0][qq]].year, timeIce[dwtInd[0][qq]].month,timeIce[dwtInd[0][qq]].day,0,0,0)) &
+#                           (tWave <= dt.datetime(timeArrayIce[dwtInd[0][qq]].year, timeArrayIce[dwtInd[0][qq]].month,
+#                                                timeArrayIce[dwtInd[0][qq]].day,23,0,0)))
+#         waveBin.append(hsCombined[dayInd[0]])
+#     waveHieghts.append(np.concatenate(waveBin,axis=0))
+#
 
 
 
-numDWTs=49
-waveHieghtsDWT = []
-for hh in range(numDWTs):
-    dwtInd = np.where((bmusDWTs==hh))
-    waveBin = []
-    for qq in range(len(dwtInd[0])):
-        dayInd = np.where((tWave >= dt.datetime(timeArrayDWTs[dwtInd[0][qq]].year, timeArrayDWTs[dwtInd[0][qq]].month,timeArrayDWTs[dwtInd[0][qq]].day,0,0,0)) &
-                          (tWave <= dt.datetime(timeArrayDWTs[dwtInd[0][qq]].year, timeArrayDWTs[dwtInd[0][qq]].month,
-                                               timeArrayDWTs[dwtInd[0][qq]].day,23,0,0)))
-        waveBin.append(hsCombined[dayInd[0]])
-    waveHieghtsDWT.append(np.concatenate(waveBin,axis=0))
-
-
-
-numDWTs=25
-waveHieghts= []
-for hh in range(numDWTs):
-    dwtInd = np.where((bmusIce==hh))
-    waveBin = []
-    for qq in range(len(dwtInd[0])):
-        dayInd = np.where((tWave >= dt.datetime(timeIce[dwtInd[0][qq]].year, timeIce[dwtInd[0][qq]].month,timeIce[dwtInd[0][qq]].day,0,0,0)) &
-                          (tWave <= dt.datetime(timeArrayIce[dwtInd[0][qq]].year, timeArrayIce[dwtInd[0][qq]].month,
-                                               timeArrayIce[dwtInd[0][qq]].day,23,0,0)))
-        waveBin.append(hsCombined[dayInd[0]])
-    waveHieghts.append(np.concatenate(waveBin,axis=0))
-
-
-
-
-numDWTs=49
 waveHieghtsDWT = []
 for hh in range(numDWTs):
     waveHieghtsIce = []
-    for yy in range(2):
+    for yy in range(4):
 
         dwtInd = np.where((bmusDWTs==hh) & (bmus_corrected==yy))
         waveBin = []
@@ -213,7 +243,7 @@ for hh in range(numDWTs):
 
 
 
-dwtcolors = cm.rainbow(np.linspace(0, 1, 49))
+dwtcolors = cm.rainbow(np.linspace(0, 1, numDWTs))
 #plt.style.use('dark_background')
 
 # plt.style.use('dark_background')
@@ -221,13 +251,13 @@ plt.style.use('default')
 
 dist_space = np.linspace(0, 5, 100)
 fig = plt.figure(figsize=(10,10))
-gs2 = gridspec.GridSpec(7, 7)
+gs2 = gridspec.GridSpec(int(np.sqrt(numDWTs)), int(np.sqrt(numDWTs)))
 
-colorparam = np.zeros((49,))
+colorparam = np.zeros((numDWTs,))
 counter = 0
 plotIndx = 0
 plotIndy = 0
-for xx in range(49):
+for xx in range(numDWTs):
     dwtInd = xx
     #dwtInd = order[xx]
     #dwtInd = newOrder[xx]
@@ -273,10 +303,10 @@ for xx in range(49):
     if len(data) > 1:
         kde = gaussian_kde(data)
         colorparam[counter] = np.nanmean(data)
-        colormap2 = cm.Oranges
+        colormap2 = cm.Reds
         color = colormap2(normalize(colorparam[counter]))
         # ax.plot(dist_space, kde(dist_space), linewidth=1, color=color)
-        ax.plot(dist_space, kde(dist_space), linewidth=1, color='g')
+        ax.plot(dist_space, kde(dist_space), linewidth=1, color='r')
 
         ax.spines['bottom'].set_color([0.5, 0.5, 0.5])
         ax.spines['top'].set_color([0.5, 0.5, 0.5])
@@ -291,6 +321,52 @@ for xx in range(49):
         ax.spines['left'].set_color([0.3, 0.3, 0.3])
 
 
+
+    data2 = waveHieghtsDWT[xx][2]
+    data = data2[~np.isnan(data2)]
+
+    if len(data) > 1:
+        kde = gaussian_kde(data)
+        colorparam[counter] = np.nanmean(data)
+        colormap2 = cm.Reds
+        color = colormap2(normalize(colorparam[counter]))
+        # ax.plot(dist_space, kde(dist_space), linewidth=1, color=color)
+        ax.plot(dist_space, kde(dist_space), linewidth=1, color='orange')
+
+        ax.spines['bottom'].set_color([0.5, 0.5, 0.5])
+        ax.spines['top'].set_color([0.5, 0.5, 0.5])
+        ax.spines['right'].set_color([0.5, 0.5, 0.5])
+        ax.spines['left'].set_color([0.5, 0.5, 0.5])
+        # ax.text(1.8, 1, np.round(colorparam*100)/100, fontweight='bold')
+
+    else:
+        ax.spines['bottom'].set_color([0.3, 0.3, 0.3])
+        ax.spines['top'].set_color([0.3, 0.3, 0.3])
+        ax.spines['right'].set_color([0.3, 0.3, 0.3])
+        ax.spines['left'].set_color([0.3, 0.3, 0.3])
+
+    data2 = waveHieghtsDWT[xx][3]
+    data = data2[~np.isnan(data2)]
+
+    if len(data) > 1:
+        kde = gaussian_kde(data)
+        colorparam[counter] = np.nanmean(data)
+        colormap2 = cm.Reds
+        color = colormap2(normalize(colorparam[counter]))
+        # ax.plot(dist_space, kde(dist_space), linewidth=1, color=color)
+        ax.plot(dist_space, kde(dist_space), linewidth=1, color='k')
+
+        ax.spines['bottom'].set_color([0.5, 0.5, 0.5])
+        ax.spines['top'].set_color([0.5, 0.5, 0.5])
+        ax.spines['right'].set_color([0.5, 0.5, 0.5])
+        ax.spines['left'].set_color([0.5, 0.5, 0.5])
+        # ax.text(1.8, 1, np.round(colorparam*100)/100, fontweight='bold')
+
+    else:
+        ax.spines['bottom'].set_color([0.3, 0.3, 0.3])
+        ax.spines['top'].set_color([0.3, 0.3, 0.3])
+        ax.spines['right'].set_color([0.3, 0.3, 0.3])
+        ax.spines['left'].set_color([0.3, 0.3, 0.3])
 
     # data2 = waveHieghtsDWT[xx][2]
     # data = data2[~np.isnan(data2)]
@@ -316,10 +392,10 @@ for xx in range(49):
 
 
 
-    if plotIndx < 7:
+    if plotIndx < 6:
 
         ax.yaxis.set_ticklabels([])
-    if plotIndx < 6:
+    if plotIndx < 5:
         ax.xaxis.set_ticklabels([])
         ax.xaxis.set_ticks([])
     else:
@@ -337,7 +413,7 @@ for xx in range(49):
 
     # ax.set_title('{} / {} / {}'.format(len(data), len(data3),len(dataNan)))
     counter = counter + 1
-    if plotIndy < 6:
+    if plotIndy < 7:
         plotIndy = plotIndy + 1
     else:
         plotIndy = 0

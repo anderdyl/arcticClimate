@@ -145,9 +145,13 @@ def dateDay2datetime(d_vec):
 
 # with open(r"dwtsAll6TCTracksClusters.pickle", "rb") as input_file:
 # with open(r"dwts25ClustersArctic2.pickle", "rb") as input_file:
+# with open(r"dwts49ClustersArctic2y2022.pickle", "rb") as input_file:
+# with open(r"dwts64ClustersArcticRGy2022.pickle", "rb") as input_file:
 with open(r"dwts49ClustersArcticRGy2022.pickle", "rb") as input_file:
+# with open(r"dwts81ClustersArcticRGy2022.pickle", "rb") as input_file:
     historicalDWTs = pickle.load(input_file)
 
+numClusters = 49
 timeDWTs = historicalDWTs['SLPtime']
 # outputDWTs['slpDates'] = slpDates
 bmus = historicalDWTs['bmus_corrected']
@@ -171,11 +175,17 @@ timeArrayIce = np.array(timeIce)#
 
 # kma_order = sort_cluster_gen_corr_end(kma.cluster_centers_, num_clusters)
 # newOrderIce = np.array([0,0,0,1,1,1,0,1,0,1,0,1,0,1,2,1,2,2,2,2,2,2,2,2,2])
-newOrderIce = np.array([0,0,0,0,0,
+# newOrderIce = np.array([0,0,0,1,1,1,0,1,0,0,0,1,0,1,1,0,1,1,1,1,1,1,1,1,1])
+newOrderIce = np.array([0,0,0,1,0,
                         0,0,0,0,0,
-                        0,0,0,1,1,
+                        0,0,0,0,1,
                         0,1,1,1,1,
                         1,1,1,1,1])
+# newOrderIce = np.array([0,0,0,1,1,
+#                         1,0,1,0,0,
+#                         0,1,0,1,2,
+#                         1,2,2,2,2,
+#                         2,2,2,2,2])
 
 bmus_corrected = np.zeros((len(bmusIce),), ) * np.nan
 for i in range(2):
@@ -187,28 +197,28 @@ for i in range(2):
 
 
 newBmus = np.zeros((len(bmusIce),), ) * np.nan
-for i in range(49):
+for i in range(numClusters):
     for yy in range(2):
 
         posc = np.where((bmus == i) & (bmus_corrected==yy))
-
-        monthSubset = bmus_dates_months[posc]
-        daySubset = bmus_dates_days[posc]
-
-        early = np.where((monthSubset < 8))# & (daySubset < 15))
-        later = np.where((monthSubset >= 8))# & (daySubset > 14))
-
         if yy == 1:
-            newBmus[posc[0][early[0]]]= 49+49+i
-            newBmus[posc[0][later[0]]] = 49+49+49+i
-
+            newBmus[posc] = numClusters+i# (i+1)*(yy+1)
+        # elif yy == 2:
+        #     newBmus[posc] = numClusters+numClusters+i
         else:
-            newBmus[posc[0][early[0]]] = i
-            newBmus[posc[0][later[0]]]= i+49
+            newBmus[posc] = i
 
 
 # asdfg
+with open(r"fetchLengthAttempt2.pickle", "rb") as input_file:
+   fetchPickle = pickle.load(input_file)
+fetch = fetchPickle['fetch']
+fetchFiltered = fetchPickle['fetchFiltered']
+slpWaves = fetchPickle['slpWaves']
+dayTime = fetchPickle['dayTime']
 
+badFetch = np.where(np.isnan(fetchFiltered))
+fetchFiltered[badFetch] = 0
 
 waveData = mat73.loadmat('era5_waves_pthope.mat')
 # wlData = mat73.loadmat('pthope_tides_for_dylan.mat')
@@ -250,6 +260,7 @@ dmCombined = dm_all#waveData['mwd_all']
 
 
 waveNorm = dmCombined
+
 
 
 def hourlyVec2datetime(d_vec):
@@ -323,12 +334,16 @@ groupLength = np.asarray([len(i) for i in grouped])
 bmuGroup = np.asarray([bmus[i[0]] for i in grouped])
 timeGroup = [np.asarray(midnightTime)[i] for i in grouped]
 
+# fetchGroup = np.asarray([fetchFiltered[i[0]] for i in grouped])
+
 startTimes = [i[0] for i in timeGroup]
 endTimes = [i[-1] for i in timeGroup]
 
 hydrosInds = np.unique(bmuGroup)
 
-bmusRange = np.arange(0,(49*4))
+
+
+bmusRange = np.arange(0,(numClusters*2))
 hydros = list()
 c = 0
 for p in bmusRange:#range(len(np.unique(bmuGroup))):
@@ -341,13 +356,17 @@ for p in bmusRange:#range(len(np.unique(bmuGroup))):
         tempList = list()
     else:
 
-        print('should have {} hydros in it'.format(len(index)))
+        print('should have at least {} days in it'.format(len(index)))
         subLength = groupLength[index]
         m = np.ceil(np.sqrt(len(index)))
         tempList = list()
+
+
         for i in range(len(index)):
             st = startTimes[index[i]]
             et = endTimes[index[i]] + timedelta(days=1)
+
+            # tempFetch = fetchGroup[index[i]]#np.array([fetchFiltered[index[i]]])
 
             if et > datetime(2022,5,31):
                 print('done up to 2022/5/31')
@@ -355,26 +374,36 @@ for p in bmusRange:#range(len(np.unique(bmuGroup))):
                 waveInd = np.where((tWave < et) & (tWave >= st))
                 # waterInd = np.where((tWl < et) & (tWl >= st))
                 if len(waveInd[0]) > 0:
+                    newTime = startTimes[index[i]]
 
-                    if subLength[i] > 2:
-                        randLength = random.randint(1,2)
-                        etNew = startTimes[index[i]] + timedelta(days=randLength)
-                        waveInd = np.where((tWave < etNew) & (tWave >= st))
+                    tempHydroLength = subLength[i]
+                    counter = 0
+                    while tempHydroLength > 1:
+                        #randLength = random.randint(1,2)
+                        etNew = newTime + timedelta(days=1)
+                        waveInd = np.where((tWave < etNew) & (tWave >= newTime))
+                        fetchInd = np.where((np.asarray(dayTime) == st))
+
                         # waterInd = np.where((tWl < etNew) & (tWl >= st))
                         deltaDays = et-etNew
                         #print('After first cut off = {}'.format(deltaDays.days))
                         c = c + 1
+                        counter = counter + 1
+                        if counter > 15:
+                            print('we have split 15 times')
+
                         tempDict = dict()
                         tempDict['time'] = tWave[waveInd[0]]
                         tempDict['numDays'] = subLength[i]
                         tempDict['hs'] = hsCombined[waveInd[0]]
                         tempDict['tp'] = tpCombined[waveInd[0]]
                         tempDict['dm'] = waveNorm[waveInd[0]]
+                        tempDict['fetch'] = fetchFiltered[fetchInd[0][0]]#tempFetch[0]
                         # tempDict['res'] = res[waterInd[0]]
                         # tempDict['wl'] = wlHycom[waterInd[0]]
                         tempDict['cop'] = np.asarray([np.nanmin(hsCombined[waveInd[0]]), np.nanmax(hsCombined[waveInd[0]]),
                                                       np.nanmin(tpCombined[waveInd[0]]), np.nanmax(tpCombined[waveInd[0]]),
-                                                      np.nanmean(waveNorm[waveInd[0]])])#, np.nanmean(res[waterInd[0]])])
+                                                      np.nanmean(waveNorm[waveInd[0]]),fetchFiltered[fetchInd[0][0]]])#, np.nanmean(res[waterInd[0]])])
                         tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
                         tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
                         tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
@@ -382,458 +411,11 @@ for p in bmusRange:#range(len(np.unique(bmuGroup))):
                         tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
                         # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
                         tempList.append(tempDict)
-                        if deltaDays.days > 2:
-                            randLength = random.randint(1, 2)
-                            etNew2 = etNew + timedelta(days=randLength)
-                            waveInd = np.where((tWave < etNew2) & (tWave >= etNew))
-                            # waterInd = np.where((tWl < etNew2) & (tWl >= etNew))
-                            deltaDays2 = et - etNew2
-                            #print('After second cut off = {}'.format(deltaDays2.days))
-                            c = c + 1
-                            tempDict = dict()
-                            tempDict['time'] = tWave[waveInd[0]]
-                            tempDict['numDays'] = subLength[i]
-                            tempDict['hs'] = hsCombined[waveInd[0]]
-                            tempDict['tp'] = tpCombined[waveInd[0]]
-                            tempDict['dm'] = waveNorm[waveInd[0]]
-                            # tempDict['res'] = res[waterInd[0]]
-                            # tempDict['wl'] = wlHycom[waterInd[0]]
-                            tempDict['cop'] = np.asarray(
-                                [np.nanmin(hsCombined[waveInd[0]]), np.nanmax(hsCombined[waveInd[0]]),
-                                 np.nanmin(tpCombined[waveInd[0]]), np.nanmax(tpCombined[waveInd[0]]),
-                                 np.nanmean(waveNorm[waveInd[0]])])#, np.nanmean(res[waterInd[0]])])
-                            tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                            tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                            tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                            tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                            tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                            # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                            tempList.append(tempDict)
-                            if deltaDays2.days > 2:
-                                randLength = random.randint(1, 2)
-                                etNew3 = etNew2 + timedelta(days=randLength)
-                                waveInd = np.where((tWave < etNew3) & (tWave >= etNew2))
-                                # waterInd = np.where((tWl < etNew3) & (tWl >= etNew2))
-                                deltaDays3 = et - etNew3
-                                #print('After third cut off = {}'.format(deltaDays3.days))
-                                c = c + 1
-                                tempDict = dict()
-                                tempDict['time'] = tWave[waveInd[0]]
-                                tempDict['numDays'] = subLength[i]
-                                tempDict['hs'] = hsCombined[waveInd[0]]
-                                tempDict['tp'] = tpCombined[waveInd[0]]
-                                tempDict['dm'] = waveNorm[waveInd[0]]
-                                # tempDict['res'] = res[waterInd[0]]
-                                # tempDict['wl'] = wlHycom[waterInd[0]]
-                                tempDict['cop'] = np.asarray(
-                                    [np.nanmin(hsCombined[waveInd[0]]), np.nanmax(hsCombined[waveInd[0]]),
-                                     np.nanmin(tpCombined[waveInd[0]]), np.nanmax(tpCombined[waveInd[0]]),
-                                     np.nanmean(waveNorm[waveInd[0]])])#, np.nanmean(res[waterInd[0]])])
-                                tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                tempList.append(tempDict)
-                                if deltaDays3.days > 2:
-                                    randLength = random.randint(1, 2)
-                                    etNew4 = etNew3 + timedelta(days=randLength)
-                                    waveInd = np.where((tWave < etNew4) & (tWave >= etNew3))
-                                    # waterInd = np.where((tWl < etNew4) & (tWl >= etNew3))
-                                    deltaDays4 = et - etNew4
-                                    #print('After fourth cut off = {}'.format(deltaDays4.days))
-                                    c = c + 1
-                                    tempDict = dict()
-                                    tempDict['time'] = tWave[waveInd[0]]
-                                    tempDict['numDays'] = subLength[i]
-                                    tempDict['hs'] = hsCombined[waveInd[0]]
-                                    tempDict['tp'] = tpCombined[waveInd[0]]
-                                    tempDict['dm'] = waveNorm[waveInd[0]]
-                                    # tempDict['res'] = res[waterInd[0]]
-                                    # tempDict['wl'] = wlHycom[waterInd[0]]
-                                    tempDict['cop'] = np.asarray(
-                                        [np.nanmin(hsCombined[waveInd[0]]), np.nanmax(hsCombined[waveInd[0]]),
-                                         np.nanmin(tpCombined[waveInd[0]]), np.nanmax(tpCombined[waveInd[0]]),
-                                         np.nanmean(waveNorm[waveInd[0]])])#, np.nanmean(res[waterInd[0]])])
-                                    tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                    tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                    tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                    tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                    tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                    # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                    tempList.append(tempDict)
-                                    if deltaDays4.days > 2:
-                                        randLength = random.randint(1, 2)
-                                        etNew5 = etNew4 + timedelta(days=randLength)
-                                        waveInd = np.where((tWave < etNew5) & (tWave >= etNew4))
-                                        # waterInd = np.where((tWl < etNew5) & (tWl >= etNew4))
-                                        deltaDays5 = et - etNew5
-                                        print('After fifth cut off = {}'.format(deltaDays5.days))
-                                        c = c + 1
-                                        tempDict = dict()
-                                        tempDict['time'] = tWave[waveInd[0]]
-                                        tempDict['numDays'] = subLength[i]
-                                        tempDict['hs'] = hsCombined[waveInd[0]]
-                                        tempDict['tp'] = tpCombined[waveInd[0]]
-                                        tempDict['dm'] = waveNorm[waveInd[0]]
-                                        # tempDict['res'] = res[waterInd[0]]
-                                        # tempDict['wl'] = wlHycom[waterInd[0]]
-                                        tempDict['cop'] = np.asarray(
-                                            [np.nanmin(hsCombined[waveInd[0]]), np.nanmax(hsCombined[waveInd[0]]),
-                                             np.nanmin(tpCombined[waveInd[0]]), np.nanmax(tpCombined[waveInd[0]]),
-                                             np.nanmean(waveNorm[waveInd[0]])])#, np.nanmean(res[waterInd[0]])])
-                                        tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                        tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                        tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                        tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                        tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                        # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                        tempList.append(tempDict)
-                                        if deltaDays5.days > 2:
-                                            randLength = random.randint(1, 2)
-                                            etNew6 = etNew5 + timedelta(days=randLength)
-                                            waveInd = np.where((tWave < etNew6) & (tWave >= etNew5))
-                                            # waterInd = np.where((tWl < etNew6) & (tWl >= etNew5))
-                                            deltaDays6 = et - etNew6
-                                            print('After sixth cut off = {}'.format(deltaDays6.days))
-                                            c = c + 1
-                                            tempDict = dict()
-                                            tempDict['time'] = tWave[waveInd[0]]
-                                            tempDict['numDays'] = subLength[i]
-                                            tempDict['hs'] = hsCombined[waveInd[0]]
-                                            tempDict['tp'] = tpCombined[waveInd[0]]
-                                            tempDict['dm'] = waveNorm[waveInd[0]]
-                                            # tempDict['res'] = res[waterInd[0]]
-                                            # tempDict['wl'] = wlHycom[waterInd[0]]
-                                            tempDict['cop'] = np.asarray(
-                                                [np.nanmin(hsCombined[waveInd[0]]), np.nanmax(hsCombined[waveInd[0]]),
-                                                 np.nanmin(tpCombined[waveInd[0]]), np.nanmax(tpCombined[waveInd[0]]),
-                                                 np.nanmean(waveNorm[waveInd[0]])])#, np.nanmean(res[waterInd[0]])])
-                                            tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                            tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                            tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                            tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                            tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                            # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                            tempList.append(tempDict)
-                                            if deltaDays6.days > 2:
-                                                randLength = random.randint(1, 2)
-                                                etNew7 = etNew6 + timedelta(days=randLength)
-                                                waveInd = np.where((tWave < etNew7) & (tWave >= etNew6))
-                                                # waterInd = np.where((tWl < etNew7) & (tWl >= etNew6))
-                                                deltaDays7 = et - etNew7
-                                                print('After seventh cut off = {}'.format(deltaDays7.days))
-                                                c = c + 1
-                                                tempDict = dict()
-                                                tempDict['time'] = tWave[waveInd[0]]
-                                                tempDict['numDays'] = subLength[i]
-                                                tempDict['hs'] = hsCombined[waveInd[0]]
-                                                tempDict['tp'] = tpCombined[waveInd[0]]
-                                                tempDict['dm'] = waveNorm[waveInd[0]]
-                                                # tempDict['res'] = res[waterInd[0]]
-                                                # tempDict['wl'] = wlHycom[waterInd[0]]
-                                                tempDict['cop'] = np.asarray(
-                                                    [np.nanmin(hsCombined[waveInd[0]]), np.nanmax(hsCombined[waveInd[0]]),
-                                                     np.nanmin(tpCombined[waveInd[0]]), np.nanmax(tpCombined[waveInd[0]]),
-                                                     np.nanmean(waveNorm[waveInd[0]])])#, np.nanmean(res[waterInd[0]])])
-                                                tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                                tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                                tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                                tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                                tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                                # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                                tempList.append(tempDict)
-                                                if deltaDays7.days > 2:
-                                                    randLength = random.randint(1, 2)
-                                                    etNew8 = etNew7 + timedelta(days=randLength)
-                                                    waveInd = np.where((tWave < etNew8) & (tWave >= etNew7))
-                                                    # waterInd = np.where((tWl < etNew7) & (tWl >= etNew6))
-                                                    deltaDays8 = et - etNew8
-                                                    print('After eighth cut off = {}'.format(deltaDays8.days))
-                                                    c = c + 1
-                                                    tempDict = dict()
-                                                    tempDict['time'] = tWave[waveInd[0]]
-                                                    tempDict['numDays'] = subLength[i]
-                                                    tempDict['hs'] = hsCombined[waveInd[0]]
-                                                    tempDict['tp'] = tpCombined[waveInd[0]]
-                                                    tempDict['dm'] = waveNorm[waveInd[0]]
-                                                    # tempDict['res'] = res[waterInd[0]]
-                                                    # tempDict['wl'] = wlHycom[waterInd[0]]
-                                                    tempDict['cop'] = np.asarray(
-                                                        [np.nanmin(hsCombined[waveInd[0]]),
-                                                         np.nanmax(hsCombined[waveInd[0]]),
-                                                         np.nanmin(tpCombined[waveInd[0]]),
-                                                         np.nanmax(tpCombined[waveInd[0]]),
-                                                         np.nanmean(
-                                                             waveNorm[waveInd[0]])])  # , np.nanmean(res[waterInd[0]])])
-                                                    tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                                    tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                                    tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                                    tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                                    tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                                    # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                                    tempList.append(tempDict)
-                                                    if deltaDays8.days > 2:
-                                                        randLength = random.randint(1, 2)
-                                                        etNew9 = etNew8 + timedelta(days=randLength)
-                                                        waveInd = np.where((tWave < etNew9) & (tWave >= etNew8))
-                                                        # waterInd = np.where((tWl < etNew7) & (tWl >= etNew6))
-                                                        deltaDays9 = et - etNew9
-                                                        print('After ninth cut off = {}'.format(deltaDays9.days))
-                                                        c = c + 1
-                                                        tempDict = dict()
-                                                        tempDict['time'] = tWave[waveInd[0]]
-                                                        tempDict['numDays'] = subLength[i]
-                                                        tempDict['hs'] = hsCombined[waveInd[0]]
-                                                        tempDict['tp'] = tpCombined[waveInd[0]]
-                                                        tempDict['dm'] = waveNorm[waveInd[0]]
-                                                        # tempDict['res'] = res[waterInd[0]]
-                                                        # tempDict['wl'] = wlHycom[waterInd[0]]
-                                                        tempDict['cop'] = np.asarray(
-                                                            [np.nanmin(hsCombined[waveInd[0]]),
-                                                             np.nanmax(hsCombined[waveInd[0]]),
-                                                             np.nanmin(tpCombined[waveInd[0]]),
-                                                             np.nanmax(tpCombined[waveInd[0]]),
-                                                             np.nanmean(
-                                                                 waveNorm[waveInd[0]])])  # , np.nanmean(res[waterInd[0]])])
-                                                        tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                                        tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                                        tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                                        tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                                        tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                                        # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                                        tempList.append(tempDict)
-                                                        if deltaDays9.days > 2:
-                                                            print('jesus need another')
-                                                        else:
-                                                            waveInd = np.where((tWave < et) & (tWave >= etNew9))
-                                                            # waterInd = np.where((tWl < et) & (tWl >= etNew7))
-                                                            c = c + 1
-                                                            tempDict = dict()
-                                                            tempDict['time'] = tWave[waveInd[0]]
-                                                            tempDict['numDays'] = subLength[i]
-                                                            tempDict['hs'] = hsCombined[waveInd[0]]
-                                                            tempDict['tp'] = tpCombined[waveInd[0]]
-                                                            tempDict['dm'] = waveNorm[waveInd[0]]
-                                                            # tempDict['res'] = res[waterInd[0]]
-                                                            # tempDict['wl'] = wlHycom[waterInd[0]]
-                                                            tempDict['cop'] = np.asarray([np.nanmin(hsCombined[waveInd[0]]),
-                                                                                          np.nanmax(hsCombined[waveInd[0]]),
-                                                                                          np.nanmin(tpCombined[waveInd[0]]),
-                                                                                          np.nanmax(tpCombined[waveInd[0]]),
-                                                                                          np.nanmean(
-                                                                                              waveNorm[waveInd[0]])])  # ,
-                                                            # np.nanmean(res[waterInd[0]])])
-                                                            tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                                            tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                                            tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                                            tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                                            tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                                            # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                                            tempList.append(tempDict)
-
-                                                    else:
-                                                        waveInd = np.where((tWave < et) & (tWave >= etNew8))
-                                                        # waterInd = np.where((tWl < et) & (tWl >= etNew7))
-                                                        c = c + 1
-                                                        tempDict = dict()
-                                                        tempDict['time'] = tWave[waveInd[0]]
-                                                        tempDict['numDays'] = subLength[i]
-                                                        tempDict['hs'] = hsCombined[waveInd[0]]
-                                                        tempDict['tp'] = tpCombined[waveInd[0]]
-                                                        tempDict['dm'] = waveNorm[waveInd[0]]
-                                                        # tempDict['res'] = res[waterInd[0]]
-                                                        # tempDict['wl'] = wlHycom[waterInd[0]]
-                                                        tempDict['cop'] = np.asarray([np.nanmin(hsCombined[waveInd[0]]),
-                                                                                      np.nanmax(hsCombined[waveInd[0]]),
-                                                                                      np.nanmin(tpCombined[waveInd[0]]),
-                                                                                      np.nanmax(tpCombined[waveInd[0]]),
-                                                                                      np.nanmean(
-                                                                                          waveNorm[waveInd[0]])])  # ,
-                                                        # np.nanmean(res[waterInd[0]])])
-                                                        tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                                        tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                                        tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                                        tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                                        tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                                        # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                                        tempList.append(tempDict)
-
-                                                else:
-                                                    waveInd = np.where((tWave < et) & (tWave >= etNew7))
-                                                    # waterInd = np.where((tWl < et) & (tWl >= etNew7))
-                                                    c = c + 1
-                                                    tempDict = dict()
-                                                    tempDict['time'] = tWave[waveInd[0]]
-                                                    tempDict['numDays'] = subLength[i]
-                                                    tempDict['hs'] = hsCombined[waveInd[0]]
-                                                    tempDict['tp'] = tpCombined[waveInd[0]]
-                                                    tempDict['dm'] = waveNorm[waveInd[0]]
-                                                    # tempDict['res'] = res[waterInd[0]]
-                                                    # tempDict['wl'] = wlHycom[waterInd[0]]
-                                                    tempDict['cop'] = np.asarray([np.nanmin(hsCombined[waveInd[0]]),
-                                                                                  np.nanmax(hsCombined[waveInd[0]]),
-                                                                                  np.nanmin(tpCombined[waveInd[0]]),
-                                                                                  np.nanmax(tpCombined[waveInd[0]]),
-                                                                                  np.nanmean(waveNorm[waveInd[0]])])#,
-                                                                                  #np.nanmean(res[waterInd[0]])])
-                                                    tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                                    tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                                    tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                                    tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                                    tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                                    # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                                    tempList.append(tempDict)
-
-
-
-                                            else:
-                                                waveInd = np.where((tWave < et) & (tWave >= etNew6))
-                                                # waterInd = np.where((tWl < et) & (tWl >= etNew6))
-                                                c = c + 1
-                                                tempDict = dict()
-                                                tempDict['time'] = tWave[waveInd[0]]
-                                                tempDict['numDays'] = subLength[i]
-                                                tempDict['hs'] = hsCombined[waveInd[0]]
-                                                tempDict['tp'] = tpCombined[waveInd[0]]
-                                                tempDict['dm'] = waveNorm[waveInd[0]]
-                                                # tempDict['res'] = res[waterInd[0]]
-                                                # tempDict['wl'] = wlHycom[waterInd[0]]
-                                                tempDict['cop'] = np.asarray(
-                                                    [np.nanmin(hsCombined[waveInd[0]]), np.nanmax(hsCombined[waveInd[0]]),
-                                                     np.nanmin(tpCombined[waveInd[0]]), np.nanmax(tpCombined[waveInd[0]]),
-                                                     np.nanmean(waveNorm[waveInd[0]])])#, np.nanmean(res[waterInd[0]])])
-                                                tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                                tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                                tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                                tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                                tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                                # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                                tempList.append(tempDict)
-
-
-                                        else:
-                                            waveInd = np.where((tWave < et) & (tWave >= etNew5))
-                                            # waterInd = np.where((tWl < et) & (tWl >= etNew5))
-                                            c = c + 1
-                                            tempDict = dict()
-                                            tempDict['time'] = tWave[waveInd[0]]
-                                            tempDict['numDays'] = subLength[i]
-                                            tempDict['hs'] = hsCombined[waveInd[0]]
-                                            tempDict['tp'] = tpCombined[waveInd[0]]
-                                            tempDict['dm'] = waveNorm[waveInd[0]]
-                                            # tempDict['res'] = res[waterInd[0]]
-                                            # tempDict['wl'] = wlHycom[waterInd[0]]
-                                            tempDict['cop'] = np.asarray(
-                                                [np.nanmin(hsCombined[waveInd[0]]), np.nanmax(hsCombined[waveInd[0]]),
-                                                 np.nanmin(tpCombined[waveInd[0]]), np.nanmax(tpCombined[waveInd[0]]),
-                                                 np.nanmean(waveNorm[waveInd[0]])])#, np.nanmean(res[waterInd[0]])])
-                                            tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                            tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                            tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                            tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                            tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                            # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                            tempList.append(tempDict)
-
-                                    else:
-                                        waveInd = np.where((tWave < et) & (tWave >= etNew4))
-                                        # waterInd = np.where((tWl < et) & (tWl >= etNew4))
-                                        c = c + 1
-                                        tempDict = dict()
-                                        tempDict['time'] = tWave[waveInd[0]]
-                                        tempDict['numDays'] = subLength[i]
-                                        tempDict['hs'] = hsCombined[waveInd[0]]
-                                        tempDict['tp'] = tpCombined[waveInd[0]]
-                                        tempDict['dm'] = waveNorm[waveInd[0]]
-                                        # tempDict['res'] = res[waterInd[0]]
-                                        # tempDict['wl'] = wlHycom[waterInd[0]]
-                                        tempDict['cop'] = np.asarray(
-                                            [np.nanmin(hsCombined[waveInd[0]]), np.nanmax(hsCombined[waveInd[0]]),
-                                             np.nanmin(tpCombined[waveInd[0]]), np.nanmax(tpCombined[waveInd[0]]),
-                                             np.nanmean(waveNorm[waveInd[0]])])#, np.nanmean(res[waterInd[0]])])
-                                        tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                        tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                        tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                        tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                        tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                        # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                        tempList.append(tempDict)
-
-
-                                else:
-                                    waveInd = np.where((tWave < et) & (tWave >= etNew3))
-                                    # waterInd = np.where((tWl < et) & (tWl >= etNew3))
-                                    c = c + 1
-                                    tempDict = dict()
-                                    tempDict['time'] = tWave[waveInd[0]]
-                                    tempDict['numDays'] = subLength[i]
-                                    tempDict['hs'] = hsCombined[waveInd[0]]
-                                    tempDict['tp'] = tpCombined[waveInd[0]]
-                                    tempDict['dm'] = waveNorm[waveInd[0]]
-                                    # tempDict['res'] = res[waterInd[0]]
-                                    # tempDict['wl'] = wlHycom[waterInd[0]]
-                                    tempDict['cop'] = np.asarray(
-                                        [np.nanmin(hsCombined[waveInd[0]]), np.nanmax(hsCombined[waveInd[0]]),
-                                         np.nanmin(tpCombined[waveInd[0]]), np.nanmax(tpCombined[waveInd[0]]),
-                                         np.nanmean(waveNorm[waveInd[0]])])#, np.nanmean(res[waterInd[0]])])
-                                    tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                    tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                    tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                    tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                    tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                    # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                    tempList.append(tempDict)
-                            else:
-                                waveInd = np.where((tWave < et) & (tWave >= etNew2))
-                                # waterInd = np.where((tWl < et) & (tWl >= etNew2))
-                                c = c + 1
-                                tempDict = dict()
-                                tempDict['time'] = tWave[waveInd[0]]
-                                tempDict['numDays'] = subLength[i]
-                                tempDict['hs'] = hsCombined[waveInd[0]]
-                                tempDict['tp'] = tpCombined[waveInd[0]]
-                                tempDict['dm'] = waveNorm[waveInd[0]]
-                                # tempDict['res'] = res[waterInd[0]]
-                                # tempDict['wl'] = wlHycom[waterInd[0]]
-                                tempDict['cop'] = np.asarray(
-                                    [np.nanmin(hsCombined[waveInd[0]]), np.nanmax(hsCombined[waveInd[0]]),
-                                     np.nanmin(tpCombined[waveInd[0]]), np.nanmax(tpCombined[waveInd[0]]),
-                                     np.nanmean(waveNorm[waveInd[0]])])#, np.nanmean(res[waterInd[0]])])
-                                tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                                tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                                tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                                tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                                tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                                # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                                tempList.append(tempDict)
-                        else:
-                            waveInd = np.where((tWave < et) & (tWave >= etNew))
-                            # waterInd = np.where((tWl < et) & (tWl >= etNew))
-                            c = c + 1
-                            tempDict = dict()
-                            tempDict['time'] = tWave[waveInd[0]]
-                            tempDict['numDays'] = subLength[i]
-                            tempDict['hs'] = hsCombined[waveInd[0]]
-                            tempDict['tp'] = tpCombined[waveInd[0]]
-                            tempDict['dm'] = waveNorm[waveInd[0]]
-                            # tempDict['res'] = res[waterInd[0]]
-                            # tempDict['wl'] = wlHycom[waterInd[0]]
-                            tempDict['cop'] = np.asarray(
-                                [np.nanmin(hsCombined[waveInd[0]]), np.nanmax(hsCombined[waveInd[0]]),
-                                 np.nanmin(tpCombined[waveInd[0]]), np.nanmax(tpCombined[waveInd[0]]),
-                                 np.nanmean(waveNorm[waveInd[0]])])#, np.nanmean(res[waterInd[0]])])
-                            tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
-                            tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
-                            tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
-                            tempDict['tpMax'] = np.nanmax(tpCombined[waveInd[0]])
-                            tempDict['dmMean'] = np.nanmean(waveNorm[waveInd[0]])
-                            # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
-                            tempList.append(tempDict)
+                        tempHydroLength = tempHydroLength-1
+                        newTime = etNew
                     else:
-                        # waveInd = np.where((tWave < et) & (tWave >= etNew))
-                        # waterInd = np.where((tWl < et) & (tWl >= etNew))
+                        waveInd = np.where((tWave < et) & (tWave >= newTime))
+                        # waterInd = np.where((tWl < et) & (tWl >= etNew7))
                         c = c + 1
                         tempDict = dict()
                         tempDict['time'] = tWave[waveInd[0]]
@@ -841,11 +423,18 @@ for p in bmusRange:#range(len(np.unique(bmuGroup))):
                         tempDict['hs'] = hsCombined[waveInd[0]]
                         tempDict['tp'] = tpCombined[waveInd[0]]
                         tempDict['dm'] = waveNorm[waveInd[0]]
+                        tempDict['fetch'] = fetchFiltered[fetchInd[0][0]]#tempFetch[0]
+
                         # tempDict['res'] = res[waterInd[0]]
                         # tempDict['wl'] = wlHycom[waterInd[0]]
-                        tempDict['cop'] = np.asarray([np.nanmin(hsCombined[waveInd[0]]),np.nanmax(hsCombined[waveInd[0]]),
-                                                     np.nanmin(tpCombined[waveInd[0]]),np.nanmax(tpCombined[waveInd[0]]),
-                                                     np.nanmean(waveNorm[waveInd[0]])])#,np.nanmean(res[waterInd[0]])])
+                        tempDict['cop'] = np.asarray(
+                            [np.nanmin(hsCombined[waveInd[0]]),
+                             np.nanmax(hsCombined[waveInd[0]]),
+                             np.nanmin(tpCombined[waveInd[0]]),
+                             np.nanmax(tpCombined[waveInd[0]]),
+                             np.nanmean(
+                                 waveNorm[waveInd[0]]),fetchFiltered[fetchInd[0][0]]])  # ,
+                        # np.nanmean(res[waterInd[0]])])
                         tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
                         tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
                         tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
@@ -854,6 +443,8 @@ for p in bmusRange:#range(len(np.unique(bmuGroup))):
                         # tempDict['ssMean'] = np.nanmean(res[waterInd[0]])
                         tempList.append(tempDict)
     hydros.append(tempList)
+
+
 
 
 myFmt = mdates.DateFormatter('%d')
@@ -935,7 +526,7 @@ for i in bmusRange:#(len(np.unique(bmuGroup))):
         # dataCop.append(list([tempHydros[kk]['hsMax'],tempHydros[kk]['hsMin'],tempHydros[kk]['tpMax'],
         #                      tempHydros[kk]['tpMin'],tempHydros[kk]['dmMean'],tempHydros[kk]['ssMean'],kk]))
         dataCop.append(list([tempHydros[kk]['hsMax'],tempHydros[kk]['hsMin'],tempHydros[kk]['tpMax'],
-                             tempHydros[kk]['tpMin'],tempHydros[kk]['dmMean'],len(tempHydros[kk]['time']),kk]))
+                             tempHydros[kk]['tpMin'],tempHydros[kk]['dmMean'],tempHydros[kk]['fetch'],len(tempHydros[kk]['time']),kk]))
         # dataCop.append(list([tempHydros[kk]['hsMax'],tempHydros[kk]['hsMin'],tempHydros[kk]['tpMax'],
         #                      tempHydros[kk]['tpMin'],tempHydros[kk]['dmMean'],tempHydros[kk]['ssMean'],kk]))
         # if np.isnan(tempHydros[kk]['ssMean']):
@@ -951,7 +542,7 @@ for i in bmusRange:#(len(np.unique(bmuGroup))):
 
         else:
             dataCop2.append(list([tempHydros[kk]['hsMax'], tempHydros[kk]['hsMin'], tempHydros[kk]['tpMax'],
-                                 tempHydros[kk]['tpMin'], tempHydros[kk]['dmMean'], len(tempHydros[kk]['time']), kk]))
+                                 tempHydros[kk]['tpMin'], tempHydros[kk]['dmMean'],tempHydros[kk]['fetch'], len(tempHydros[kk]['time']), kk]))
     copulaData.append(dataCop)
     copulaDataNoNaNs.append(dataCop2)
 
@@ -1104,7 +695,7 @@ for i in bmusRange: #range(len(np.unique(bmuGroup))):
 
 import pickle
 
-normHydrosPickle = 'normalizedWaveHydrographsHope4Dist.pickle'
+normHydrosPickle = 'normalizedWaveHydrographsHope2Dist49.pickle'
 outputHydrosNorm = {}
 outputHydrosNorm['normalizedHydros'] = normalizedHydros
 outputHydrosNorm['bmuDataMin'] = bmuDataMin
@@ -1116,13 +707,13 @@ with open(normHydrosPickle,'wb') as f:
     pickle.dump(outputHydrosNorm, f)
 
 
-hydrosPickle = 'waveHydrographsHope4Dist.pickle'
+hydrosPickle = 'waveHydrographsHope2Dist49.pickle'
 outputHydros = {}
 outputHydros['hydros'] = hydros
 with open(hydrosPickle,'wb') as f:
     pickle.dump(outputHydros, f)
 
-copPickle = 'hydrographCopulaDataHope4Dist.pickle'
+copPickle = 'hydrographCopulaDataHope2Dist49.pickle'
 outputCopula = {}
 outputCopula['copulaData'] = copulaData
 outputCopula['copulaDataNoNaNs'] = copulaDataNoNaNs
@@ -1130,7 +721,7 @@ with open(copPickle,'wb') as f:
     pickle.dump(outputCopula, f)
 
 
-historicalPickle = 'historicalDataHope4Dist.pickle'
+historicalPickle = 'historicalDataHope2Dist49.pickle'
 outputHistorical = {}
 outputHistorical['grouped'] = grouped
 outputHistorical['groupLength'] = groupLength
@@ -1139,6 +730,7 @@ outputHistorical['timeGroup'] = timeGroup
 
 with open(historicalPickle,'wb') as f:
     pickle.dump(outputHistorical, f)
+
 
 
 

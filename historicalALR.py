@@ -56,9 +56,13 @@ def dateDay2datetime(d_vec):
 
 
 import pickle
-with open(r"dwts49ClustersArctic2y2022.pickle", "rb") as input_file:
-   slpDWTs = pickle.load(input_file)
+# with open(r"dwts49ClustersArctic2y2022.pickle", "rb") as input_file:
+#    slpDWTs = pickle.load(input_file)
 
+# with open(r"dwts49ClustersArcticRGy2022.pickle", "rb") as input_file:
+
+with open(r"dwts81ClustersArcticRGy2022.pickle", "rb") as input_file:
+   slpDWTs = pickle.load(input_file)
 
 timeDWTs = slpDWTs['SLPtime']
 # monthDWTS = historicalDWTs['month']
@@ -382,7 +386,7 @@ xds_bmus_fit = xds_KMA_fit.sel(
 
 
 # Autoregressive logistic wrapper
-num_clusters = 49
+num_clusters = 81
 sim_num = 100
 fit_and_save = True # False for loading
 p_test_ALR = '/media/dylananderson/Elements/pointHope/testALR/'
@@ -434,7 +438,7 @@ dates_sim = dates_sim[0:-2]
 evbmus_sim = xds_ALR.evbmus_sims.values
 # evbmus_probcum = xds_ALR.evbmus_probcum.values
 
-p_mat_output = ('/media/dylananderson/Elements/pointHope/testALR/testWithAWTandATemp49_y{0}s{1}.h5'.format(
+p_mat_output = ('/media/dylananderson/Elements/pointHope/testALR/testWithAWTandATemp81RG_y{0}s{1}.h5'.format(
         sim_years, sim_num))
 import h5py
 with h5py.File(p_mat_output, 'w') as hf:
@@ -446,7 +450,7 @@ with h5py.File(p_mat_output, 'w') as hf:
         [d.day for d in dates_sim])).T
 
 
-samplesPickle = 'dwt49HistoricalSimulations100withTemp.pickle'
+samplesPickle = 'dwt81RGHistoricalSimulations100withTemp.pickle'
 outputSamples = {}
 outputSamples['evbmus_sim'] = evbmus_sim
 # outputSamples['evbmus_probcum'] = evbmus_probcum
