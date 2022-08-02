@@ -5,8 +5,18 @@ import matplotlib.pyplot as plt
 import datetime as dt
 from dateutil.relativedelta import relativedelta
 import cmocean
+import mat73
+import xarray as xr
+import pandas as pd
+from scipy.interpolate import griddata
+from scipy.interpolate import interp1d
 
+import sys
+import subprocess
 
+if 'darwin' in sys.platform:
+    print('Running \'caffeinate\' on MacOSX to prevent the system from sleeping')
+    subprocess.Popen('caffeinate')
 
 iceSubset = []
 year = []
@@ -18,7 +28,7 @@ grabYears = np.arange(1979,endYear)
 counter = 0
 for ff in range(len(grabYears)):
 
-    icedir = '/media/dylananderson/Elements/iceData/nsidc0051/daily/{}'.format(grabYears[ff])
+    icedir = '/users/dylananderson/Documents/data/ice/nsidc0051/daily/{}'.format(grabYears[ff])
     files = os.listdir(icedir)
     files.sort()
     files_path = [os.path.abspath(icedir) for x in os.listdir(icedir)]
@@ -127,8 +137,7 @@ dayOfYearSine = np.sin(2*np.pi/366*dayOfYear)
 dayOfYearCosine = np.cos(2*np.pi/366*dayOfYear)
 
 
-import mat73
-import datetime as dt
+
 # define some constants
 epoch = dt.datetime(1970, 1, 1)
 matlab_to_epoch_days = 719529  # days from 1-1-0000 to 1-1-1970
@@ -150,9 +159,8 @@ waveArrayTime = [matlab_to_datetime(t * 24 * 60 * 60) for t in waveData['time_al
 #
 # wlArrayTime = [matlab_to_datetime(t * 24 * 60 * 60) for t in wlData['time']]
 
-import xarray as xr
 
-ds2 = xr.open_dataset('/home/dylananderson/Downloads/era5wavesJanToMay2022.nc')
+ds2 = xr.open_dataset('era5wavesJanToMay2022.nc')
 df2 = ds2.to_dataframe()
 
 wh_all = np.hstack((waveData['wh_all'],np.nan*np.zeros(3624,)))
@@ -186,7 +194,7 @@ while st < end:
 # df = pd.DataFrame(data.T,columns=['time','wh_all','tp_all'])
 
 
-import pandas as pd
+
 # data = np.vstack((waveData['wh_all'],waveData['tp_all']))
 # df = pd.DataFrame(data=data.T,index=np.asarray(waveArrayTime),columns=['wh_all','tp_all'])
 data = np.vstack((wh_all,tp_all))
@@ -254,11 +262,11 @@ xSmall = x[65:175]#[55:140]
 ySmall = y[160:245]#[150:225]
 plt.plot(xSmall[9],ySmall[28],'ro')
 plt.plot((xSmall[9],xSmall[105]),(ySmall[28],ySmall[28]),'--',color='orange')
-xAngle1 = np.array([xSmall[9],xSmall[105]])
+xAngle1 = np.array([xSmall[9],xSmall[107]])
 yAngle1 = np.array([ySmall[28],ySmall[44]])
 plt.plot(xAngle1,yAngle1,'--',color='orange')
 
-xAngle1 = np.array([xSmall[9],xSmall[105]])
+xAngle1 = np.array([xSmall[9],xSmall[104]])
 yAngle1 = np.array([ySmall[28],ySmall[15]])
 plt.plot(xAngle1,yAngle1,'--',color='orange')
 
@@ -274,9 +282,28 @@ xAngle2 = np.array([xSmall[9],xSmall[94]])
 yAngle2 = np.array([ySmall[28],ySmall[82]])
 plt.plot(xAngle2,yAngle2,'--',color='orange')
 
+xAngle2 = np.array([xSmall[9],xSmall[97]])
+yAngle2 = np.array([ySmall[28],ySmall[76]])
+plt.plot(xAngle2,yAngle2,'--',color='red')
+
+xAngle2 = np.array([xSmall[9],xSmall[102]])
+yAngle2 = np.array([ySmall[28],ySmall[65]])
+plt.plot(xAngle2,yAngle2,'--',color='red')
+
+xAngle2 = np.array([xSmall[9],xSmall[107]])
+yAngle2 = np.array([ySmall[28],ySmall[51]])
+plt.plot(xAngle2,yAngle2,'--',color='red')
+
+xAngle2 = np.array([xSmall[9],xSmall[106]])
+yAngle2 = np.array([ySmall[28],ySmall[37]])
+plt.plot(xAngle2,yAngle2,'--',color='red')
+
+xAngle1 = np.array([xSmall[9],xSmall[105]])
+yAngle1 = np.array([ySmall[28],ySmall[22]])
+plt.plot(xAngle1,yAngle1,'--',color='red')
 
 #We need to define our 6 rays
-from scipy.interpolate import griddata
+
 xRay1 = np.linspace(xSmall[9],xSmall[105], 5000)
 yRay1 = np.linspace(ySmall[28],ySmall[44], 5000)
 
@@ -294,6 +321,22 @@ yRay5 = np.linspace(ySmall[28],ySmall[80], 5000)
 
 xRay6 = np.linspace(xSmall[9],xSmall[105], 5000)
 yRay6 = np.linspace(ySmall[28],ySmall[58], 5000)
+
+xRay7 = np.linspace(xSmall[9],xSmall[105], 5000)
+yRay7 = np.linspace(ySmall[28],ySmall[22], 5000)
+
+xRay8 = np.linspace(xSmall[9],xSmall[106], 5000)
+yRay8 = np.linspace(ySmall[28],ySmall[37], 5000)
+
+xRay9 = np.linspace(xSmall[9],xSmall[107], 5000)
+yRay9 = np.linspace(ySmall[28],ySmall[51], 5000)
+
+xRay10 = np.linspace(xSmall[9],xSmall[102], 5000)
+yRay10 = np.linspace(ySmall[28],ySmall[65], 5000)
+
+xRay11 = np.linspace(xSmall[9],xSmall[97], 5000)
+yRay11 = np.linspace(ySmall[28],ySmall[76], 5000)
+
 grid_x,grid_y = np.meshgrid(x[65:175], y[160:245])
 pointsA = np.array((grid_x.flatten(),grid_y.flatten())).T
 
@@ -309,7 +352,11 @@ dist3 = get_distance(xRay3,yRay3)
 dist4 = get_distance(xRay4,yRay4)
 dist5 = get_distance(xRay5,yRay5)
 dist6 = get_distance(xRay6,yRay6)
-from scipy.interpolate import interp1d
+dist7 = get_distance(xRay7,yRay7)
+dist8 = get_distance(xRay8,yRay8)
+dist9 = get_distance(xRay9,yRay9)
+dist10 = get_distance(xRay10,yRay10)
+dist11 = get_distance(xRay11,yRay11)
 
 #
 # redoRange = np.arange(13600,13950,1)
@@ -320,7 +367,14 @@ rayDict3 = []
 rayDict4 = []
 rayDict5 = []
 rayDict6 = []
+rayDict7 = []
+rayDict8 = []
+rayDict9 = []
+rayDict10 = []
+rayDict11 = []
+
 avgRayDict = []
+c = 0
 for hh in range(len(gapFilledIce)):
 
     if np.remainder(hh,365) == 0:
@@ -335,6 +389,12 @@ for hh in range(len(gapFilledIce)):
             rayDict4.append(np.array([np.nan]))
             rayDict5.append(np.array([np.nan]))
             rayDict6.append(np.array([np.nan]))
+            rayDict7.append(np.array([np.nan]))
+            rayDict8.append(np.array([np.nan]))
+            rayDict9.append(np.array([np.nan]))
+            rayDict10.append(np.array([np.nan]))
+            rayDict11.append(np.array([np.nan]))
+
             avgRayDict.append(np.array([np.nan]))
 
     else:
@@ -353,6 +413,12 @@ for hh in range(len(gapFilledIce)):
         ray4 = griddata(points=pointsA,values=valuesA, xi=(xRay4,yRay4), method="linear")
         ray5 = griddata(points=pointsA,values=valuesA, xi=(xRay5,yRay5), method="linear")
         ray6 = griddata(points=pointsA,values=valuesA, xi=(xRay6,yRay6), method="linear")
+        ray7 = griddata(points=pointsA,values=valuesA, xi=(xRay7,yRay7), method="linear")
+        ray8 = griddata(points=pointsA,values=valuesA, xi=(xRay8,yRay8), method="linear")
+        ray9 = griddata(points=pointsA,values=valuesA, xi=(xRay9,yRay9), method="linear")
+        ray10 = griddata(points=pointsA,values=valuesA, xi=(xRay10,yRay10), method="linear")
+        ray11 = griddata(points=pointsA,values=valuesA, xi=(xRay11,yRay11), method="linear")
+
         # We want to collapse this down to a single distance vector
         f1 = interp1d(dist1, ray1, kind = 'linear')
         f2 = interp1d(dist2, ray2, kind = 'linear')
@@ -360,6 +426,12 @@ for hh in range(len(gapFilledIce)):
         f4 = interp1d(dist4, ray4, kind = 'linear')
         f5 = interp1d(dist5, ray5, kind = 'linear')
         f6 = interp1d(dist6, ray6, kind = 'linear')
+        f7 = interp1d(dist7, ray7, kind = 'linear')
+        f8 = interp1d(dist8, ray8, kind = 'linear')
+        f9 = interp1d(dist9, ray9, kind = 'linear')
+        f10 = interp1d(dist10, ray10, kind = 'linear')
+        f11 = interp1d(dist11, ray11, kind = 'linear')
+
         xx = np.linspace(0, 2400000, 4000)
         rInterp1 = f1(xx)
         rInterp2 = f2(xx)
@@ -367,6 +439,11 @@ for hh in range(len(gapFilledIce)):
         rInterp4 = f4(xx)
         rInterp5 = f5(xx)
         rInterp6 = f6(xx)
+        rInterp7 = f7(xx)
+        rInterp8 = f8(xx)
+        rInterp9 = f9(xx)
+        rInterp10 = f10(xx)
+        rInterp11 = f11(xx)
 
         rayDict1.append(rInterp1)
         rayDict2.append(rInterp2)
@@ -374,12 +451,20 @@ for hh in range(len(gapFilledIce)):
         rayDict4.append(rInterp4)
         rayDict5.append(rInterp5)
         rayDict6.append(rInterp6)
+        rayDict7.append(rInterp7)
+        rayDict8.append(rInterp8)
+        rayDict9.append(rInterp9)
+        rayDict10.append(rInterp10)
+        rayDict11.append(rInterp11)
 
         rInterp4[2820:] = rInterp4[2820]*np.ones((len(rInterp4[2820:]),))
         rInterp5[2750:] = rInterp5[2750]*np.ones((len(rInterp5[2750:]),))
         rInterp6[3045:] = rInterp6[3045]*np.ones((len(rInterp6[3045:]),))
+        rInterp10[2750:] = rInterp10[2750]*np.ones((len(rInterp10[2750:]),))
+        rInterp11[2750:] = rInterp11[2750]*np.ones((len(rInterp11[2750:]),))
 
-        avgRay = np.mean((rInterp1,rInterp2,rInterp3,rInterp4,rInterp5,rInterp6),axis=0)
+        avgRay = np.mean((rInterp1,rInterp2,rInterp3,rInterp4,rInterp5,rInterp6,
+                          rInterp7,rInterp8,rInterp9,rInterp10,rInterp11),axis=0)
         avgRayDict.append(avgRay)
 
         # Now need to calculate the intersection
@@ -387,6 +472,17 @@ for hh in range(len(gapFilledIce)):
         f2 = interp1d(xx, y2, kind='linear')
         y2_interp = f2(xx)
         idx = np.argwhere(np.diff(np.sign(avgRay - y2_interp))).flatten()
+        if slpWaves['wh_all'][hh] > 0:
+            if not np.any(np.isreal(idx)):
+                print('so we have waves but no fetch {} times on {}'.format(c, dayTime[hh]))
+                print(xx[idx])
+                c = c + 1
+
+                y2 = 0.75 * np.ones((np.size(xx)))
+                f2 = interp1d(xx, y2, kind='linear')
+                y2_interp = f2(xx)
+                idx = np.argwhere(np.diff(np.sign(avgRay - y2_interp))).flatten()
+                print('tried at 0.75 and got a fetch of {}'.format(xx[idx]))
         fetch.append(xx[idx])
         # fetch[hh] = xx[idx]
 # plt.figure()
@@ -396,7 +492,7 @@ for hh in range(len(gapFilledIce)):
 # plt.plot(dist4,ray4)
 # plt.plot(dist5,ray5)
 # plt.plot(dist6,ray6)
-
+#
 # plt.figure()
 # plt.plot(xx,rInterp1)
 # plt.plot(xx,rInterp2)
@@ -404,6 +500,12 @@ for hh in range(len(gapFilledIce)):
 # plt.plot(xx,rInterp4)
 # plt.plot(xx,rInterp5)
 # plt.plot(xx,rInterp6)
+# plt.plot(xx,rInterp7)
+# plt.plot(xx,rInterp8)
+# plt.plot(xx,rInterp9)
+# plt.plot(xx,rInterp10)
+# plt.plot(xx,rInterp11)
+#
 # plt.plot(xx,avgRay,'k--',linewidth=2)
 
 #
@@ -564,7 +666,7 @@ for qq in range(len(fetch)):
 
     if slpWaves['wh_all'][qq] > 0:
         if np.isnan(fetchFiltered2[qq]):
-            print('so we have waves but fetch {} times on {}'.format(c,dayTime[qq]))
+            print('so we have waves but no fetch {} times on {}'.format(c,dayTime[qq]))
             print(fetch[qq])
             c = c +1
 
@@ -581,13 +683,19 @@ plt.plot(xx/1000,rayDict3[temp],color='orange',alpha=0.5)
 plt.plot(xx/1000,rayDict4[temp],color='orange',alpha=0.5)
 plt.plot(xx/1000,rayDict5[temp],color='orange',alpha=0.5)
 plt.plot(xx/1000,rayDict6[temp],color='orange',alpha=0.5)
+plt.plot(xx/1000,rayDict7[temp],color='orange',alpha=0.5)
+plt.plot(xx/1000,rayDict8[temp],color='orange',alpha=0.5)
+plt.plot(xx/1000,rayDict9[temp],color='orange',alpha=0.5)
+plt.plot(xx/1000,rayDict10[temp],color='orange',alpha=0.5)
+plt.plot(xx/1000,rayDict11[temp],color='orange',alpha=0.5)
+
 plt.plot(xx/1000,avgRayDict[temp],'w--',linewidth=3)
 plt.ylabel('Sea Ice Concentration')
 plt.xlabel('distance (km)')
 
 
 
-
+asdf
 import pickle
 
 dwtPickle = 'fetchLengthAttempt3.pickle'
@@ -603,18 +711,36 @@ outputDWTs['xRay3'] = xRay3
 outputDWTs['xRay4'] = xRay4
 outputDWTs['xRay5'] = xRay5
 outputDWTs['xRay6'] = xRay6
+outputDWTs['xRay7'] = xRay7
+outputDWTs['xRay8'] = xRay8
+outputDWTs['xRay9'] = xRay9
+outputDWTs['xRay10'] = xRay10
+outputDWTs['xRay11'] = xRay11
+
 outputDWTs['yRay1'] = yRay1
 outputDWTs['yRay2'] = yRay2
 outputDWTs['yRay3'] = yRay3
 outputDWTs['yRay4'] = yRay4
 outputDWTs['yRay5'] = yRay5
 outputDWTs['yRay6'] = yRay6
+outputDWTs['yRay7'] = yRay7
+outputDWTs['yRay8'] = yRay8
+outputDWTs['yRay9'] = yRay9
+outputDWTs['yRay10'] = yRay10
+outputDWTs['yRay11'] = yRay11
+
 outputDWTs['dist1'] = dist1
 outputDWTs['dist2'] = dist2
 outputDWTs['dist3'] = dist3
 outputDWTs['dist4'] = dist4
 outputDWTs['dist5'] = dist5
 outputDWTs['dist6'] = dist6
+outputDWTs['dist7'] = dist7
+outputDWTs['dist8'] = dist8
+outputDWTs['dist9'] = dist9
+outputDWTs['dist10'] = dist10
+outputDWTs['dist11'] = dist11
+
 outputDWTs['x'] = x
 outputDWTs['y'] = y
 outputDWTs['xSmall'] = xSmall
@@ -627,6 +753,12 @@ outputDWTs['rayDict3'] = rayDict3
 outputDWTs['rayDict4'] = rayDict4
 outputDWTs['rayDict5'] = rayDict5
 outputDWTs['rayDict6'] = rayDict6
+outputDWTs['rayDict7'] = rayDict7
+outputDWTs['rayDict8'] = rayDict8
+outputDWTs['rayDict9'] = rayDict9
+outputDWTs['rayDict10'] = rayDict10
+outputDWTs['rayDict11'] = rayDict11
+
 outputDWTs['avgRayDict'] = avgRayDict
 
 

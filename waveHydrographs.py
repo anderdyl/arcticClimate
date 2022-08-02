@@ -25,8 +25,6 @@ from scipy.spatial import distance
 import scipy.io
 import h5py
 import mat73
-import matplotlib.pyplot as plt
-import numpy as np
 import datetime as dt
 from datetime import timedelta
 import itertools

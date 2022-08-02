@@ -2,21 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3790cb9a-306f-4a6d-a2a2-1e9574428de0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/clusterSLParcticeRG.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fetchDistributionsByIce.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/fetchLengthExtraction.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/waveHydrographsDaily.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/historicalALR.py" beforeDir="false" afterPath="$PROJECT_DIR$/historicalALR.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/runningFutureSlps.py" beforeDir="false" afterPath="$PROJECT_DIR$/runningFutureSlps.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/waveDistributionByIceSlpSeason.py" beforeDir="false" afterPath="$PROJECT_DIR$/waveDistributionByIceSlpSeason.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/waveDistributionsByIceSLP.py" beforeDir="false" afterPath="$PROJECT_DIR$/waveDistributionsByIceSLP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/waveHydrographCopulasNoWL.py" beforeDir="false" afterPath="$PROJECT_DIR$/waveHydrographCopulasNoWL.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/waveHydrographsMultiDist.py" beforeDir="false" afterPath="$PROJECT_DIR$/waveHydrographsMultiDist.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/waveHydrographsMultiDistSeasons.py" beforeDir="false" afterPath="$PROJECT_DIR$/waveHydrographsMultiDistSeasons.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/waveHydrographsSimulationsChopped.py" beforeDir="false" afterPath="$PROJECT_DIR$/waveHydrographsSimulationsChopped.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/waveHydrographsValidations.py" beforeDir="false" afterPath="$PROJECT_DIR$/waveHydrographsValidations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/waveHydrograpphsInterpolatedMultiDist.py" beforeDir="false" afterPath="$PROJECT_DIR$/waveHydrograpphsInterpolatedMultiDist.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fetchLengthExtraction.py" beforeDir="false" afterPath="$PROJECT_DIR$/fetchLengthExtraction.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/waveHydrographs.py" beforeDir="false" afterPath="$PROJECT_DIR$/waveHydrographs.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,14 +30,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/dylananderson/projects/arcticClimate/fetchDistributionsByIce.py&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "/Users/dylananderson/Documents/projects/arcticClimate",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
-  <component name="RunManager" selected="Python.waveHydrographs">
+}]]></component>
+  <component name="RunManager" selected="Python.fetchLength">
     <configuration name="alrForIceCoverage" type="PythonConfigurationType" factoryName="Python">
       <module name="arcticClimate" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -180,15 +169,12 @@
       <module name="arcticClimate" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python3" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/fetchDistributionsByIce.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/fetchLengthExtraction.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -306,12 +292,9 @@
       <module name="arcticClimate" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python3" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/iceClusterPlots.py" />
@@ -519,9 +502,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/bin/python3" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/waveHydrographsDaily.py" />
