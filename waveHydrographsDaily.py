@@ -171,7 +171,12 @@ bmusIce = historicalICEs['bmus_corrected'][31:]
 timeIce = historicalICEs['dayTime'][31:]
 timeArrayIce = np.array(timeIce)#
 
-
+with open(r"fetchAreaAttempt1.pickle", "rb") as input_file:
+   fetchPickle = pickle.load(input_file)
+kiloArea = fetchPickle['kiloArea']
+slpWaves = fetchPickle['slpWaves'][31:]
+dayTime = fetchPickle['dayTime'][31:]
+fetchTotalConcentration = np.asarray(fetchPickle['fetchTotalConcentration'])[31:]/1000*kiloArea
 
 # kma_order = sort_cluster_gen_corr_end(kma.cluster_centers_, num_clusters)
 # newOrderIce = np.array([0,0,0,1,1,1,0,1,0,1,0,1,0,1,2,1,2,2,2,2,2,2,2,2,2])
@@ -209,16 +214,16 @@ for i in range(numClusters):
             newBmus[posc] = i
 
 
-# asdfg
-with open(r"fetchLengthAttempt2.pickle", "rb") as input_file:
-   fetchPickle = pickle.load(input_file)
-fetch = fetchPickle['fetch']
-fetchFiltered = fetchPickle['fetchFiltered']
-slpWaves = fetchPickle['slpWaves']
-dayTime = fetchPickle['dayTime']
-
-badFetch = np.where(np.isnan(fetchFiltered))
-fetchFiltered[badFetch] = 0
+# # asdfg
+# with open(r"fetchLengthAttempt2.pickle", "rb") as input_file:
+#    fetchPickle = pickle.load(input_file)
+# fetch = fetchPickle['fetch']
+# fetchFiltered = fetchPickle['fetchFiltered']
+# slpWaves = fetchPickle['slpWaves']
+# dayTime = fetchPickle['dayTime']
+#
+# badFetch = np.where(np.isnan(fetchFiltered))
+# fetchFiltered[badFetch] = 0
 
 waveData = mat73.loadmat('era5_waves_pthope.mat')
 # wlData = mat73.loadmat('pthope_tides_for_dylan.mat')
@@ -382,7 +387,7 @@ for p in bmusRange:#range(len(np.unique(bmuGroup))):
                         #randLength = random.randint(1,2)
                         etNew = newTime + timedelta(days=1)
                         waveInd = np.where((tWave < etNew) & (tWave >= newTime))
-                        fetchInd = np.where((np.asarray(dayTime) == st))
+                        fetchInd = np.where((np.asarray(dayTime) == newTime))
 
                         # waterInd = np.where((tWl < etNew) & (tWl >= st))
                         deltaDays = et-etNew
@@ -398,12 +403,12 @@ for p in bmusRange:#range(len(np.unique(bmuGroup))):
                         tempDict['hs'] = hsCombined[waveInd[0]]
                         tempDict['tp'] = tpCombined[waveInd[0]]
                         tempDict['dm'] = waveNorm[waveInd[0]]
-                        tempDict['fetch'] = fetchFiltered[fetchInd[0][0]]#tempFetch[0]
+                        tempDict['fetch'] = fetchTotalConcentration[fetchInd[0][0]]#tempFetch[0]
                         # tempDict['res'] = res[waterInd[0]]
                         # tempDict['wl'] = wlHycom[waterInd[0]]
                         tempDict['cop'] = np.asarray([np.nanmin(hsCombined[waveInd[0]]), np.nanmax(hsCombined[waveInd[0]]),
                                                       np.nanmin(tpCombined[waveInd[0]]), np.nanmax(tpCombined[waveInd[0]]),
-                                                      np.nanmean(waveNorm[waveInd[0]]),fetchFiltered[fetchInd[0][0]]])#, np.nanmean(res[waterInd[0]])])
+                                                      np.nanmean(waveNorm[waveInd[0]]),fetchTotalConcentration[fetchInd[0][0]]])#, np.nanmean(res[waterInd[0]])])
                         tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
                         tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
                         tempDict['tpMin'] = np.nanmin(tpCombined[waveInd[0]])
@@ -415,6 +420,8 @@ for p in bmusRange:#range(len(np.unique(bmuGroup))):
                         newTime = etNew
                     else:
                         waveInd = np.where((tWave < et) & (tWave >= newTime))
+                        fetchInd = np.where((np.asarray(dayTime) == newTime))
+
                         # waterInd = np.where((tWl < et) & (tWl >= etNew7))
                         c = c + 1
                         tempDict = dict()
@@ -423,7 +430,7 @@ for p in bmusRange:#range(len(np.unique(bmuGroup))):
                         tempDict['hs'] = hsCombined[waveInd[0]]
                         tempDict['tp'] = tpCombined[waveInd[0]]
                         tempDict['dm'] = waveNorm[waveInd[0]]
-                        tempDict['fetch'] = fetchFiltered[fetchInd[0][0]]#tempFetch[0]
+                        tempDict['fetch'] = fetchTotalConcentration[fetchInd[0][0]]#tempFetch[0]
 
                         # tempDict['res'] = res[waterInd[0]]
                         # tempDict['wl'] = wlHycom[waterInd[0]]
@@ -433,7 +440,7 @@ for p in bmusRange:#range(len(np.unique(bmuGroup))):
                              np.nanmin(tpCombined[waveInd[0]]),
                              np.nanmax(tpCombined[waveInd[0]]),
                              np.nanmean(
-                                 waveNorm[waveInd[0]]),fetchFiltered[fetchInd[0][0]]])  # ,
+                                 waveNorm[waveInd[0]]),fetchTotalConcentration[fetchInd[0][0]]])  # ,
                         # np.nanmean(res[waterInd[0]])])
                         tempDict['hsMin'] = np.nanmin(hsCombined[waveInd[0]])
                         tempDict['hsMax'] = np.nanmax(hsCombined[waveInd[0]])
@@ -587,7 +594,7 @@ for i in bmusRange:#range(len(np.unique(bmuGroup))):
     else:
         dataHs = np.array([sub[0] for sub in copulaData[i]])
         data = temporCopula[~np.isnan(dataHs)]
-        data2 = data[~np.isnan(data[:,4])]
+        data2 = data[~np.isnan(data[:,0])]
         if len(data2) == 0:
             print('woah, no waves here bub')
         #     data2 = data

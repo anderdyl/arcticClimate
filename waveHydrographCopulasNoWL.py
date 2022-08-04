@@ -50,6 +50,8 @@ groupLength = historicalData['groupLength']
 bmuGroup = historicalData['bmuGroup']
 timeGroup = historicalData['timeGroup']
 
+
+
 numClusters = 49
 
 def CDF_Distribution(self, vn, vv, xds_GEV_Par, d_shape, i_wt):
@@ -662,7 +664,7 @@ for i in rangeBmus:#range(len(np.unique(bmuGroup))):
 
 
 
-gevCopulaSimsPickle = 'gevCopulaSims1000002Dist81.pickle'
+gevCopulaSimsPickle = 'gevCopulaSims1000002Dist49.pickle'
 outputgevCopulaSims = {}
 outputgevCopulaSims['gevCopulaSims'] = gevCopulaSims
 

@@ -539,10 +539,50 @@ for hh in range(len(gapFilledIce)):
 #     idx = np.argwhere(np.diff(np.sign(y1_interp - y2_interp))).flatten()
 #     fetch.append(xx[idx] - np.min(xFetch))
 
-# newFetch = fetch
-# for qq in range(len(fetch)):
-#
 import random
+
+clickFetch = np.nan * np.zeros((len(fetch),))
+
+
+
+
+#
+# indexForFetch = np.arange(0,len(fetch))
+# for qq in indexForFetch:#range(len(fetch)):
+#     if np.all(np.isnan(fetch[qq])):
+#         if dayTime[qq].month == 8 or dayTime[qq].month == 9:
+#             clickFetch[qq] = 2250000 + random.random() * 100000 - 50000
+#         else:
+#             clickFetch[qq] = np.nan
+#     else:
+#         if slpWaves['wh_all'][qq] > 0:
+#             plt.figure(figsize=(12,8))
+#             plt.plot(xx,rayDict1[qq],color='orange',alpha=0.5)
+#             plt.plot(xx,rayDict2[qq],color='orange',alpha=0.5)
+#             plt.plot(xx,rayDict3[qq],color='orange',alpha=0.5)
+#             plt.plot(xx,rayDict4[qq],color='orange',alpha=0.5)
+#             plt.plot(xx,rayDict5[qq],color='orange',alpha=0.5)
+#             plt.plot(xx,rayDict6[qq],color='orange',alpha=0.5)
+#             plt.plot(xx,rayDict7[qq],color='orange',alpha=0.5)
+#             plt.plot(xx,rayDict8[qq],color='orange',alpha=0.5)
+#             plt.plot(xx,rayDict9[qq],color='orange',alpha=0.5)
+#             plt.plot(xx,rayDict10[qq],color='orange',alpha=0.5)
+#             plt.plot(xx,rayDict11[qq],color='orange',alpha=0.5)
+#             plt.plot(xx,avgRayDict[qq],'w--',linewidth=2)
+#             plt.plot([xx[0],xx[-1]],[0.75,0.75])
+#             plt.title('{}/{}/{}'.format(dayTime[qq].year,dayTime[qq].month,dayTime[qq].day))
+#             if len(fetch[qq]) >= 1:
+#                 for yy in fetch[qq]:
+#                     plt.plot([yy,yy],[0,1],'r--')
+#
+#             picked = plt.ginput(1)
+#             plt.close()
+#             clickFetch[qq] = picked[0][0]
+#         else:
+#             clickFetch[qq] = np.nan
+# # newFetch = fetch
+# # for qq in range(len(fetch)):
+# #
 
 fetchFiltered = np.nan * np.zeros((len(fetch),))
 for qq in range(len(fetch)):
@@ -599,7 +639,7 @@ for qq in range(len(fetch)):
                 fetchFiltered[qq] = np.nan
 
 
-
+indexForFetch = []
 fetchFiltered2 = np.nan * np.zeros((len(fetch),))
 c = 0
 for qq in range(len(fetch)):
@@ -667,8 +707,16 @@ for qq in range(len(fetch)):
     if slpWaves['wh_all'][qq] > 0:
         if np.isnan(fetchFiltered2[qq]):
             print('so we have waves but no fetch {} times on {}'.format(c,dayTime[qq]))
-            print(fetch[qq])
+            #print(fetch[qq])
+            indexForFetch.append(qq)
             c = c +1
+
+
+
+
+
+
+
 
 
 plt.figure()

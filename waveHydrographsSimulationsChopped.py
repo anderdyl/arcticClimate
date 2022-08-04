@@ -6,7 +6,7 @@ import operator
 import pickle
 import matplotlib.pyplot as plt
 
-with open(r"normalizedWaveHydrographsHope2Dist81.pickle", "rb") as input_file:
+with open(r"normalizedWaveHydrographsHope2Dist49.pickle", "rb") as input_file:
    normalizedWaveHydrographs = pickle.load(input_file)
 normalizedHydros = normalizedWaveHydrographs['normalizedHydros']
 bmuDataMin = normalizedWaveHydrographs['bmuDataMin']
@@ -15,24 +15,24 @@ bmuDataStd = normalizedWaveHydrographs['bmuDataStd']
 bmuDataNormalized = normalizedWaveHydrographs['bmuDataNormalized']
 
 
-with open(r"hydrographCopulaDataHope2Dist81.pickle", "rb") as input_file:
+with open(r"hydrographCopulaDataHope2Dist49.pickle", "rb") as input_file:
    hydrographCopulaData = pickle.load(input_file)
 copulaData = hydrographCopulaData['copulaData']
 
-with open(r"historicalDataHope4Dist.pickle", "rb") as input_file:
+with open(r"historicalDataHope2Dist49.pickle", "rb") as input_file:
    historicalData = pickle.load(input_file)
 grouped = historicalData['grouped']
 groupLength = historicalData['groupLength']
 bmuGroup = historicalData['bmuGroup']
 timeGroup = historicalData['timeGroup']
 
-with open(r"gevCopulaSims1000002Dist81.pickle", "rb") as input_file:
+with open(r"gevCopulaSims1000002Dist49.pickle", "rb") as input_file:
    gevCopulaSimsInput = pickle.load(input_file)
 gevCopulaSims = gevCopulaSimsInput['gevCopulaSims']
 
-with open(r"dwt81RGHistoricalSimulations100withTemp.pickle", "rb") as input_file:
+# with open(r"dwt81RGHistoricalSimulations100withTemp.pickle", "rb") as input_file:
 # with open(r"dwt64HistoricalSimulations100withTemp.pickle", "rb") as input_file:
-# with open(r"dwt49HistoricalSimulations100withTemp.pickle", "rb") as input_file:
+with open(r"dwt49RGHistoricalSimulations100withTemp.pickle", "rb") as input_file:
 # with open(r"dwtFutureSimulations1000.pickle", "rb") as input_file:
    dwtFutureSimulations = pickle.load(input_file)
 evbmus_sim = dwtFutureSimulations['evbmus_sim']
@@ -287,12 +287,16 @@ ax.xaxis.set_major_formatter(monthsFmt)
 
 
 # newOrderIce = np.array([0,0,0,1,1,1,0,1,0,0,0,1,0,1,1,0,1,1,1,1,1,1,1,1,1])
-newOrderIce = np.array([0,0,0,0,0,
+# newOrderIce = np.array([0,0,0,0,0,
+#                         0,0,0,0,0,
+#                         0,0,0,1,1,
+#                         0,1,1,1,1,
+#                         1,1,1,1,1])
+newOrderIce = np.array([0,0,0,1,0,
                         0,0,0,0,0,
-                        0,0,0,1,1,
+                        0,0,0,0,1,
                         0,1,1,1,1,
                         1,1,1,1,1])
-
 # newOrderIce = np.array([0,0,0,1,1,
 #                         1,0,1,0,0,
 #                         0,1,0,1,2,
@@ -434,7 +438,7 @@ for pp in range(numRealizations):
 
 
 
-simsChoppedPickle = 'simulations100Chopped81_2Dist.pickle'
+simsChoppedPickle = 'simulations100Chopped49_2Dist.pickle'
 outputSimsChopped = {}
 outputSimsChopped['simBmuLengthChopped'] = simBmuLengthChopped
 outputSimsChopped['simBmuGroupsChopped'] = simBmuGroupsChopped

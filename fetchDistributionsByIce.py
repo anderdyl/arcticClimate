@@ -15,13 +15,33 @@ from matplotlib import gridspec
 import cartopy.crs as ccrs
 import pickle
 
-with open(r"fetchLengthAttempt1.pickle", "rb") as input_file:
+with open(r"fetchAreaAttempt1.pickle", "rb") as input_file:
    fetchPickle = pickle.load(input_file)
-fetch = fetchPickle['fetch']
-fetchFiltered = fetchPickle['fetchFiltered']
+fetchTotalConcentration = fetchPickle['fetchTotalConcentration']
+kiloArea = fetchPickle['kiloArea']
 slpWaves = fetchPickle['slpWaves']
 dayTime = fetchPickle['dayTime']
-fetch = fetchPickle['fetch']
+
+# outputDWTs['fetchTotalConcentration'] = fetchTotalConcentration
+# outputDWTs['slpWaves'] = slpWaves
+# outputDWTs['dayTime'] = dayTime
+# outputDWTs['gapFilledIce'] = gapFilledIce
+# outputDWTs['mask'] = mask
+# outputDWTs['xEdge'] = xEdge
+# outputDWTs['yEdge'] = yEdge
+# outputDWTs['kiloArea'] = kiloArea
+# outputDWTs['wavesYearly'] = wavesYearly
+# outputDWTs['iceYearly'] = iceYearly
+# outputDWTs['xMeshSmallx'] = xMeshSmallx
+# outputDWTs['yMeshSmallx'] = yMeshSmallx
+# outputDWTs['tupVerts'] = tupVerts
+# outputDWTs['points2'] = points2
+# outputDWTs['x'] = x
+# outputDWTs['y'] = y
+# outputDWTs['xSmall'] = xSmall
+# outputDWTs['ySmall'] = ySmall
+# outputDWTs['myDates'] = myDates
+# outputDWTs['waves'] = waves
 
 
 with open(r"iceData25ClustersMediumishMin150withDayNumRG.pickle", "rb") as input_file:
@@ -109,142 +129,6 @@ for hh in range(25):
 
 
 
-import random
-
-fetchFiltered2 = np.nan * np.zeros((len(fetch),))
-c = 0
-for qq in range(len(fetch)):
-    # if len(fetch[qq]) == 0:
-    #     fetchFiltered[qq] = np.nan
-    if np.all(np.isnan(fetch[qq])):
-        if dayTime[qq].month == 8 or dayTime[qq].month == 9:
-            fetchFiltered2[qq] = 2250000 + random.random() * 100000 - 50000
-        else:
-            fetchFiltered2[qq] = np.array([np.nan])
-    else:
-        # print('{}'.format(qq))
-        if len(fetch[qq]) >= 1:
-
-            if len(fetch[qq]) == 2:
-                # if fetch[qq][0] == 0:
-                #     fetchFiltered[qq] = fetch[qq][1]
-                # else:
-                if fetch[qq][1] < 1000000:
-                    fetchFiltered2[qq] = fetch[qq][1]
-                else:
-                    fetchFiltered2[qq] = fetch[qq][0]
-            elif len(fetch[qq]) == 3:
-                if fetch[qq][1] < 100000:
-                    fetchFiltered2[qq] = fetch[qq][2]
-                elif fetch[qq][0] < 20000:
-                    fetchFiltered2[qq] = fetch[qq][1]
-                else:
-                    fetchFiltered2[qq] = fetch[qq][0]
-            elif len(fetch[qq]) == 4:
-                if fetch[qq][0] < 150000:
-                    fetchFiltered2[qq] = fetch[qq][2]
-                else:
-                    fetchFiltered2[qq] = fetch[qq][0]
-            elif len(fetch[qq]) == 5:
-                if fetch[qq][1] < 100000:
-                    fetchFiltered2[qq] = fetch[qq][2]
-                else:
-                    fetchFiltered2[qq] = fetch[qq][0]
-            else:
-                # print('we should be here')
-                fetchFiltered2[qq] = fetch[qq][0]
-
-            if dayTime[qq].month == 9:# or dayTime[qq].month == 9:
-                if fetch[qq][0] < 50000:
-                    fetchFiltered2[qq] = fetch[qq][1]
-
-            if slpWaves['wh_all'][qq] == 0:
-                fetchFiltered2[qq] = np.array([np.nan])
-
-            if fetch[qq][0] > 600000:
-                fetchFiltered2[qq] = fetch[qq][0]
-
-        elif len(fetch[qq]) == 0:
-            # print('hey hi yo')
-            if dayTime[qq].month == 8 or dayTime[qq].month == 9:
-                fetchFiltered2[qq] = 2000000 + random.random()*10000-5000
-            else:
-                fetchFiltered2[qq] = np.array([np.nan])
-
-    if slpWaves['wh_all'][qq] > 0:
-        if np.isnan(fetchFiltered2[qq]):
-            print('so we have waves but fetch {} times on {}'.format(c,dayTime[qq]))
-            print(fetch[qq])
-            c = c +1
-
-plt.figure()
-plt.plot(dayTime,fetchFiltered2)
-
-
-plt.style.use('dark_background')
-from scipy import signal as sg
-plt.figure()
-iceYearly = np.nan*np.ones((42,365))
-c = 0
-ax = plt.subplot2grid((2,1),(0,0))
-
-for hh in range(42):
-    temp = fetchFiltered2[c:c+365]
-    temp2 = sg.medfilt(temp,5)
-    iceYearly[hh,:]=temp2
-    c = c + 365
-    ax.plot(dayTime[0:365],temp2/1000,alpha=0.5)
-
-badInd = np.where(np.isnan(iceYearly))
-iceYearly[badInd] = 0
-ax.plot(dayTime[0:365],np.nanmean(iceYearly,axis=0)/1000,color='white',linewidth=2,label='Average Fetch')
-ax.set_ylabel('Fetch (km)')
-
-ax.xaxis.set_ticks([datetime(1979,1,1),datetime(1979,2,1),datetime(1979,3,1),datetime(1979,4,1),datetime(1979,5,1),datetime(1979,6,1),
-                    datetime(1979,7,1),datetime(1979,8,1),datetime(1979,9,1),datetime(1979,10,1),datetime(1979,11,1),datetime(1979,12,1)])
-ax.xaxis.set_ticklabels(['Jan', 'Feb', 'Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])
-# ax.set_xlabel('Fetch (km)')
-# ax.set_title('Average Fetch Length to Sea Ice')
-
-
-
-wavesYearly = np.nan*np.ones((42,365))
-c = 0
-ax2 = plt.subplot2grid((2,1),(1,0))
-
-for hh in range(42):
-    temp2 = slpWaves['wh_all'][c:c+365]
-    #temp2 = sg.medfilt(temp,5)
-    wavesYearly[hh,:]=temp2
-    c = c + 365
-    ax2.plot(dayTime[0:365],temp2/1000,alpha=0.5)
-
-
-badIndW = np.where(np.isnan(wavesYearly))
-wavesYearly[badIndW] = 0
-ax2.plot(dayTime[0:365],np.nanmean(wavesYearly,axis=0)/1000,color='white',linewidth=2,label='Average Fetch')
-ax2.set_ylabel('Hs (m)')
-
-ax2.xaxis.set_ticks([datetime(1979,1,1),datetime(1979,2,1),datetime(1979,3,1),datetime(1979,4,1),datetime(1979,5,1),datetime(1979,6,1),
-                    datetime(1979,7,1),datetime(1979,8,1),datetime(1979,9,1),datetime(1979,10,1),datetime(1979,11,1),datetime(1979,12,1)])
-ax2.xaxis.set_ticklabels(['Jan', 'Feb', 'Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])
-# ax.set_xlabel('Fetch (km)')
-# ax2.set_title('Average Fetch Length to Sea Ice')
-
-
-sdfg
-
-
-dwtPickle = 'fetchLengthAttempt2.pickle'
-outputDWTs = {}
-outputDWTs['fetch'] = fetch
-outputDWTs['fetchFiltered'] = fetchFiltered2
-outputDWTs['slpWaves'] = slpWaves
-outputDWTs['dayTime'] = dayTime
-outputDWTs['iceYearly'] = iceYearly
-
-with open(dwtPickle,'wb') as f:
-    pickle.dump(outputDWTs, f)
 
 
 import datetime as dt
@@ -261,7 +145,7 @@ for hh in range(numDWTs):
         #                                        timeArray[dwtInd[0][qq]].day,23,0,0)))
         # dayInd = np.where((dayTime == ))
         # fetchBin.append(hsCombined[dayInd[0]])
-    fetchBin.append(fetchFiltered[dwtInd[0]])
+    fetchBin.append(np.asarray(fetchTotalConcentration)[dwtInd[0]])
     waveBin.append(slpWaves['wh_all'][dwtInd[0]])
 
     fetchLengths.append(np.concatenate(fetchBin,axis=0))
@@ -273,7 +157,7 @@ dwtcolors = cm.rainbow(np.linspace(0, 1, numDWTs))
 #plt.style.use('dark_background')
 
 plt.style.use('dark_background')
-dist_space = np.linspace(0, 1800000/1000, 1000)
+dist_space = np.linspace(0, 1600000/1000, 1000)
 fig = plt.figure(figsize=(10,10))
 gs2 = gridspec.GridSpec(5, 5)
 
@@ -297,7 +181,7 @@ for xx in range(numDWTs):
     #data = dwtHs[dwtInd]
 
     data2 = fetchLengths[xx]
-    data = data2[~np.isnan(data2)]/1000
+    data = data2[~np.isnan(data2)]/1000*kiloArea
 
     if len(data) > 2:
         kde = gaussian_kde(data)
@@ -326,7 +210,7 @@ for xx in range(numDWTs):
     else:
         ax.xaxis.set_ticks([200, 800, 1400])
         ax.xaxis.set_ticklabels(['200','800','1400'])
-        ax.set_xlabel('Fetch (km)')
+        ax.set_xlabel('Fetch Area (km^2)')
     if plotIndy == 0:
         ax.set_ylabel('Probability')
 
@@ -351,7 +235,7 @@ s_map.set_array(colorparam)
 fig.subplots_adjust(right=0.86)
 cbar_ax = fig.add_axes([0.89, 0.15, 0.02, 0.7])
 cbar = fig.colorbar(s_map, cax=cbar_ax)
-cbar.set_label('Fetch Length (km)')
+cbar.set_label('Wave Gen Area (km^2)')
 
 
 
@@ -375,7 +259,7 @@ for xx in range(numDWTs):
 
     ax = plt.subplot(gs2[xx])
 
-    fetchTemp = fetchLengths[xx]/1000
+    fetchTemp = fetchLengths[xx]/1000*kiloArea
     waveTemp = waveHeights[xx]
     # data = data2[~np.isnan(data2)]
     ax.set_xlim([0, 2100000/1000])
@@ -507,10 +391,10 @@ fetchSims = []
 for hh in range(numDWTs):
     dwtInd = np.where((bmus==hh))
     fetchBin = []
-    obsFetch = fetchFiltered[dwtInd[0]]
-    data = obsFetch[~np.isnan(obsFetch)]/1000
+    obsFetch = np.asarray(fetchTotalConcentration)[dwtInd[0]]
+    data = obsFetch[~np.isnan(obsFetch)]/1000*kiloArea
     if len(data) > 2:
-        uSim = [random.uniform(0,1) for hh in range(1000)]
+        uSim = [random.uniform(0,1) for ff in range(100000)]
         simFetch = ksdensity_ICDF(data,np.asarray(uSim))
         fetchSims.append(simFetch)
     else:
@@ -611,5 +495,14 @@ s_map.set_array(colorparam)
 fig.subplots_adjust(right=0.86)
 cbar_ax = fig.add_axes([0.89, 0.15, 0.02, 0.7])
 cbar = fig.colorbar(s_map, cax=cbar_ax)
-cbar.set_label('Fetch Length (km)')
+cbar.set_label('Wave Gen Area (km^2)')
 
+
+
+
+gevCopulaSimsPickle = 'iceFetchSims.pickle'
+outputgevCopulaSims = {}
+outputgevCopulaSims['fetchSims'] = fetchSims
+
+with open(gevCopulaSimsPickle,'wb') as f:
+    pickle.dump(outputgevCopulaSims, f)
