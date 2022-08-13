@@ -32,7 +32,7 @@ def toTimestamp(d):
     return calendar.timegm(d.timetuple())
 
 
-with open(r"simulations100Chopped81_2Dist.pickle", "rb") as input_file:
+with open(r"simulations100Chopped49_2Dist.pickle", "rb") as input_file:
    simsChoppedInput = pickle.load(input_file)
 simBmuLengthChopped = simsChoppedInput['simBmuLengthChopped']
 simBmuGroupsChopped = simsChoppedInput['simBmuGroupsChopped']
@@ -42,11 +42,11 @@ simIceSlpGroupsChopped = simsChoppedInput['simIceSlpGroupsChopped']
 simTimeGroupsChopped = simsChoppedInput['simTimeGroupsChopped']
 
 
-with open(r"gevCopulaSims1000002Dist81.pickle", "rb") as input_file:
+with open(r"gevCopulaSims1000002Dist49.pickle", "rb") as input_file:
    gevCopulaSimsInput = pickle.load(input_file)
 gevCopulaSims = gevCopulaSimsInput['gevCopulaSims']
 
-with open(r"normalizedWaveHydrographsHope2Dist81.pickle", "rb") as input_file:
+with open(r"normalizedWaveHydrographsHope2Dist49.pickle", "rb") as input_file:
    normalizedWaveHydrographs = pickle.load(input_file)
 normalizedHydros = normalizedWaveHydrographs['normalizedHydros']
 bmuDataMin = normalizedWaveHydrographs['bmuDataMin']
@@ -54,7 +54,7 @@ bmuDataMax = normalizedWaveHydrographs['bmuDataMax']
 bmuDataStd = normalizedWaveHydrographs['bmuDataStd']
 bmuDataNormalized = normalizedWaveHydrographs['bmuDataNormalized']
 
-with open(r"hydrographCopulaDataHope2Dist81.pickle", "rb") as input_file:
+with open(r"hydrographCopulaDataHope2Dist49.pickle", "rb") as input_file:
    hydrographCopulaData = pickle.load(input_file)
 copulaData = hydrographCopulaData['copulaData']
 copulaDataNoNaNs = hydrographCopulaData['copulaDataNoNaNs']
@@ -330,33 +330,33 @@ for simNum in range(100):
         #         or tempBmu==116 or tempBmu==117 or tempBmu==118 or tempBmu==119 or tempBmu==121 or tempBmu==122 or tempBmu==124 or tempBmu==125 or tempBmu==126\
         #         or tempBmu==127 or tempBmu==128 or tempBmu==132 or tempBmu==133 or tempBmu==134 or tempBmu==135 or tempBmu==140 or tempBmu==141 or tempBmu==142\
         #         or tempBmu==143 or tempBmu==145 or tempBmu==146:
-        if tempBmu==2:
-            tempHs = np.array([0.25,0.25,0.25,0.25])
-            tempTp = np.array([3,3,3,3])
-            tempDm = np.array([0,0,0,0])
-            simTime.append(np.array([0.25,0.25,0.25,0.25])*durSim)
-
-        elif tempBmu == 83 or tempBmu == 84 or tempBmu == 125 or tempBmu == 142 or tempBmu == 158:
-            tempHs = np.array([1.5,1.5,1.5,1.5])
-            tempTp = np.array([8,8,8,8])
-            tempDm = np.array([0,0,0,0])
-            simTime.append(np.array([0.25,0.25,0.25,0.25])*durSim)
+        # if tempBmu==2:
+        #     tempHs = np.array([0.25,0.25,0.25,0.25])
+        #     tempTp = np.array([3,3,3,3])
+        #     tempDm = np.array([0,0,0,0])
+        #     simTime.append(np.array([0.25,0.25,0.25,0.25])*durSim)
+        #
+        # elif tempBmu == 83 or tempBmu == 84 or tempBmu == 125 or tempBmu == 142 or tempBmu == 158:
+        #     tempHs = np.array([1.5,1.5,1.5,1.5])
+        #     tempTp = np.array([8,8,8,8])
+        #     tempDm = np.array([0,0,0,0])
+        #     simTime.append(np.array([0.25,0.25,0.25,0.25])*durSim)
 
         # elif tempBmu == 188 or tempBmu == 189 or tempBmu == 191:
         #     tempHs = np.array([1.5,1.5,1.5])
         #     tempTp = np.array([8,8,8])
         #     tempDm = np.array([0,0,0])
         #     simTime.append(np.array([0,0.5,0.99999]))
-        else:
-            tempHs = ((normalizedHydros[tempBmu][actualIndex]['hsNorm']) * (stormDetails[0]-stormDetails[1]) + stormDetails[1])#.filled()
-            tempTp = ((normalizedHydros[tempBmu][actualIndex]['tpNorm']) * (stormDetails[2]-stormDetails[3]) + stormDetails[3])#.filled()
-            tempDm = ((normalizedHydros[tempBmu][actualIndex]['dmNorm']) + stormDetails[4])
+        # else:
+        tempHs = ((normalizedHydros[tempBmu][actualIndex]['hsNorm']) * (stormDetails[0]-stormDetails[1]) + stormDetails[1])#.filled()
+        tempTp = ((normalizedHydros[tempBmu][actualIndex]['tpNorm']) * (stormDetails[2]-stormDetails[3]) + stormDetails[3])#.filled()
+        tempDm = ((normalizedHydros[tempBmu][actualIndex]['dmNorm']) + stormDetails[4])
             # tempSs = ((normalizedHydros[tempBmu][actualIndex]['ssNorm']) + stormDetails[5])
-            if len(normalizedHydros[tempBmu][actualIndex]['hsNorm']) < len(normalizedHydros[tempBmu][actualIndex]['timeNorm']):
-                print('Time is shorter than Hs in bmu {}, index {}'.format(tempBmu,actualIndex))
-            if stormDetails[1] < 0:
-                print('woah, we''re less than 0 over here')
-                asdfg
+        if len(normalizedHydros[tempBmu][actualIndex]['hsNorm']) < len(normalizedHydros[tempBmu][actualIndex]['timeNorm']):
+            print('Time is shorter than Hs in bmu {}, index {}'.format(tempBmu,actualIndex))
+        if stormDetails[1] < 0:
+            print('woah, we''re less than 0 over here')
+            asdfg
         # if len(tempSs) < len(normalizedHydros[tempBmu][actualIndex]['timeNorm']):
         #     print('Ss is shorter than Time in bmu {}, index {}'.format(tempBmu,actualIndex))
         #     tempLength = len(normalizedHydros[tempBmu][actualIndex]['timeNorm'])

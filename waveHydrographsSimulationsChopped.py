@@ -57,6 +57,11 @@ percentIce = onOffData['percentIce']
 with open(r"iceData25ClustersMediumishMin150withDayNumRG.pickle", "rb") as input_file:
    iceDWTs = pickle.load(input_file)
 
+with open(r"iceFetchSims.pickle", "rb") as input_file:
+   fwtchSimsPickle = pickle.load(input_file)
+fetchSims = fwtchSimsPickle['fetchSims']
+
+
 
 #
 # iceOnOff = []
@@ -116,11 +121,13 @@ with open(r"iceData25ClustersMediumishMin150withDayNumRG.pickle", "rb") as input
 
 
 iceOnOff = []
+iceArea = []
 years = np.arange(1979,2022)
 # lets start in January and assume that we are always beginning with an iced ocean
 for hh in range(100):
     simOfIce = iceSims[:,hh]
     yearsStitched = []
+    yearsIceStitched = []
     timeStitched = []
     tempControl = 0
 
@@ -136,8 +143,11 @@ for hh in range(100):
 
         # lets a
         wavesStitched = []
+        iceStitched = []
         for qq in range(len(groupTemp)):
             tempRand = np.random.uniform(size=len(groupTemp[qq]))
+            randIceSize = [random.randint(0, 9999) for xx in range(len(tempRand))]
+            iceDetails = fetchSims[int(bmuGroupIce[qq]-1)][randIceSize]
             if tempControl == 0:
                 # lets enter the next group assuming that waves were previously off
                 sortedRand = np.sort(tempRand)            # so we have a bunch of probabilities between 0 and 1
@@ -168,6 +178,12 @@ for hh in range(100):
                     #         tempControl = 0
 
                 wavesStitched.append(waveDays)
+                # add iceDetails here
+                if timeGroupTemp[qq][0].month < 9:
+                    iceStitched.append(np.sort(iceDetails))
+                else:
+                    iceStitched.append(np.sort(iceDetails)[::-1])
+
             else:
                 # now we're entering with waves ON and want to turn them OFF
                 sortedRand = np.sort(tempRand)#[::-1]        # again a bunch of probabilities between 0 and 1
@@ -188,93 +204,44 @@ for hh in range(100):
                         waveDays = np.ones((len(sortedRand),))
 
                 wavesStitched.append(waveDays)
+                if timeGroupTemp[qq][0].month < 9:
+                    iceStitched.append(np.sort(iceDetails))
+                else:
+                    iceStitched.append(np.sort(iceDetails)[::-1])
+
         yearsStitched.append(wavesStitched)
+        yearsIceStitched.append(iceStitched)
     iceOnOff.append(np.concatenate([x for xs in yearsStitched for x in xs]).ravel())
+    iceArea.append(np.concatenate([x for xs in yearsIceStitched for x in xs]).ravel())
 
 
-
-def GenOneYearDaily(yy=1981, month_ini=1):
-   'returns one generic year in a list of datetimes. Daily resolution'
-
-   dp1 = datetime(yy, month_ini, 1)
-   dp2 = dp1 + timedelta(days=365)
-
-   return [dp1 + timedelta(days=i) for i in range((dp2 - dp1).days)]
-
-list_pyear = GenOneYearDaily(month_ini=1)
-
-histDates = onOffData['iceDateTimes']
-bmus_dates_months = np.array([d.month for d in histDates])
-bmus_dates_days = np.array([d.day for d in histDates])
-yearsOfHist= np.arange(1980,2022)
-stacked = np.zeros((len(yearsOfHist),365))
-for qq in range(len(yearsOfHist)):
-    # index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq],6,1)) & (np.array(histDates) < datetime(yearsOfHist[qq]+1,5,31)))
-    index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq],1,1)) & (np.array(histDates) < datetime(yearsOfHist[qq],12,31)))
-    stacked[qq,0:len(index[0])] = onOffData['wavesOnOff'][index]
-
-import cmocean
-fig = plt.figure(figsize=(10,4))
-ax = plt.subplot2grid((1,1),(0,0))
-X,Y = np.meshgrid(list_pyear,np.arange(1980,2022))
-ax.pcolormesh(X,Y,stacked,cmap=cmocean.cm.ice_r,vmin=0,vmax=2)
-import matplotlib.dates as mdates
-# customize  axis
-months = mdates.MonthLocator()
-monthsFmt = mdates.DateFormatter('%b')
-ax.set_xlim(list_pyear[0], list_pyear[-1])
-ax.xaxis.set_major_locator(months)
-ax.xaxis.set_major_formatter(monthsFmt)
-
-
-
-
-simulat = 0
-
-histDates = iceDates#[214:]#onOffData['iceDateTimes']
-bmus_dates_months = np.array([d.month for d in histDates])
-bmus_dates_days = np.array([d.day for d in histDates])
-yearsOfHist= np.arange(1980,2021)
-stacked = np.zeros((len(yearsOfHist),365))
-for qq in range(len(yearsOfHist)):
-    # index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq],6,1)) & (np.array(histDates) < datetime(yearsOfHist[qq]+1,5,31)))
-    index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq],1,1)) & (np.array(histDates) < datetime(yearsOfHist[qq],12,31)))
-    stacked[qq,0:len(index[0])] = iceOnOff[simulat][index]
-
-import cmocean
-fig = plt.figure(figsize=(10,4))
-ax = plt.subplot2grid((1,1),(0,0))
-X,Y = np.meshgrid(list_pyear,np.arange(1980,2022))
-ax.pcolormesh(X,Y,stacked,cmap=cmocean.cm.ice_r,vmin=0,vmax=2)
-import matplotlib.dates as mdates
-# customize  axis
-months = mdates.MonthLocator()
-monthsFmt = mdates.DateFormatter('%b')
-ax.set_xlim(list_pyear[0], list_pyear[-1])
-ax.xaxis.set_major_locator(months)
-ax.xaxis.set_major_formatter(monthsFmt)
 #
+# def GenOneYearDaily(yy=1981, month_ini=1):
+#    'returns one generic year in a list of datetimes. Daily resolution'
 #
-# num_simulations = 100
-# histDates = iceDates#[214:]#onOffData['iceDateTimes']
+#    dp1 = datetime(yy, month_ini, 1)
+#    dp2 = dp1 + timedelta(days=365)
+#
+#    return [dp1 + timedelta(days=i) for i in range((dp2 - dp1).days)]
+#
+# list_pyear = GenOneYearDaily(month_ini=1)
+#
+# histDates = onOffData['iceDateTimes']
 # bmus_dates_months = np.array([d.month for d in histDates])
 # bmus_dates_days = np.array([d.day for d in histDates])
-# yearsOfHist= np.arange(1980,2021)
+# yearsOfHist= np.arange(1980,2022)
 # stacked = np.zeros((len(yearsOfHist),365))
 # for qq in range(len(yearsOfHist)):
-#     index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq], 1, 1)) & (
-#                 np.array(histDates) < datetime(yearsOfHist[qq], 12, 31)))
-#     yearlyStacked = np.zeros((num_simulations,len(index[0])))
-#     for tt in range(num_simulations):
-#         # index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq],6,1)) & (np.array(histDates) < datetime(yearsOfHist[qq]+1,5,31)))
-#         yearlyStacked[tt,0:len(index[0])] = iceOnOff[tt][index]
-#     stacked[qq,0:len(index[0])] = np.nanmean(yearlyStacked,axis=0)
+#     # index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq],6,1)) & (np.array(histDates) < datetime(yearsOfHist[qq]+1,5,31)))
+#     index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq],1,1)) & (np.array(histDates) < datetime(yearsOfHist[qq],12,31)))
+#     stacked[qq,0:len(index[0])] = onOffData['wavesOnOff'][index]
 #
-#
+# import cmocean
 # fig = plt.figure(figsize=(10,4))
 # ax = plt.subplot2grid((1,1),(0,0))
 # X,Y = np.meshgrid(list_pyear,np.arange(1980,2022))
 # ax.pcolormesh(X,Y,stacked,cmap=cmocean.cm.ice_r,vmin=0,vmax=2)
+# import matplotlib.dates as mdates
 # # customize  axis
 # months = mdates.MonthLocator()
 # monthsFmt = mdates.DateFormatter('%b')
@@ -282,7 +249,63 @@ ax.xaxis.set_major_formatter(monthsFmt)
 # ax.xaxis.set_major_locator(months)
 # ax.xaxis.set_major_formatter(monthsFmt)
 #
-
+#
+#
+#
+# simulat = 0
+#
+# histDates = iceDates#[214:]#onOffData['iceDateTimes']
+# bmus_dates_months = np.array([d.month for d in histDates])
+# bmus_dates_days = np.array([d.day for d in histDates])
+# yearsOfHist= np.arange(1980,2021)
+# stacked = np.zeros((len(yearsOfHist),365))
+# for qq in range(len(yearsOfHist)):
+#     # index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq],6,1)) & (np.array(histDates) < datetime(yearsOfHist[qq]+1,5,31)))
+#     index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq],1,1)) & (np.array(histDates) < datetime(yearsOfHist[qq],12,31)))
+#     stacked[qq,0:len(index[0])] = iceOnOff[simulat][index]
+#
+# import cmocean
+# fig = plt.figure(figsize=(10,4))
+# ax = plt.subplot2grid((1,1),(0,0))
+# X,Y = np.meshgrid(list_pyear,np.arange(1980,2022))
+# ax.pcolormesh(X,Y,stacked,cmap=cmocean.cm.ice_r,vmin=0,vmax=2)
+# import matplotlib.dates as mdates
+# # customize  axis
+# months = mdates.MonthLocator()
+# monthsFmt = mdates.DateFormatter('%b')
+# ax.set_xlim(list_pyear[0], list_pyear[-1])
+# ax.xaxis.set_major_locator(months)
+# ax.xaxis.set_major_formatter(monthsFmt)
+# #
+# #
+# # num_simulations = 100
+# # histDates = iceDates#[214:]#onOffData['iceDateTimes']
+# # bmus_dates_months = np.array([d.month for d in histDates])
+# # bmus_dates_days = np.array([d.day for d in histDates])
+# # yearsOfHist= np.arange(1980,2021)
+# # stacked = np.zeros((len(yearsOfHist),365))
+# # for qq in range(len(yearsOfHist)):
+# #     index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq], 1, 1)) & (
+# #                 np.array(histDates) < datetime(yearsOfHist[qq], 12, 31)))
+# #     yearlyStacked = np.zeros((num_simulations,len(index[0])))
+# #     for tt in range(num_simulations):
+# #         # index = np.where((np.array(histDates) >= datetime(yearsOfHist[qq],6,1)) & (np.array(histDates) < datetime(yearsOfHist[qq]+1,5,31)))
+# #         yearlyStacked[tt,0:len(index[0])] = iceOnOff[tt][index]
+# #     stacked[qq,0:len(index[0])] = np.nanmean(yearlyStacked,axis=0)
+# #
+# #
+# # fig = plt.figure(figsize=(10,4))
+# # ax = plt.subplot2grid((1,1),(0,0))
+# # X,Y = np.meshgrid(list_pyear,np.arange(1980,2022))
+# # ax.pcolormesh(X,Y,stacked,cmap=cmocean.cm.ice_r,vmin=0,vmax=2)
+# # # customize  axis
+# # months = mdates.MonthLocator()
+# # monthsFmt = mdates.DateFormatter('%b')
+# # ax.set_xlim(list_pyear[0], list_pyear[-1])
+# # ax.xaxis.set_major_locator(months)
+# # ax.xaxis.set_major_formatter(monthsFmt)
+# #
+#
 
 
 
@@ -321,6 +344,7 @@ groupedList = list()
 groupLengthList = list()
 bmuGroupList = list()
 iceOnOffGroupList = list()
+iceAreaGroupList = list()
 iceSlpGroupList = list()
 timeGroupList = list()
 for hh in range(100):
@@ -328,6 +352,7 @@ for hh in range(100):
     bmus = evbmus_sim[:,hh]
     iceBmus = iceOnOff[hh]
     actualIceBmus = iceSims[:,hh]
+    iceAreaBmus = iceArea[hh]
 
     tempBmusGroup = [[e[0] for e in d[1]] for d in itertools.groupby(enumerate(bmus), key=operator.itemgetter(1))]
 
@@ -341,13 +366,10 @@ for hh in range(100):
     groupedList.append(tempBmusGroup)
     groupLengthList.append(np.asarray([len(i) for i in tempBmusGroup]))
     bmuGroupList.append(np.asarray([bmus[i[0]] for i in tempBmusGroup]))
-    # iceOnOffGroupList.append(np.asarray([iceBmus[i] for i in tempBmusGroup]))
     iceOnOffGroupList.append([iceBmus[i] for i in tempBmusGroup])
-
+    iceAreaGroupList.append([iceAreaBmus[i] for i in tempBmusGroup])
     iceSlpGroupList.append([bmusICESLP[i] for i in tempBmusGroup])
-
     timeGroupList.append([bmus_dates_months[i] for i in tempBmusGroup])
-
 
 
 
@@ -356,12 +378,12 @@ for hh in range(100):
 numRealizations = 100
 
 
-
 simBmuChopped = []
 simBmuLengthChopped = []
 simBmuGroupsChopped = []
 simIceGroupsChopped = []
 simIceSlpGroupsChopped = []
+simIceAreaGroupsChopped = []
 simTimeGroupsChopped = []
 for pp in range(numRealizations):
 
@@ -371,6 +393,7 @@ for pp in range(numRealizations):
     grouped = groupedList[pp]
     iceGroup = iceOnOffGroupList[pp]
     iceSlpGroup = iceSlpGroupList[pp]
+    iceAreaGroup = iceAreaGroupList[pp]
     timeGroup = timeGroupList[pp]
 
     simGroupLength = []
@@ -380,6 +403,7 @@ for pp in range(numRealizations):
     simIceGrouped = []
     simIceBmu = []
     simIceSlpGrouped = []
+    simIceAreaGrouped = []
     simTimeGrouped = []
     for i in range(len(groupLength)):
         # if np.remainder(i,10000) == 0:
@@ -389,49 +413,52 @@ for pp in range(numRealizations):
         tempIceGrouped = iceGroup[i]
         tempIceSlpGrouped = iceSlpGroup[i]
         tempTimeGrouped = timeGroup[i]
-
-        remainingDays = groupLength[i] - 2
-        if groupLength[i] < 2:
-            simGroupLength.append(int(groupLength[i]))
-            simGrouped.append(grouped[i])
-            simIceGrouped.append(iceGroup[i])
-            simIceSlpGrouped.append(iceSlpGroup[i])
-            simTimeGrouped.append(timeGroup[i])
-            simBmu.append(tempBmu)
-        else:
-            counter = 0
-            while (len(grouped[i]) - counter) > 2:
+        tempIceAreaGrouped = iceAreaGroup[i]
+        remainingDays = groupLength[i]
+        counter = 0
+        # if groupLength[i] < 2:
+        #     simGroupLength.append(int(groupLength[i]))
+        #     simGrouped.append(grouped[i])
+        #     simIceGrouped.append(iceGroup[i])
+        #     simIceSlpGrouped.append(iceSlpGroup[i])
+        #     simTimeGrouped.append(timeGroup[i])
+        #     simBmu.append(tempBmu)
+        # else:
+        #     counter = 0
+        while (len(grouped[i]) - counter) > 1:
                 # print('we are in the loop with remainingDays = {}'.format(remainingDays))
                 # random days between 3 and 5
-                randLength = random.randint(1, 2)
+            randLength = 1#random.randint(1, 2)
                 # add this to the record
-                simGroupLength.append(int(randLength))
+            simGroupLength.append(int(randLength))
                 # simGrouped.append(tempGrouped[0:randLength])
                 # print('should be adding {}'.format(grouped[i][counter:counter+randLength]))
-                simGrouped.append(grouped[i][counter:counter+randLength])
-                simIceGrouped.append(iceGroup[i][counter:counter+randLength])
-                simIceSlpGrouped.append(iceSlpGroup[i][counter:counter+randLength])
-                simTimeGrouped.append(timeGroup[i][counter:counter+randLength])
-                simBmu.append(tempBmu)
+            simGrouped.append(grouped[i][counter:counter+randLength])
+            simIceGrouped.append(iceGroup[i][counter:counter+randLength])
+            simIceSlpGrouped.append(iceSlpGroup[i][counter:counter+randLength])
+            simTimeGrouped.append(timeGroup[i][counter:counter+randLength])
+            simIceAreaGrouped.append(iceAreaGroup[i][counter:counter+randLength])
+            simBmu.append(tempBmu)
                 # remove those from the next step
                 # tempGrouped = np.delete(tempGrouped,np.arange(0,randLength))
                 # do we continue forward
-                remainingDays = remainingDays - randLength
-                counter = counter + randLength
+            remainingDays = remainingDays - randLength
+            counter = counter + randLength
 
-            if (len(grouped[i]) - counter) > 0:
-                simGroupLength.append(int((len(grouped[i]) - counter)))
+            # if (len(grouped[i]) - counter) > 0:
+        simGroupLength.append(int((len(grouped[i]) - counter)))
                 # simGrouped.append(tempGrouped[0:])
-                simGrouped.append(grouped[i][counter:])
-                simIceGrouped.append(iceGroup[i][counter:])
-                simIceSlpGrouped.append(iceSlpGroup[i][counter:])
-                simTimeGrouped.append(timeGroup[i][counter:])
-                simBmu.append(tempBmu)
+        simGrouped.append(grouped[i][counter:])
+        simIceGrouped.append(iceGroup[i][counter:])
+        simIceSlpGrouped.append(iceSlpGroup[i][counter:])
+        simTimeGrouped.append(timeGroup[i][counter:])
+        simBmu.append(tempBmu)
     simBmuLengthChopped.append(np.asarray(simGroupLength))
     simBmuGroupsChopped.append(simGrouped)
     simIceGroupsChopped.append(simIceGrouped)
     simBmuChopped.append(np.asarray(simBmu))
     simIceSlpGroupsChopped.append(simIceSlpGrouped)
+    simIceAreaGroupsChopped.append(simIceAreaGrouped)
     simTimeGroupsChopped.append(simTimeGrouped)
 
 
@@ -446,6 +473,7 @@ outputSimsChopped['simBmuChopped'] = simBmuChopped
 outputSimsChopped['simIceGroupsChopped'] = simIceGroupsChopped
 outputSimsChopped['simIceSlpGroupsChopped'] = simIceSlpGroupsChopped
 outputSimsChopped['simTimeGroupsChopped'] = simTimeGroupsChopped
+outputSimsChopped['simIceAreaGroupsChopped'] = simIceAreaGroupsChopped
 
 with open(simsChoppedPickle,'wb') as f:
     pickle.dump(outputSimsChopped, f)
