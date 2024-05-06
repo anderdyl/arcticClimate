@@ -264,41 +264,11 @@ time_all = np.hstack((waveArrayTime,hourTime))
 # tWl = np.array(wlArrayTime)
 
 # waveDates = [datenum_to_date(t) for t in waveData['time_all']]
-
-
-
-import sys
-sys.path.append('/users/dylananderson/Documents/projects/gencadeClimate/')
-import pickle
-with open(r"/Users/dylananderson/Documents/projects/duneLifeCycles/ptLayWavesWinds164by70.pickle", "rb") as input_file:
-    ptLayWavesWinds = pickle.load(input_file)
-
-ptLayWaves = ptLayWavesWinds['ptLayWaves']
-endTime = ptLayWavesWinds['endTime']
-startTime = ptLayWavesWinds['startTime']
-
-from dateutil.relativedelta import relativedelta
-st = dt.datetime(startTime[0], startTime[1], startTime[2])
-# end = dt.datetime(2021,12,31)
-end = dt.datetime(endTime[0],endTime[1]+1,1)
-step = relativedelta(hours=1)
-hourTime = []
-while st < end:
-    hourTime.append(st)#.strftime('%Y-%m-%d'))
-    st += step
-
-import datetime as dt
-waveDates = [dt.datetime(t.year,t.month,t.day) for t in hourTime]
-wh_all = ptLayWaves.Hs[0:-(2929+(365*24))]
-tp_all = ptLayWaves.Tp[0:-(2929+(365*24))]
-dm_all = ptLayWaves.Dm[0:-(2929+(365*24))]
-time_all = hourTime
-
-
 tWave = np.array(time_all)
 hsCombined = wh_all#waveData['wh_all']
 tpCombined = tp_all#waveData['tp_all']
 dmCombined = dm_all#waveData['mwd_all']
+
 
 waveNorm = dmCombined
 
@@ -338,7 +308,7 @@ def datenum_to_datetime(datenum):
 
 
 
-realWavesPickle = 'realWavesPtLay.pickle'
+realWavesPickle = 'realWaves.pickle'
 outputReal = {}
 outputReal['tWave'] = tWave
 outputReal['hsCombined'] = hsCombined
@@ -738,7 +708,7 @@ for i in bmusRange: #range(len(np.unique(bmuGroup))):
 
 import pickle
 
-normHydrosPickle = 'normalizedWaveHydrographsHope2Dist49ptLay.pickle'
+normHydrosPickle = 'normalizedWaveHydrographsHope2Dist49.pickle'
 outputHydrosNorm = {}
 outputHydrosNorm['normalizedHydros'] = normalizedHydros
 outputHydrosNorm['bmuDataMin'] = bmuDataMin
@@ -750,13 +720,13 @@ with open(normHydrosPickle,'wb') as f:
     pickle.dump(outputHydrosNorm, f)
 
 
-hydrosPickle = 'waveHydrographsHope2Dist49ptLay.pickle'
+hydrosPickle = 'waveHydrographsHope2Dist49.pickle'
 outputHydros = {}
 outputHydros['hydros'] = hydros
 with open(hydrosPickle,'wb') as f:
     pickle.dump(outputHydros, f)
 
-copPickle = 'hydrographCopulaDataHope2Dist49ptLay.pickle'
+copPickle = 'hydrographCopulaDataHope2Dist49.pickle'
 outputCopula = {}
 outputCopula['copulaData'] = copulaData
 outputCopula['copulaDataNoNaNs'] = copulaDataNoNaNs
@@ -764,7 +734,7 @@ with open(copPickle,'wb') as f:
     pickle.dump(outputCopula, f)
 
 
-historicalPickle = 'historicalDataHope2Dist49ptLay.pickle'
+historicalPickle = 'historicalDataHope2Dist49.pickle'
 outputHistorical = {}
 outputHistorical['grouped'] = grouped
 outputHistorical['groupLength'] = groupLength

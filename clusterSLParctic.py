@@ -18,13 +18,13 @@ from scipy.spatial import distance_matrix
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import datetime
-from dateutil.relativedelta import relativedelta
+# from dateutil.relativedelta import relativedelta
 import random
-import xarray as xr
-import geopy.distance
-from dipy.segment.metric import Metric
-from dipy.segment.metric import ResampleFeature
-from dipy.segment.clustering import QuickBundles
+# import xarray as xr
+# import geopy.distance
+# from dipy.segment.metric import Metric
+# from dipy.segment.metric import ResampleFeature
+# from dipy.segment.clustering import QuickBundles
 from mpl_toolkits.basemap import Basemap
 
 def dateDay2datetime(d_vec):
@@ -225,7 +225,8 @@ def sort_cluster_gen_corr_end(centers, dimdim):
 #
 import mat73
 
-SLPs = mat73.loadmat('/media/dylananderson/Elements/pointHope/slpsPolarGrid2v4y2022.mat')
+# SLPs = mat73.loadmat('/media/dylananderson/Elements/pointHope/slpsPolarGrid2v4y2022.mat')
+SLPs = mat73.loadmat('slpsArcticPolarGrid5v1y2023.mat')
 
 X_in = SLPs['X_in']
 Y_in = SLPs['Y_in']
@@ -467,7 +468,7 @@ for hh in range(num_clusters):
 
 import pickle
 
-dwtPickle = 'dwts49ClustersArctic2y2022.pickle'
+dwtPickle = 'dwts49ClustersArctic2023.pickle'
 outputDWTs = {}
 outputDWTs['APEV'] = APEV
 outputDWTs['EOFs'] = EOFs

@@ -23,7 +23,7 @@ year = []
 month = []
 day = []
 
-endYear = 2023
+endYear = 2024
 grabYears = np.arange(1979,endYear)
 counter = 0
 for ff in range(len(grabYears)):
@@ -36,28 +36,30 @@ for ff in range(len(grabYears)):
     print('working on {}'.format(grabYears[ff]))
 
     for hh in range(len(files)):
-        #infile='/media/dylananderson/Elements/iceData/nsidc0051/monthly/nt_198901_f08_v1.1_n.bin'
-        timeFile = files[hh].split('_')[1]
-        infile = os.path.join(files_path[hh],files[hh])
-        fr=open(infile,'rb')
-        hdr=fr.read(300)
-        ice=np.fromfile(fr,dtype=np.uint8)
-        iceReshape=ice.reshape(448,304)
-        #Convert to the fractional parameter range of 0.0 to 1.0
-        iceDivide = iceReshape/250.
-        #mask all land and missing values
-        iceMasked=np.ma.masked_greater(iceDivide,1.0)
-        fr.close()
-        #Show ice concentration
-        #plt.figure()
-        # plt.imshow(iceMasked[125:235,25:155])
-        #plt.imshow(np.flipud(iceMasked[125:235,25:155].T))
+        if not files[hh].startswith('.'):
 
-        year.append(int(timeFile[0:4]))
-        month.append(int(timeFile[4:6]))
-        day.append(int(timeFile[6:8]))
-        #iceSubset.append(iceMasked[125:235,25:155])
-        iceSubset.append(iceMasked[165:250,70:175])
+            #infile='/media/dylananderson/Elements/iceData/nsidc0051/monthly/nt_198901_f08_v1.1_n.bin'
+            timeFile = files[hh].split('_')[1]
+            infile = os.path.join(files_path[hh],files[hh])
+            fr=open(infile,'rb')
+            hdr=fr.read(300)
+            ice=np.fromfile(fr,dtype=np.uint8)
+            iceReshape=ice.reshape(448,304)
+            #Convert to the fractional parameter range of 0.0 to 1.0
+            iceDivide = iceReshape/250.
+            #mask all land and missing values
+            iceMasked=np.ma.masked_greater(iceDivide,1.0)
+            fr.close()
+            #Show ice concentration
+            #plt.figure()
+            # plt.imshow(iceMasked[125:235,25:155])
+            #plt.imshow(np.flipud(iceMasked[125:235,25:155].T))
+
+            year.append(int(timeFile[0:4]))
+            month.append(int(timeFile[4:6]))
+            day.append(int(timeFile[6:8]))
+            #iceSubset.append(iceMasked[125:235,25:155])
+            iceSubset.append(iceMasked[165:250,70:175])
 
 
 

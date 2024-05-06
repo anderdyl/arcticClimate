@@ -39,11 +39,11 @@ simBmuGroupsChopped = simsChoppedInput['simBmuGroupsChopped']
 simBmuChopped = simsChoppedInput['simBmuChopped']
 simIceGroupsChopped = simsChoppedInput['simIceGroupsChopped']
 
-with open(r"gevCopulaSims100000.pickle", "rb") as input_file:
+with open(r"gevCopulaSims100000ptLay.pickle", "rb") as input_file:
    gevCopulaSimsInput = pickle.load(input_file)
 gevCopulaSims = gevCopulaSimsInput['gevCopulaSims']
 
-with open(r"normalizedWaveHydrographsHope.pickle", "rb") as input_file:
+with open(r"normalizedWaveHydrographsHope2Dist49ptLay.pickle", "rb") as input_file:
    normalizedWaveHydrographs = pickle.load(input_file)
 normalizedHydros = normalizedWaveHydrographs['normalizedHydros']
 bmuDataMin = normalizedWaveHydrographs['bmuDataMin']
@@ -51,20 +51,20 @@ bmuDataMax = normalizedWaveHydrographs['bmuDataMax']
 bmuDataStd = normalizedWaveHydrographs['bmuDataStd']
 bmuDataNormalized = normalizedWaveHydrographs['bmuDataNormalized']
 
-with open(r"hydrographCopulaDataHope.pickle", "rb") as input_file:
+with open(r"hydrographCopulaDataHope2Dist49ptLay.pickle", "rb") as input_file:
    hydrographCopulaData = pickle.load(input_file)
 copulaData = hydrographCopulaData['copulaData']
 copulaDataNoNaNs = hydrographCopulaData['copulaDataNoNaNs']
 
 
-with open(r"iceTempWith2PCsNAO36DWTsSimulations100.pickle", "rb") as input_file:
-
-# with open(r"iceWithTempElNinosSimulations100.pickle", "rb") as input_file:
+# with open(r"iceTempWith2PCsNAO36DWTsSimulations100.pickle", "rb") as input_file:
+with open(r"iceWithTempElNinosSimulations100.pickle", "rb") as input_file:
    iceSimulations = pickle.load(input_file)
 iceSims = iceSimulations['evbmus_sim']
 iceDates = iceSimulations['dates_sim']
 
-with open(r"processedWaveWaterLevels25DWTs36IWTs.pickle", "rb") as input_file:
+with open(r"processedWaveWaterLevels49DWTs25IWTs2022v2.pickle", "rb") as input_file:
+# with open(r"processedWaveWaterLevels25DWTs36IWTs.pickle", "rb") as input_file:
    onOffData = pickle.load(input_file)
 percentWaves = onOffData['percentWaves']
 percentIce = onOffData['percentIce']
@@ -346,7 +346,7 @@ for simNum in range(100):
     # testTime2 = testTime.to_pydatetime()
 
     # simsPickle = ('/home/dylananderson/projects/atlanticClimate/Sims/simulation{}.pickle'.format(simNum))
-    simsPickle = ('/media/dylananderson/Elements/historicSims/simulation{}.pickle'.format(simNum))
+    simsPickle = ('/volumes/macDrive/historicalSims2/simulation{}.pickle'.format(simNum))
 
     outputSims= {}
     outputSims['simulationData'] = simDataInterp.T

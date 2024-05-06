@@ -43,13 +43,14 @@ dayTime = fetchPickle['dayTime']
 # outputDWTs['myDates'] = myDates
 # outputDWTs['waves'] = waves
 
+# with open(r"iceData25ClustersMediumishMin150withDayNumRG.pickle", "rb") as input_file:
 
-with open(r"iceData25ClustersMediumishMin150withDayNumRG.pickle", "rb") as input_file:
+with open(r"iceData36ClustersDayNumRGAdjusted.pickle", "rb") as input_file:
    historicalDWTs = pickle.load(input_file)
 
 order = historicalDWTs['kma_order']
 
-bmus = historicalDWTs['bmus_corrected']
+bmus = historicalDWTs['bmus_final']
 time = historicalDWTs['dayTime']
 timeArray = np.array(time)
 kma_order = historicalDWTs['kma_order']
@@ -64,18 +65,16 @@ y = historicalDWTs['y']
 
 
 fig2 = plt.figure(figsize=(10,10))
-gs1 = gridspec.GridSpec(5, 5)
+gs1 = gridspec.GridSpec(6, 6)
 gs1.update(wspace=0.00, hspace=0.00) # set the spacing between axes.
 c1 = 0
 c2 = 0
 counter = 0
 plotIndx = 0
 plotIndy = 0
-for hh in range(25):
-    #p1 = plt.subplot2grid((6,6),(c1,c2))
+for hh in range(36):
     ax = plt.subplot(gs1[hh],projection=ccrs.NorthPolarStereo(central_longitude=-45))
     num = kma_order[hh]
-    # num = kma_orderOG[hh]
 
     # spatialField = kmOG[(hh - 1), :]# / 100 - np.nanmean(SLP_C, axis=0) / 100
     spatialField = kmSorted[(hh), :]# / 100 - np.nanmean(SLP_C, axis=0) / 100
@@ -83,26 +82,11 @@ for hh in range(25):
     linearField[points] = spatialField
     rectField = linearField.reshape(75, 85)
 
-    # ax.set_extent([-180, 180, 50, 90], crs=ccrs.PlateCarree())
-    # gl = ax.gridlines(draw_labels=True)
-    # extent = [-9.97, 168.35, 30.98, 34.35]
-
-    # ax.pcolormesh(x[25:155], y[125:235], rectField, cmap=cmocean.cm.ice)
-    # ax.pcolormesh(x[40:135], y[140:230], rectField, cmap=cmocean.cm.ice)
-    # ax.pcolormesh(x[45:135], y[140:230], rectField, cmap=cmocean.cm.ice)
-
-    # #  this is the proper orientation
-    # ax.pcolormesh(x[65:150], y[160:235], rectField, cmap=cmocean.cm.ice)
-    # ax.set_xlim([-2323000, 0])
-    # ax.set_ylim([0, 2330000])
-    # ax.text(-2323000/3*2,2100000,'{} days'.format(group_size[num]))
-
     # Inverted orientation
     ax.pcolormesh(y[160:235],x[65:150], np.fliplr(rectField.T), cmap=cmocean.cm.ice)
     ax.set_ylim([-2323000, 300000])
     ax.set_xlim([-200000, 2130000])
     ax.text(1230000/3,30000,'{} days'.format(group_size[num]))
-
 
     temp = np.fliplr(rectField.T)
     tempInd = np.where((np.isnan(temp)))
@@ -111,13 +95,6 @@ for hh in range(25):
     temp2 = temp
     temp[64:,0:25] = np.nan
     ax.pcolormesh(y[160:235],x[65:150], temp, vmin=0, vmax=1, cmap='Greys')
-
-    # gl.xlabels_top = False
-    # gl.ylabels_left = False
-    # gl.xformatter = LONGITUDE_FORMATTER
-    # gl.yformatter = LATITUDE_FORMATTER
-    # ax.set_title('EOF {} = {}%'.format(hh+1,np.round(nPercent[hh]*10000)/100))
-    # ax.set_title('{} days'.format(group_size[num]))
 
     c2 += 1
     if c2 == 6:
@@ -132,34 +109,24 @@ for hh in range(25):
 
 
 import datetime as dt
-numDWTs=25
+numDWTs=36
 fetchLengths = []
 waveHeights = []
 for hh in range(numDWTs):
     dwtInd = np.where((bmus==hh))
     fetchBin = []
     waveBin = []
-    #for qq in range(len(dwtInd[0])):
-        # dayInd = np.where((tWave >= dt.datetime(time[dwtInd[0][qq]].year, time[dwtInd[0][qq]].month,time[dwtInd[0][qq]].day,0,0,0)) &
-        #                   (tWave <= dt.datetime(timeArray[dwtInd[0][qq]].year, timeArray[dwtInd[0][qq]].month,
-        #                                        timeArray[dwtInd[0][qq]].day,23,0,0)))
-        # dayInd = np.where((dayTime == ))
-        # fetchBin.append(hsCombined[dayInd[0]])
     fetchBin.append(np.asarray(fetchTotalConcentration)[dwtInd[0]])
     waveBin.append(slpWaves['wh_all'][dwtInd[0]])
-
     fetchLengths.append(np.concatenate(fetchBin,axis=0))
     waveHeights.append(np.concatenate(waveBin,axis=0))
 
 
-
 dwtcolors = cm.rainbow(np.linspace(0, 1, numDWTs))
-#plt.style.use('dark_background')
-
 plt.style.use('dark_background')
 dist_space = np.linspace(0, 1600000/1000, 1000)
 fig = plt.figure(figsize=(10,10))
-gs2 = gridspec.GridSpec(5, 5)
+gs2 = gridspec.GridSpec(6, 6)
 
 colorparam = np.zeros((numDWTs,))
 counter = 0
@@ -167,19 +134,8 @@ plotIndx = 0
 plotIndy = 0
 for xx in range(numDWTs):
     dwtInd = xx
-    #dwtInd = order[xx]
-    #dwtInd = newOrder[xx]
-
-    #ax = plt.subplot2grid((6, 5), (plotIndx, plotIndy), rowspan=1, colspan=1)
     ax = plt.subplot(gs2[xx])
-
-    # normalize = mcolors.Normalize(vmin=np.min(colorparams), vmax=np.max(colorparams))
     normalize = mcolors.Normalize(vmin=50000/1000, vmax=1500000/1000)
-
-    # ax.set_xlim([0, 5])
-    # ax.set_ylim([0, 1])
-    #data = dwtHs[dwtInd]
-
     data2 = fetchLengths[xx]
     data = data2[~np.isnan(data2)]/1000*kiloArea
 
@@ -193,7 +149,6 @@ for xx in range(numDWTs):
         ax.spines['top'].set_color([0.5, 0.5, 0.5])
         ax.spines['right'].set_color([0.5, 0.5, 0.5])
         ax.spines['left'].set_color([0.5, 0.5, 0.5])
-        # ax.text(1.8, 1, np.round(colorparam*100)/100, fontweight='bold')
 
     else:
         ax.spines['bottom'].set_color([0.3, 0.3, 0.3])
@@ -239,16 +194,11 @@ cbar.set_label('Wave Gen Area (km^2)')
 
 
 
-
-
-
 dwtcolors = cm.rainbow(np.linspace(0, 1, numDWTs))
-#plt.style.use('dark_background')
-
 plt.style.use('dark_background')
 dist_space = np.linspace(0, 1800000/1000, 1000)
 fig = plt.figure(figsize=(10,10))
-gs2 = gridspec.GridSpec(5, 5)
+gs2 = gridspec.GridSpec(6, 6)
 
 colorparam = np.zeros((numDWTs,))
 counter = 0
@@ -386,7 +336,7 @@ def ksdensity_ICDF(x, p):
 
 import random
 import datetime as dt
-numDWTs=25
+numDWTs=36
 fetchSims = []
 for hh in range(numDWTs):
     dwtInd = np.where((bmus==hh))
@@ -416,7 +366,7 @@ dwtcolors = cm.rainbow(np.linspace(0, 1, numDWTs))
 plt.style.use('dark_background')
 dist_space = np.linspace(0, 1800000/1000, 1000)
 fig = plt.figure(figsize=(10,10))
-gs2 = gridspec.GridSpec(5, 5)
+gs2 = gridspec.GridSpec(6, 65)
 
 colorparam = np.zeros((numDWTs,))
 counter = 0
@@ -500,7 +450,7 @@ cbar.set_label('Wave Gen Area (km^2)')
 
 
 
-gevCopulaSimsPickle = 'iceFetchSims.pickle'
+gevCopulaSimsPickle = 'ice36FetchSims.pickle'
 outputgevCopulaSims = {}
 outputgevCopulaSims['fetchSims'] = fetchSims
 

@@ -9,7 +9,13 @@ from time_operations import xds_common_dates_daily as xcd_daily
 import pickle
 from dateutil.relativedelta import relativedelta
 from alr import ALR_WRP
+import sys
+import subprocess
 
+
+if 'darwin' in sys.platform:
+    print('Running \'caffeinate\' on MacOSX to prevent the system from sleeping')
+    subprocess.Popen('caffeinate')
 
 def ReadMatfile(p_mfile):
     'Parse .mat file to nested python dictionaries'
@@ -57,16 +63,20 @@ def dateDay2datetime(d_vec):
 
 
 import pickle
-with open(r"iceData25ClustersMediumishMin150withDayNumRG.pickle", "rb") as input_file:
+# with open(r"iceData25ClustersMediumishMin150withDayNumRG.pickle", "rb") as input_file:
+# with open(r"iceData36ClustersDayNumRGAdjusted.pickle", "rb") as input_file:
+with open(r"iceData36ClustersDayNumRGFinalized.pickle", "rb") as input_file:
     # with open(r"iceData36ClustersMin60.pickle", "rb") as input_file:
     iceDWTs = pickle.load(input_file)
 
 iceTime = iceDWTs['dayTime']
 #iceTime = [np.array((iceDWTs['year'][i],iceDWTs['month'][i],iceDWTs['day'][i])) for i in range(len(iceDWTs['year']))]
 iceDateTimes = iceTime# dateDay2datetime(iceTime)
-bmus = iceDWTs['bmus_corrected']
+# bmus = iceDWTs['bmus_corrected']
+bmus = iceDWTs['bmus_final']
 bmus = bmus[151:]+1
 bmus_dates = iceDateTimes[151:]
+
 
 xds_KMA_fit = xr.Dataset(
     {
@@ -231,8 +241,9 @@ covTNorm = np.divide(np.subtract(cov_T,cov_T_mean),cov_T_std)
 covTNormalize = np.multiply(covTNorm,multCovT)
 
 
+i0 = d_covars_fit.index(datetime(int(xds_KMA_fit.time.dt.year[0]),int(xds_KMA_fit.time.dt.month[0]),int(xds_KMA_fit.time.dt.day[0])))
 
-i0 = d_covars_fit.index(x2d(xds_KMA_fit.time[0]))
+# i0 = d_covars_fit.index(x2d(xds_KMA_fit.time[0]))
 cov_KMA = cov_T[i0:,:]
 d_covars_fit = d_covars_fit[i0:]
 
@@ -258,10 +269,10 @@ xds_bmus_fit = xds_KMA_fit.sel(
 
 
 # Autoregressive logistic wrapper
-num_clusters = 25
+num_clusters = 36
 sim_num = 10
 fit_and_save = True # False for loading
-p_test_ALR = '/media/dylananderson/Elements/NC_climate/testALR/'
+p_test_ALR = '/users/dylananderson/documents/data/pointHope/testIceALR/'
 
 # ALR terms
 d_terms_settings = {
@@ -280,6 +291,7 @@ ALRW.SetFitData(
     num_clusters, xds_bmus_fit, d_terms_settings)
 
 ALRW.FitModel(max_iter=10000)
+
 
 sim_num = 10
 diffSims = 100
@@ -403,7 +415,9 @@ for simIndex in range(diffSims):
     # ALR model simulations
     sim_years = 71
     # start simulation at PCs available data
-    d1 = x2d(xds_cov_sim.time[0])
+    # d1 = x2d(xds_cov_sim.time[0])
+    d1 = datetime(int(xds_cov_sim.time.dt.year[0]), int(xds_cov_sim.time.dt.month[0]), int(xds_cov_sim.time.dt.day[0]))
+
     d2 = datetime(d1.year+sim_years, d1.month, d1.day)
     dates_sim = [d1 + timedelta(days=i) for i in range((d2-d1).days+1)]
     dates_sim = dates_sim[0:-2]
@@ -441,7 +455,7 @@ for simIndex in range(diffSims):
 #         [d.day for d in dates_sim])).T
 #
 
-samplesPickle = 'iceFutureSimulations1000.pickle'
+samplesPickle = 'ice36FinalFutureSimulations1000.pickle'
 outputSamples = {}
 outputSamples['evbmus_sim'] = evbmus_sim
 # outputSamples['evbmus_probcum'] = evbmus_probcum
@@ -765,7 +779,7 @@ ax.set_ylabel('Probability')
 
 # Lets make a plot comparing probabilities in sim vs. historical
 probH = np.nan*np.ones((num_clusters,))
-probS = np.nan * np.ones((sim_num,num_clusters))
+probS = np.nan * np.ones((1000,num_clusters))
 
 for h in np.unique(bmus):
     findH = np.where((bmus == h))[0][:]

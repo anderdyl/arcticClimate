@@ -45,8 +45,26 @@ def DateConverter_Mat2Py(datearray_matlab):
 def xds2datetime(d64):
     'converts xr.Dataset np.datetime64[ns] into datetime'
     # TODO: hour minutes and seconds
+    return datetime(int(d64.dt.year), int(d64.dt.month), int(d64.dt.day))
 
-    return datetime(d64.dt.year, d64.dt.month, d64.dt.day)
+def date2datenum(d):
+    'Returns date d (any format) in datetime'
+
+    # TODO: new type switch for xarray.core numpy.datetime64
+    # TODO: rename to date2datetime
+
+    if isinstance(d, datetime):
+        return d
+
+    # else get timetuple
+    elif isinstance(d, np.datetime64):
+        ttup = npdt64todatetime(d).timetuple()
+
+    elif isinstance(d, DatetimeGregorian):
+        ttup = d.timetuple()
+
+    # return datetime
+    return datetime(*ttup[:6])
 
 def npdt64todatetime(dt64):
     'converts np.datetime64[ns] into datetime'
@@ -183,8 +201,10 @@ def xds_reindex_daily(xds_data,  dt_lim1=None, dt_lim2=None):
         xds_dt2 = xds_data.time.values[-1]
     else:
         # parse xds times to python datetime
-        xds_dt1 = xds2datetime(xds_data.time[0])
-        xds_dt2 = xds2datetime(xds_data.time[-1])
+        xds_dt1 = datetime(int(xds_data.time.dt.year[0]),int(xds_data.time.dt.month[0]),int(xds_data.time.dt.day[0]))
+        #xds_dt1 = xds2datetime(xds_data.time[0])
+        xds_dt2 = datetime(int(xds_data.time.dt.year[-1]),int(xds_data.time.dt.month[-1]),int(xds_data.time.dt.day[-1]))
+        #xds_dt2 = xds2datetime(xds_data.time[-1])
 
     # cut data at limits
     if dt_lim1:
@@ -212,8 +232,11 @@ def xds_reindex_monthly(xds_data):
         xds_dt2 = xds_data.time.values[-1]
     else:
         # parse xds times to python datetime
-        xds_dt1 = xds2datetime(xds_data.time[0])
-        xds_dt2 = xds2datetime(xds_data.time[-1])
+        # xds_dt1 = xds2datetime(xds_data.time[0])
+        xds_dt1 = datetime(int(xds_data.time.dt.year[0]),int(xds_data.time.dt.month[0]),int(xds_data.time.dt.day[0]))
+
+        # xds_dt2 = xds2datetime(xds_data.time[-1])
+        xds_dt2 = datetime(int(xds_data.time.dt.year[-1]),int(xds_data.time.dt.month[-1]),int(xds_data.time.dt.day[-1]))
 
     # number of months
     num_months = (xds_dt2.year - xds_dt1.year)*12 + \
@@ -251,9 +274,13 @@ def xds_limit_dates(xds_list):
             xds_e_dt2 = xds_e.time.values[-1]
         else:
             # parse xds times to python datetime
-            xds_e_dt1 = xds2datetime(xds_e.time[0])
-            xds_e_dt2 = xds2datetime(xds_e.time[-1])
+            # xds_e_dt1 = xds2datetime(xds_e.time[0])
+            xds_e_dt1 = datetime(int(xds_e.time.dt.year[0]), int(xds_e.time.dt.month[0]),
+                               int(xds_e.time.dt.day[0]))
 
+            # xds_e_dt2 = xds2datetime(xds_e.time[-1])
+            xds_e_dt2 = datetime(int(xds_e.time.dt.year[-1]), int(xds_e.time.dt.month[-1]),
+                               int(xds_e.time.dt.day[-1]))
         if d1 == None:
             d1 = xds_e_dt1
             d2 = xds_e_dt2
@@ -279,9 +306,12 @@ def xds_further_dates(xds_list):
             xds_e_dt2 = xds_e.time.values[-1]
         else:
             # parse xds times to python datetime
-            xds_e_dt1 = xds2datetime(xds_e.time[0])
-            xds_e_dt2 = xds2datetime(xds_e.time[-1])
-
+            # xds_e_dt1 = xds2datetime(xds_e.time[0])
+            xds_e_dt1 = datetime(int(xds_e.time.dt.year[0]), int(xds_e.time.dt.month[0]),
+                               int(xds_e.time.dt.day[0]))
+            # xds_e_dt2 = xds2datetime(xds_e.time[-1])
+            xds_e_dt2 = datetime(int(xds_e.time.dt.year[-1]), int(xds_e.time.dt.month[-1]),
+                               int(xds_e.time.dt.day[-1]))
         if d1 == None:
             d1 = xds_e_dt1
             d2 = xds_e_dt2
@@ -309,24 +339,7 @@ def date2yearfrac(d):
 
     return ttup.tm_yday / year_ndays
 
-def date2datenum(d):
-    'Returns date d (any format) in datetime'
 
-    # TODO: new type switch for xarray.core numpy.datetime64
-    # TODO: rename to date2datetime
-
-    if isinstance(d, datetime):
-        return d
-
-    # else get timetuple
-    elif isinstance(d, np.datetime64):
-        ttup = npdt64todatetime(d).timetuple()
-
-    elif isinstance(d, DatetimeGregorian):
-        ttup = d.timetuple()
-
-    # return datetime
-    return datetime(*ttup[:6])
 
 def get_years_months_days(time):
     '''

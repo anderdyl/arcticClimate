@@ -26,7 +26,7 @@ import pickle
 import xarray as xr
 
 
-with open(r"normalizedWaveHydrographsHope.pickle", "rb") as input_file:
+with open(r"normalizedWaveHydrographsHope2Dist49ptLay.pickle", "rb") as input_file:
    normalizedWaveHydrographs = pickle.load(input_file)
 normalizedHydros = normalizedWaveHydrographs['normalizedHydros']
 bmuDataMin = normalizedWaveHydrographs['bmuDataMin']
@@ -35,15 +35,15 @@ bmuDataStd = normalizedWaveHydrographs['bmuDataStd']
 bmuDataNormalized = normalizedWaveHydrographs['bmuDataNormalized']
 
 
-with open(r"waveHydrographsHope.pickle", "rb") as input_file:
+with open(r"waveHydrographsHope2Dist49ptLay.pickle", "rb") as input_file:
    waveHydrographs = pickle.load(input_file)
 hydros = waveHydrographs['hydros']
 
-with open(r"hydrographCopulaDataHope.pickle", "rb") as input_file:
+with open(r"hydrographCopulaDataHope2Dist49ptLay.pickle", "rb") as input_file:
    hydrographCopulaData = pickle.load(input_file)
 copulaData = hydrographCopulaData['copulaData']
 
-with open(r"historicalDataHope.pickle", "rb") as input_file:
+with open(r"historicalDataHope2Dist49ptLay.pickle", "rb") as input_file:
    historicalData = pickle.load(input_file)
 grouped = historicalData['grouped']
 groupLength = historicalData['groupLength']
@@ -580,11 +580,21 @@ for i in range(len(np.unique(bmuGroup))):
     dataHs = np.array([sub[0] for sub in copulaData[i]])
     data = tempCopula[~np.isnan(dataHs)]
     data2 = data[~np.isnan(data[:,5])]
-    if i == 32:
-        data2 = data
-        data2[:,5] = 0
-    print('{} hydrographs of {} in DWT {}'.format(len(data2),len(data),i))
 
+    # if i == 36:
+    #     data2 = data
+    #     data2[:,5] = 0
+    print('{} hydrographs of {} in DWT {}'.format(len(data2),len(data),i))
+    if i == 36:
+        data2 = data3
+        # data2[:,5] = 0
+    if i == 85:
+        data2 = data3
+        # data2[:,5] = 0
+    if i == 91:
+        data2 = data3[0:3,:]
+        # data2[:,5] = 0
+    data3 = data2
     if len(tempCopula) > 50:
         # # if i == 59 or i == 55 or i == 65 or i == 47 or i == 66 or i == 53 or i == 56:
         # if i == 47 or i == 66 or i == 53 or i == 56:
@@ -595,23 +605,33 @@ for i in range(len(np.unique(bmuGroup))):
     else:
         kernels = ['KDE','KDE','KDE','KDE','KDE','KDE']
 
-    if i == 32:
+    if i == 36:
         samples = np.tile(data2[:,0:6],(100000,1))
+    elif i == 43:
+        samples = np.tile(data2[:, 0:6], (100000, 1))
+    elif i == 77:
+        samples = np.tile(data2[:, 0:6], (100000, 1))
+    elif i == 85:
+        samples = np.tile(data2[:, 0:6], (100000, 1))
+    elif i == 86:
+        samples = np.tile(data2[:, 0:6], (100000, 1))
+    elif i == 91:
+        samples = np.tile(data2[:, 0:6], (100000, 1))
     else:
         samples = CopulaSimulation(data2[:,0:6],kernels,100000)
 
-    negIndex1 = np.where(samples[:,0] > 0.25)
-    samples2 = samples[negIndex1]
-    negIndex2 = np.where(samples2[:,1] > 0.05)
-    samples3 = samples2[negIndex2]
-    negIndex3 = np.where(samples3[:,2] > 2.5)
-    samples4 = samples3[negIndex3]
-    negIndex4 = np.where(samples4[:,3] > 1.5)
-    samples5 = samples4[negIndex4]
+        negIndex1 = np.where(samples[:,0] > 0.25)
+        samples2 = samples[negIndex1]
+        negIndex2 = np.where(samples2[:,1] > 0.05)
+        samples3 = samples2[negIndex2]
+        negIndex3 = np.where(samples3[:,2] > 2.5)
+        samples4 = samples3[negIndex3]
+        negIndex4 = np.where(samples4[:,3] > 1.5)
+        samples5 = samples4[negIndex4]
 
-    cutoff = 1.25*np.nanmax(tempCopula[:,0])
-    toobig = np.where(samples5[:, 0] < cutoff)
-    samples5 = samples5[toobig]
+        cutoff = 1.25*np.nanmax(tempCopula[:,0])
+        toobig = np.where(samples5[:, 0] < cutoff)
+        samples5 = samples5[toobig]
 
     # if i == 39:
     #     toobig = np.where(samples5[:,0] < 8)
@@ -655,7 +675,7 @@ for i in range(len(np.unique(bmuGroup))):
 
 
 
-gevCopulaSimsPickle = 'gevCopulaSims100000.pickle'
+gevCopulaSimsPickle = 'gevCopulaSims100000ptLay.pickle'
 outputgevCopulaSims = {}
 outputgevCopulaSims['gevCopulaSims'] = gevCopulaSims
 

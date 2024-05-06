@@ -107,31 +107,34 @@ wlData = mat73.loadmat('pthope_tides_for_dylan.mat')
 environData = mat73.loadmat('updated_env_for_dylan.mat')
 environDates = [datenum_to_date(t) for t in environData['time']]
 environTime = [matlab_to_datetime(t * 24 * 60 * 60) for t in environData['time']]
-#
-# import sys
-# sys.path.append('/users/dylananderson/Documents/projects/gencadeClimate/')
-# import pickle
-# with open(r"/Users/dylananderson/Documents/projects/duneLifeCycles/ptLayWavesWinds164by70.pickle", "rb") as input_file:
-#     ptLayWavesWinds = pickle.load(input_file)
-#
-# ptLayWaves = ptLayWavesWinds['ptLayWaves']
-# endTime = ptLayWavesWinds['endTime']
-# startTime = ptLayWavesWinds['startTime']
-#
-# st = dt.datetime(1979, 1, 1)
-# # end = dt.datetime(2021,12,31)
-# end = dt.datetime(2022,6,1)
-# step = relativedelta(days=1)
-# dayTime = []
-# while st < end:
-#     dayTime.append(st)#.strftime('%Y-%m-%d'))
-#     st += step
+
+import sys
+sys.path.append('/users/dylananderson/Documents/projects/gencadeClimate/')
+import pickle
+with open(r"/Users/dylananderson/Documents/projects/duneLifeCycles/ptLayWavesWinds164by70.pickle", "rb") as input_file:
+    ptLayWavesWinds = pickle.load(input_file)
+
+ptLayWaves = ptLayWavesWinds['ptLayWaves']
+endTime = ptLayWavesWinds['endTime']
+startTime = ptLayWavesWinds['startTime']
+
+from dateutil.relativedelta import relativedelta
+st = dt.datetime(startTime[0], startTime[1], startTime[2])
+# end = dt.datetime(2021,12,31)
+end = dt.datetime(endTime[0],endTime[1]+1,1)
+step = relativedelta(hours=1)
+hourTime = []
+while st < end:
+    hourTime.append(st)#.strftime('%Y-%m-%d'))
+    st += step
+
 
 wlArrayTime = [matlab_to_datetime(t * 24 * 60 * 60) for t in wlData['time_all']]
 waveArrayTime = [matlab_to_datetime(t * 24 * 60 * 60) for t in waveData['time_all']]
 
-
-waveDates = [datenum_to_date(t) for t in waveData['time_all']]
+# waveDates = [datenum_to_date(t) for t in waveData['time_all']]
+import datetime as dt
+waveDates = [dt.datetime(t.year,t.month,t.day) for t in hourTime]
 
 plt.style.use('dark_background')
 plt.figure()
@@ -147,37 +150,49 @@ allWLs[wlsInd] = np.zeros((len(wlsInd),))
 # ax1.plot(wlArrayTime,wlData['wl_all'])
 ax1.plot(environTime,allWLs)
 
-ax1.set_xlim([dt.datetime(1979,1,1), dt.datetime(2022,6,1)])
+ax1.set_xlim([dt.datetime(1979,1,1), dt.datetime(2023,6,1)])
 ax1.set_ylabel('wl (m)')
-ax2.plot(waveArrayTime,waveData['wh_all'])
+
+ax2.plot(hourTime,ptLayWaves.Hs)
+# ax2.plot(waveArrayTime,waveData['wh_all'])
 # ax2.plot(environTime,environData['hs'])
-ax2.set_xlim([dt.datetime(1979,1,1), dt.datetime(2022,6,1)])
+ax2.set_xlim([dt.datetime(1979,1,1), dt.datetime(2023,6,1)])
 ax2.set_ylabel('hs (m)')
 
-ax3.plot(waveArrayTime,waveData['tp_all'])
+ax3.plot(hourTime,ptLayWaves.Tp)
+# ax3.plot(waveArrayTime,waveData['tp_all'])
 # ax3.plot(environTime,environData['tp'])
-ax3.set_xlim([dt.datetime(1979,1,1), dt.datetime(2022,6,1)])
+ax3.set_xlim([dt.datetime(1979,1,1), dt.datetime(2023,6,1)])
 ax3.set_ylabel('tp (s)')
 
-ax4.plot(waveArrayTime,waveData['mwd_all'])
+ax4.plot(hourTime,ptLayWaves.Dm)
+# ax4.plot(waveArrayTime,waveData['mwd_all'])
 # ax4.plot(environTime,environData['wd'])
-ax4.set_xlim([dt.datetime(1979,1,1), dt.datetime(2022,6,1)])
+ax4.set_xlim([dt.datetime(1979,1,1), dt.datetime(2023,6,1)])
 ax4.set_ylabel('mwd (deg)')
 
-wh_all = np.hstack((waveData['wh_all'],np.nan*np.zeros(3624,)))
-tp_all = np.hstack((waveData['tp_all'],np.nan*np.zeros(3624,)))
-dm_all = np.hstack((waveData['mwd_all'],np.nan*np.zeros(3624,)))
 
-st = dt.datetime(2022, 1, 1)
-end = dt.datetime(2022,6,1)
-from dateutil.relativedelta import relativedelta
-step = relativedelta(hours=1)
-hourTime = []
-while st < end:
-    hourTime.append(st)#.strftime('%Y-%m-%d'))
-    st += step
 
-time_all = np.hstack((waveArrayTime,hourTime))
+wh_all = ptLayWaves.Hs[0:-(2929+(365*24))]
+tp_all = ptLayWaves.Tp[0:-(2929+(365*24))]
+dm_all = ptLayWaves.Dm[0:-(2929+(365*24))]
+
+
+# wh_all = np.hstack((waveData['wh_all'],np.nan*np.zeros(3624,)))
+# tp_all = np.hstack((waveData['tp_all'],np.nan*np.zeros(3624,)))
+# dm_all = np.hstack((waveData['mwd_all'],np.nan*np.zeros(3624,)))
+#
+# st = dt.datetime(2022, 1, 1)
+# end = dt.datetime(2022,6,1)
+# from dateutil.relativedelta import relativedelta
+# step = relativedelta(hours=1)
+# hourTime = []
+# while st < end:
+#     hourTime.append(st)#.strftime('%Y-%m-%d'))
+#     st += step
+
+# time_all = np.hstack((waveArrayTime,hourTime))
+time_all = hourTime
 
 # Can we identify which days have waves and which don't...
 
@@ -236,7 +251,9 @@ for hh in range(len(onOff)):
     #ind = np.where((np.array(waveArrayTime) >= dt.datetime(dayTime[hh,0],dayTime[hh,1],dayTime[hh,2],0,0,0)) &
      #              (np.array(waveArrayTime) <= dt.datetime(dayTime[hh,0],dayTime[hh,1],dayTime[hh,2],23,0,0)))
     ind = np.where((np.array(waveDates) == slpDates[hh]))
-    onOff[hh] = np.nanmean(waveData['wh_all'][ind])
+    # onOff[hh] = np.nanmean(waveData['wh_all'][ind])
+    onOff[hh] = np.nanmean(ptLayWaves.Hs[ind])
+
      #              (np.array(waveArrayTime) <= dt.datetime(dayTime[hh,0],dayTime[hh,1],dayTime[hh,2],23,0,0)))
     # if np.isnan(np.nanmean(waveData['wh_all'][ind])):
     #     onOff[hh] = 0
@@ -276,7 +293,9 @@ yearlyIceDWT = np.nan * np.ones((len(np.unique(iceDWT)),len(years)))
 for tt in range(len(years)):
     yearInd = np.where((np.array(waveArrayTime) >= datetime(years[tt],1,1)) &
                        (np.array(waveArrayTime) <= datetime(years[tt]+1,1,1)))
-    subsetWaves = waveData['wh_all'][yearInd]
+    # subsetWaves = waveData['wh_all'][yearInd]
+    subsetWaves = ptLayWaves.Hs[yearInd]
+
     icePortion = np.where(np.isnan(subsetWaves))
     wavePortion = np.where((subsetWaves > 0))
     iceGoneDatetime.append(waveArrayTime[wavePortion[0][0]])

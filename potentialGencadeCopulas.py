@@ -25,34 +25,60 @@ from scipy.spatial import distance
 import pickle
 import xarray as xr
 
-
-with open(r"normalizedWaveHydrographsHope2Dist49.pickle", "rb") as input_file:
-   normalizedWaveHydrographs = pickle.load(input_file)
+# with open(r"normalizedWaveHydrographsPointHope.pickle", "rb") as input_file:
+# with open(r"normalizedWaveHydrographsShishmaref.pickle", "rb") as input_file:
+# with open(r"normalizedWaveHydrographsWainwright.pickle", "rb") as input_file:
+# with open(r"normalizedWaveHydrographsWales.pickle", "rb") as input_file:
+# with open(r"normalizedWaveHydrographsWevok.pickle", "rb") as input_file:
+# with open(r"normalizedWaveHydrographsPointLay.pickle", "rb") as input_file:
+# with open(r"normalizedWaveHydrographsKivalina.pickle", "rb") as input_file:
+with open(r"normalizedWaveHydrographsUtqiagvik.pickle", "rb") as input_file:
+    normalizedWaveHydrographs = pickle.load(input_file)
 normalizedHydros = normalizedWaveHydrographs['normalizedHydros']
 bmuDataMin = normalizedWaveHydrographs['bmuDataMin']
 bmuDataMax = normalizedWaveHydrographs['bmuDataMax']
 bmuDataStd = normalizedWaveHydrographs['bmuDataStd']
 bmuDataNormalized = normalizedWaveHydrographs['bmuDataNormalized']
 
-
-with open(r"waveHydrographsHope2Dist49.pickle", "rb") as input_file:
-   waveHydrographs = pickle.load(input_file)
+# with open(r"waveHydrographsPointHope.pickle", "rb") as input_file:
+# with open(r"waveHydrographsShishmaref.pickle", "rb") as input_file:
+# with open(r"waveHydrographsWainwright.pickle", "rb") as input_file:
+# with open(r"waveHydrographsWales.pickle", "rb") as input_file:
+# with open(r"waveHydrographsWevok.pickle", "rb") as input_file:
+# with open(r"waveHydrographsPointLay.pickle", "rb") as input_file:
+# with open(r"waveHydrographsKivalina.pickle", "rb") as input_file:
+with open(r"waveHydrographsUtqiagvik.pickle", "rb") as input_file:
+    waveHydrographs = pickle.load(input_file)
 hydros = waveHydrographs['hydros']
 
-with open(r"hydrographCopulaDataHope2Dist49.pickle", "rb") as input_file:
-   hydrographCopulaData = pickle.load(input_file)
+# with open(r"hydrographCopulaDataPointHope.pickle", "rb") as input_file:
+# with open(r"hydrographCopulaDataShishmaref.pickle", "rb") as input_file:
+# with open(r"hydrographCopulaDataWainwright.pickle", "rb") as input_file:
+# with open(r"hydrographCopulaDataWales.pickle", "rb") as input_file:
+# with open(r"hydrographCopulaDataWevok.pickle", "rb") as input_file:
+# with open(r"hydrographCopulaDataPointLay.pickle", "rb") as input_file:
+# with open(r"hydrographCopulaDataKivalina.pickle", "rb") as input_file:
+with open(r"hydrographCopulaDataUtqiagvik.pickle", "rb") as input_file:
+    hydrographCopulaData = pickle.load(input_file)
 copulaData = hydrographCopulaData['copulaData']
 
-with open(r"historicalDataHope2Dist49.pickle", "rb") as input_file:
-   historicalData = pickle.load(input_file)
+# with open(r"historicalDataPointHope.pickle", "rb") as input_file:
+# with open(r"historicalDataShishmaref.pickle", "rb") as input_file:
+# with open(r"historicalDataWainwright.pickle", "rb") as input_file:
+# with open(r"historicalDataWales.pickle", "rb") as input_file:
+# with open(r"historicalDataWevok.pickle", "rb") as input_file:
+# with open(r"historicalDataPointLay.pickle", "rb") as input_file:
+# with open(r"historicalDataKivalina.pickle", "rb") as input_file:
+with open(r"historicalDataUtqiagvik.pickle", "rb") as input_file:
+    historicalData = pickle.load(input_file)
+
 grouped = historicalData['grouped']
 groupLength = historicalData['groupLength']
 bmuGroup = historicalData['bmuGroup']
 timeGroup = historicalData['timeGroup']
-
-
-
 numClusters = 49
+
+
 
 def CDF_Distribution(self, vn, vv, xds_GEV_Par, d_shape, i_wt):
     '''
@@ -575,12 +601,13 @@ def CopulaSimulation(U_data, kernels, num_sim):
 
 # plt.hist(np.asarray(copulaData[i])[:,0])
 
-rangeBmus = np.arange(0,numClusters*2)
+#rangeBmus = np.arange(0,numClusters*2)
 gevCopulaSims = list()
-for i in rangeBmus:#range(len(np.unique(bmuGroup))):
+for i in range(len(np.unique(bmuGroup))):
     tempCopula = np.asarray(copulaData[i])
     if len(tempCopula) == 0:
-        data2 = [[np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]]
+        # Hsmax, Hsmin, Tpmax, Tpmin, Dmmean, u10max, u10min, v10max, v10min, Ssrmean, T2mmean, Fetch, NTRmean, Sstmean, time, kk
+        data2 = [[np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]]
         data = data2
     else:
         dataHs = np.array([sub[0] for sub in copulaData[i]])
@@ -589,28 +616,28 @@ for i in rangeBmus:#range(len(np.unique(bmuGroup))):
 
     print('{} hydrographs of {} in DWT {}'.format(len(data2),len(data),i))
 
-    if len(data2) > 500:
+    if len(data2) > 100:
         # # if i == 59 or i == 55 or i == 65 or i == 47 or i == 66 or i == 53 or i == 56:
         # if i == 47 or i == 66 or i == 53 or i == 56:
         #
         #     kernels = ['KDE', 'KDE', 'KDE', 'KDE', 'KDE', 'KDE', ]
         # else:
-        kernels = ['GEV','KDE','KDE','KDE','KDE','KDE','KDE']
+        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
     elif len(data2) == 3 or len(data2) == 2:
-        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE']
+        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
         data2 = np.vstack((data2,data2-data2*0.1))
     else:
-        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE']
+        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
 
     if len(data2) <= 1:
-        samples5 = np.zeros((100000,6))
+        samples5 = np.zeros((100000,13))
     else:
-        samples = CopulaSimulation(data2[:,0:6],kernels,100000)
+        samples = CopulaSimulation(data2[:,0:13],kernels,100000)
 
-        negIndex1 = np.where(samples[:,0] > 0.05)
+        negIndex1 = np.where(samples[:,0] > 0.1)
         samples2 = samples[negIndex1]
 
-        negIndex2 = np.where(samples2[:,1] > 0.05)
+        negIndex2 = np.where(samples2[:,1] > 0.02)
         samples3 = samples2[negIndex2]
 
         negIndex3 = np.where(samples3[:,2] > 1.5)
@@ -618,7 +645,7 @@ for i in rangeBmus:#range(len(np.unique(bmuGroup))):
         negIndex4 = np.where(samples4[:,3] > 0.5)
         samples5 = samples4[negIndex4]
 
-        cutoff = 1.5*np.nanmax(tempCopula[:,0])
+        cutoff = 1.2*np.nanmax(tempCopula[:,0])
         toobig = np.where(samples5[:, 0] < cutoff)
         samples5 = samples5[toobig]
 
@@ -662,9 +689,15 @@ for i in rangeBmus:#range(len(np.unique(bmuGroup))):
 # plt.hist(samples[:,0],100)
 # plt.ylim([0, 200])
 
+# gevCopulaSimsPickle = 'gevCopulaSims100000pointHope.pickle'
+# gevCopulaSimsPickle = 'gevCopulaSims100000shishmaref.pickle'
+# gevCopulaSimsPickle = 'gevCopulaSims100000wainwright.pickle'
+# gevCopulaSimsPickle = 'gevCopulaSims100000wales.pickle'
+# gevCopulaSimsPickle = 'gevCopulaSims100000wevok.pickle'
+# gevCopulaSimsPickle = 'gevCopulaSims100000pointLay.pickle'
+# gevCopulaSimsPickle = 'gevCopulaSims100000kivalina.pickle'
+gevCopulaSimsPickle = 'gevCopulaSims100000utqiagvik.pickle'
 
-
-gevCopulaSimsPickle = 'gevCopulaSims1000002Dist49.pickle'
 outputgevCopulaSims = {}
 outputgevCopulaSims['gevCopulaSims'] = gevCopulaSims
 

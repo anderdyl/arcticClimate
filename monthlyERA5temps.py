@@ -3,23 +3,54 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
+# import sys
+# import pickle
+# sys.path.insert(0, '/Users/dylananderson/Documents/projects/gencadeClimate/')
+#
+# with open(r"utqiagvikWavesWindsTemps157pt5by71pt25.pickle", "rb") as input_file:
+#     metOcean = pickle.load(input_file)
+#
+#
+# asdfg
+
+# hsCombined = metOcean['tyndallWaves'].Hs
+
+
 path_in = "/media/dylananderson/Elements/pointHope/"
 path_out = "./"
 
-df = xr.open_dataset(path_in + 'ERA5monthlyTemps.nc')
+df = xr.open_dataset('ERA5monthlyTemps.nc')
 print(df)
 print(df.dims)
 
 df2 = xr.open_dataset('ERA5monthlyMay2022.nc')
 print(df2.dims)
 
+df3 = xr.open_dataset('ERA5monthlyJuneToDecember2022.nc')
+print(df3.dims)
+
+df4 = xr.open_dataset('ERA5monthlyJanuaryToOctober2023.nc')
+print(df4.dims)
+
+df5 = xr.open_dataset('ERA5monthlyArcticDecToNov1978.nc')
+print(df5.dims)
+
 temps = df['t2m']-273.15
 temps2 = df2['t2m']-273.15
-aoTemps = temps[:,:,0:90,:].mean(dim='expver',skipna=True)
+temps3 = df3['t2m']-273.15
+temps4 = df4['t2m']-273.15
+temps5 = df5['t2m']-273.15
 
+aoTemps = temps5[:,0:90,:]
+
+aoTemps1 = temps[:,:,0:90,:].mean(dim='expver',skipna=True)
 aoTemps2 = temps2[:,0:90,:]
+aoTemps3 = temps3[:,0:90,:]
+aoTemps4 = temps4[:,:,0:90,:].mean(dim='expver',skipna=True)
+
 # aoTemps3 = aoTemps.drop('expver')
-tempCon = xr.concat([aoTemps,aoTemps2],dim='time')
+tempCon = xr.concat([aoTemps,aoTemps1,aoTemps2,aoTemps3,aoTemps4],dim='time')
 
 temp1 = tempCon[:,0:90,:].mean(dim=['longitude','latitude'])
 
@@ -56,10 +87,10 @@ for tt in range(43):
 pdf = temp1.to_dataframe()
 
 pdfy = pdf.squeeze()
-
-y_to_train = pdfy[:'2016-05-01'] # dataset to train
-y_to_val = pdfy['2016-06-01':] # last X months for test
-predict_date = len(pdfy) - len(pdfy[:'2016-05-01']) # the number of data points for the test set
+#
+# y_to_train = pdfy[:'2016-05-01'] # dataset to train
+# y_to_val = pdfy['2016-06-01':] # last X months for test
+# predict_date = len(pdfy) - len(pdfy[:'2016-05-01']) # the number of data points for the test set
 
 
 
@@ -214,8 +245,8 @@ import time
 
 from dateutil.relativedelta import relativedelta
 from datetime import date
-dt = date(1979, 1, 1)
-end = date(2022, 6, 1)
+dt = date(1978, 11, 1)
+end = date(2023, 11, 1)
 step = relativedelta(days=1)
 atTime = []
 while dt < end:
@@ -231,8 +262,8 @@ dailyTime = []
 for i in atTime:
     dailyTime.append(time.mktime(i.timetuple()))
 
-dt2 = date(1979, 6, 1)
-end2 = date(2050, 6, 1)
+dt2 = date(1978, 11, 1)
+end2 = date(2076, 11, 1)
 step2 = relativedelta(days=1)
 atTime2 = []
 while dt2 < end2:
@@ -363,9 +394,14 @@ ax6 = plt.subplot2grid((6,1),(5,0))
 ax6.plot(ts,tr.values)
 ax6.plot(DAILYDATE2,ansSineFuture+ansSine2Future+ansSine3Future+ansSine4Future+y_lineFuture)
 ax6.plot(ts,ansSine+ansSine2+ansSine3+ansSine4+y_lineMonthlyHistorical)
+alternateFuture = ansSineFuture+ansSine2Future+np.mean(y_lineMonthlyHistorical[-100:])+ansSine3Future+ansSine4Future
+ax6.plot(DAILYDATE2[-(3655*5+365*3):],alternateFuture[-(3655*5+365*3):])
 
 
 futureTrend = ansSineFuture+ansSine2Future+ansSine3Future+ansSine4Future+y_lineFuture
+
+
+
 
 
 def testSineSeasonal(x, a, b, c, d):
@@ -391,13 +427,16 @@ plt.plot(ts,pdf)
 plt.plot(DAILYDATE2,seasonalSineFuture+futureTrend)
 
 futureTemps = seasonalSineFuture+futureTrend
+alternateFutureTemps = futureTemps#seasonalSineFuture+alternateFuture
+alternateFutureTemps[-(3655*5+365*3):] = alternateFuture[-(3655*5+365*3):] + seasonalSineFuture[-(3655*5+365*3):]
+plt.plot(DAILYDATE2,alternateFutureTemps)
 
 
 import datetime as dt
 from dateutil.relativedelta import relativedelta
-st = dt.datetime(1979, 1, 1)
+st = dt.datetime(1978, 11, 1)
 # end = dt.datetime(2021,12,31)
-end = dt.datetime(2022,6,1)
+end = dt.datetime(2023,11,1)
 step = relativedelta(days=1)
 dayTime = []
 while st < end:
@@ -405,9 +444,9 @@ while st < end:
     st += step
 
 
-st2 = dt.datetime(1979, 6, 1)
+st2 = dt.datetime(1978, 11, 1)
 # end = dt.datetime(2021,12,31)
-end2 = dt.datetime(2050,6,1)
+end2 = dt.datetime(2076,11,1)
 step2 = relativedelta(days=1)
 dayTime2 = []
 while st2 < end2:
@@ -416,8 +455,8 @@ while st2 < end2:
 
 
 
-dt3 = date(1979, 1, 1)
-end3 = date(2050, 7, 1)
+dt3 = date(1978, 11, 1)
+end3 = date(2076, 11, 1)
 step3 = relativedelta(months=1)
 monthlyTime = []
 while dt3 < end3:
@@ -437,15 +476,19 @@ possibleRes = rl.values.squeeze()
 lengthHistory = len(possibleRes)
 numSims = 100
 sims = []
+simsNoChange = []
 for hh in range(numSims):
-    simInts = np.random.randint(521, size=337)
+    # simInts = np.random.randint(521, size=337)
+    simInts = np.random.randint(539, size=636)
+
     newRes = possibleRes[simInts]
     combinedRes = np.hstack((possibleRes,newRes))
 
     interpTempFuture = np.interp(np.array(dailyTime2), np.array(dtimeFuture), combinedRes)+futureTemps
-
+    interpAlternateTempFuture = np.interp(np.array(dailyTime2), np.array(dtimeFuture), combinedRes)+alternateFutureTemps
 
     sims.append(interpTempFuture)
+    simsNoChange.append(interpAlternateTempFuture)
 
 # plt.figure()
 # plt.plot(dayTime2,interpTempFuture)
@@ -474,15 +517,18 @@ interpTemp = np.interp(np.array(dailyTime),np.array(dtime),temp1.values)
 
 
 
+
 import pickle
 
-dwtPickle = 'predictedArcticTemp.pickle'
+dwtPickle = 'predictedArctic1978to2023.pickle'
 outputDWTs = {}
 outputDWTs['dailyDate'] = dayTime
 outputDWTs['arcticTemp'] = interpTemp
 outputDWTs['futureDate'] = dayTime2
 outputDWTs['futureTemp'] = futureTemps
+outputDWTs['alternateFutureTemp'] = alternateFutureTemps
 outputDWTs['futureSims'] = sims
+outputDWTs['alternateFutureSims'] = simsNoChange
 
 
 with open(dwtPickle,'wb') as f:

@@ -62,15 +62,17 @@ import pickle
 
 # with open(r"iceData25SmallerClustersY2022.pickle", "rb") as input_file:
 #    iceDWTs = pickle.load(input_file)
-# with open(r"iceData36ClustersMediumishMin60withDayNumRG.pickle", "rb") as input_file:
-with open(r"iceData36ClustersMin60.pickle", "rb") as input_file:
+# with open(r"iceData25ClustersMediumishMin150withDayNumRG.pickle", "rb") as input_file:
+# with open(r"iceData25ClustersDayNumRGAdjusted.pickle", "rb") as input_file:
+with open(r"iceData36ClustersDayNumRGAdjusted.pickle", "rb") as input_file:
+
     iceDWTs = pickle.load(input_file)
 
 
 # dayTime = slpDWTs['SLPtime']
 iceTime = iceDWTs['dayTime']
 #iceTime = [np.array((iceDWTs['year'][i],iceDWTs['month'][i],iceDWTs['day'][i])) for i in range(len(iceDWTs['year']))]
-
+iceOrder = np.arange(0,36)
 # slpDates = dateDay2datetime(dayTime)
 # slpDatetimes = dateDay2datetime(dayTime)
 iceDateTimes = iceTime# dateDay2datetime(iceTime)
@@ -93,7 +95,8 @@ iceDateTimes = iceTime# dateDay2datetime(iceTime)
 # gapFilledIce[indices] = iceBmus[0:len(indices)]
 # gapFilledIce[indices2] = iceBmus
 
-bmus = iceDWTs['bmus_corrected']
+# bmus = iceDWTs['bmus_corrected']
+bmus = iceDWTs['bmus2']
 # slpDWT = slpDWTs['bmus_corrected']
 bmus = bmus[151:]+1
 bmus_dates = iceDateTimes[151:]#[151:-214]
@@ -175,8 +178,8 @@ xds_KMA_fit = xr.Dataset(
 with open(r"observedArcticTemp.pickle", "rb") as input_file:
    historicalTemp = pickle.load(input_file)
 
-timeTemp = historicalTemp['dailyDate']
-arcticTemp = historicalTemp['arcticTemp']
+timeTemp = historicalTemp['dailyDate'][151:-365]
+arcticTemp = historicalTemp['arcticTemp'][151:-365]
 
 xds_Temp_fit = xr.Dataset(
     {
@@ -187,6 +190,8 @@ xds_Temp_fit = xr.Dataset(
 
 # reindex to daily data after 1979-01-01 (avoid NaN)
 xds_Temp_fit = xr_daily(xds_Temp_fit, datetime(1979, 6, 1),datetime(2021,5,31))
+
+
 #
 #
 #
@@ -258,7 +263,9 @@ covTNormalize = np.multiply(covTNorm,multCovT)
 # covTSimNormalize = np.multiply(covTSimNorm,multCovT)
 
 # KMA related covars starting at KMA period
-i0 = d_covars_fit.index(x2d(xds_KMA_fit.time[0]))
+# i0 = d_covars_fit.index(x2d(xds_KMA_fit.time[0]))
+i0 = d_covars_fit.index(datetime(int(xds_KMA_fit.time.dt.year[0]),int(xds_KMA_fit.time.dt.month[0]),int(xds_KMA_fit.time.dt.day[0])))
+
 # cov_KMA = cov_T[i0:,:]
 cov_KMA = cov_T[i0:]
 
@@ -297,7 +304,7 @@ xds_bmus_fit = xds_KMA_fit.sel(
 num_clusters = 36
 sim_num = 100
 fit_and_save = True # False for loading
-p_test_ALR = '/media/dylananderson/Elements/pointHope/testIceALR/'
+p_test_ALR = '/users/dylananderson/documents/data/pointHope/testIceALR/'
 
 # ALR terms
 d_terms_settings = {
@@ -328,7 +335,8 @@ ALRW.Report_Fit() #'/media/dylananderson/Elements/NC_climate/testALR/r_Test', te
 # ALR model simulations
 sim_years = 42
 # start simulation at PCs available data
-d1 = x2d(xds_cov_fit.time[0])
+# d1 = x2d(xds_cov_fit.time[0])
+d1 = datetime(int(xds_cov_fit.time.dt.year[0]),int(xds_cov_fit.time.dt.month[0]),int(xds_cov_fit.time.dt.day[0]))
 d2 = datetime(d1.year+sim_years, d1.month, d1.day)
 dates_sim = [d1 + timedelta(days=i) for i in range((d2-d1).days+1)]
 
@@ -352,7 +360,7 @@ dates_sim = dates_sim[0:-2]
 evbmus_sim = xds_ALR.evbmus_sims.values
 # evbmus_probcum = xds_ALR.evbmus_probcum.values
 
-p_mat_output = ('/media/dylananderson/Elements/NC_climate/testALR/testOfIceW36RGTrueTemp_y{0}s{1}.h5'.format(
+p_mat_output = ('/users/dylananderson/Documents/data/pointHope/testIceALR/testOfIceW36RGTrueTemp_y{0}s{1}.h5'.format(
         sim_years, sim_num))
 import h5py
 with h5py.File(p_mat_output, 'w') as hf:
@@ -731,18 +739,18 @@ timeAsArray = np.array(bmus_dates)
 plt.figure()
 ax1 = plt.subplot2grid((2,1),(0,0))
 for qq in range(len(np.unique(bmus))):
-    getBMUS = np.where((bmus == qq+1))
+    getBMUS = np.where((bmus == qq))
     temp = bmus[getBMUS]
     tempTime = timeAsArray[getBMUS]
-    ax1.plot(np.array(bmus_dates)[getBMUS[0]],qq*np.ones((len(temp),)),'.',color=dwtcolors[iceDWTs['kma_order'][qq]])
+    ax1.plot(np.array(bmus_dates)[getBMUS[0]],qq*np.ones((len(temp),)),'.',color=dwtcolors[iceOrder[qq]])#[iceDWTs['kma_order'][qq]])
 
 simIce = 1
 ax2 = plt.subplot2grid((2,1),(1,0))
 for qq in range(len(np.unique(bmus))):
-    getBMUS = np.where((evbmus_sim[:,simIce] == qq+1))
+    getBMUS = np.where((evbmus_sim[:,simIce] == qq))
     temp = evbmus_sim[getBMUS,simIce]
     tempTime = timeAsArray[getBMUS]
-    ax2.plot(np.array(bmus_dates)[getBMUS[0]],qq*np.ones((len(temp[0]),)),'.',color=dwtcolors[iceDWTs['kma_order'][qq]])
+    ax2.plot(np.array(bmus_dates)[getBMUS[0]],qq*np.ones((len(temp[0]),)),'.',color=dwtcolors[iceOrder[qq]])#iceDWTs['kma_order'][qq]])
 
 
 

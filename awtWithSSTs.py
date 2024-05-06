@@ -147,15 +147,17 @@ def PCA_LatitudeAverage(xds, var_name, y1, y2, m1, m2):
     PCs = ipca.fit_transform(var_anom_demean)
 
     pred_lon = xds.longitude.values[:]
-
+    # print(ipca)
+    # print(var_anom_std)
+    # print(var_anom_mean)
     return xr.Dataset(
         {
             'PCs': (('n_components', 'n_components'), PCs),
             'EOFs': (('n_components','n_features'), ipca.components_),
             'variance': (('n_components',), ipca.explained_variance_),
 
-            'var_anom_std': (('n_features',), var_anom_std),
-            'var_anom_mean': (('n_features',), var_anom_mean),
+            'var_anom_std': (('n_features',), var_anom_std.values),
+            'var_anom_mean': (('n_features',), var_anom_mean.values),
 
             'time': (('n_components'), time_PCA),
             'pred_lon': (('n_lon',), pred_lon),
@@ -424,10 +426,11 @@ def Plot_AWTs_Dates(bmus, dates, n_clusters, show=True):
     return fig
 
 
-data_folder="/media/dylananderson/Elements/shusin6_contents/AWT/ERSSTV5/"
+# data_folder="/media/dylananderson/Elements/shusin6_contents/AWT/ERSSTV5/"
+data_folder="/Users/dylananderson/Documents/data/ERSSTV5/"
 
 
-years = np.arange(1880,2023)
+years = np.arange(1880,2024)
 months = np.arange(1,13)
 ogTime = []
 for ii in years:
@@ -447,7 +450,7 @@ for ii in years:
                     temp = ds
                     SST = ds['sst']
                     ogTime.append(datetime.datetime(ii,hh,1))
-            elif ii == 2022 and hh > 5:
+            elif ii == 2023 and hh > 5:
                 print("skipping {}/{}".format(ii,hh))
             else:
                 with xr.open_dataset(os.path.join(data_folder,file)) as ds:
@@ -459,7 +462,7 @@ for ii in years:
 
 
 dt = datetime.datetime(1880, 6, 1)
-end = datetime.datetime(2022, 6, 1)
+end = datetime.datetime(2023, 6, 1)
 #step = datetime.timedelta(months=1)
 step = relativedelta(years=1)
 sstTime = []
@@ -472,7 +475,7 @@ data = SST.squeeze("lev")
 # parse data to xr.Dataset
 xds_predictor = xr.Dataset(
     {
-        'SST': (('longitude','latitude','time'), data.T),
+        'SST': (('longitude','latitude','time'), data.values.T),
     },
     coords = {
         'longitude': SST.lon.values,
@@ -486,7 +489,7 @@ xds_predictor = xr.Dataset(
 subset = xds_predictor.sel(longitude=slice(120,280),latitude=slice(-5,5))
 
 
-predictor = PCA_LatitudeAverage(subset, "SST", 1880, 2021, 6, 5)
+predictor = PCA_LatitudeAverage(subset, "SST", 1880, 2022, 6, 5)
 
 
 clusters = KMA_simple(predictor, 6, repres=0.95)
@@ -498,7 +501,7 @@ Plot_AWTs_Dates(clusters.bmus.values, np.asarray(sstTime), 6, show=True)
 
 import pickle
 
-dwtPickle = 'AWT1880to2021.pickle'
+dwtPickle = 'AWT1880to2023.pickle'
 outputAWT = {}
 outputAWT['clusters'] = clusters
 outputAWT['predictor'] = predictor
@@ -590,7 +593,7 @@ for i in range(len(subsetAWT)):
 
 import pickle
 
-awtPickle = 'ensoPCs2022.pickle'
+awtPickle = 'ensoPCs2023.pickle'
 outputMWTs = {}
 outputMWTs['PC1'] = PC1
 outputMWTs['PC2'] = PC2

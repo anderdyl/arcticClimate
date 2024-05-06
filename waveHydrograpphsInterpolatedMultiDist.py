@@ -41,12 +41,14 @@ simIceGroupsChopped = simsChoppedInput['simIceGroupsChopped']
 simIceSlpGroupsChopped = simsChoppedInput['simIceSlpGroupsChopped']
 simTimeGroupsChopped = simsChoppedInput['simTimeGroupsChopped']
 
+simIceAreaGroupsChopped = simsChoppedInput['simIceAreaGroupsChopped']
 
-with open(r"gevCopulaSims1000002Dist49.pickle", "rb") as input_file:
+
+with open(r"gevCopulaSims100000ptLay.pickle", "rb") as input_file:
    gevCopulaSimsInput = pickle.load(input_file)
 gevCopulaSims = gevCopulaSimsInput['gevCopulaSims']
 
-with open(r"normalizedWaveHydrographsHope2Dist49.pickle", "rb") as input_file:
+with open(r"normalizedWaveHydrographsHope2Dist49ptLay.pickle", "rb") as input_file:
    normalizedWaveHydrographs = pickle.load(input_file)
 normalizedHydros = normalizedWaveHydrographs['normalizedHydros']
 bmuDataMin = normalizedWaveHydrographs['bmuDataMin']
@@ -54,7 +56,7 @@ bmuDataMax = normalizedWaveHydrographs['bmuDataMax']
 bmuDataStd = normalizedWaveHydrographs['bmuDataStd']
 bmuDataNormalized = normalizedWaveHydrographs['bmuDataNormalized']
 
-with open(r"hydrographCopulaDataHope2Dist49.pickle", "rb") as input_file:
+with open(r"hydrographCopulaDataHope2Dist49ptLay.pickle", "rb") as input_file:
    hydrographCopulaData = pickle.load(input_file)
 copulaData = hydrographCopulaData['copulaData']
 copulaDataNoNaNs = hydrographCopulaData['copulaDataNoNaNs']
@@ -66,13 +68,16 @@ with open(r"iceFutureSimulations1000.pickle", "rb") as input_file:
 iceSims = iceSimulations['evbmus_sim']
 iceDates = iceSimulations['dates_sim']
 
-with open(r"processedWaveWaterLevels49DWTs25IWTs2022.pickle", "rb") as input_file:
+with open(r"processedWaveWaterLevels49DWTs25IWTs2022v2.pickle", "rb") as input_file:
    onOffData = pickle.load(input_file)
 percentWaves = onOffData['percentWaves']
 percentIce = onOffData['percentIce']
 
-with open(r"iceData25ClustersMediumishMin150withDayNumRG.pickle", "rb") as input_file:
+# with open(r"iceData25ClustersMediumishMin150withDayNumRG.pickle", "rb") as input_file:
+with open(r"iceData25ClustersDayNumRGAdjusted.pickle", "rb") as input_file:
    iceDWTs = pickle.load(input_file)
+
+
 
 
 # with open(r"iceTempWith2PCsNAO36DWTsSimulations100.pickle", "rb") as input_file:
@@ -264,6 +269,7 @@ simulationsHs = list()
 simulationsTp = list()
 simulationsDm = list()
 simulationsSs = list()
+simulationsArea = list()
 simulationsTime = list()
 
 for simNum in range(100):
@@ -272,6 +278,7 @@ for simNum in range(100):
     simTp = []
     simDm = []
     simSs = []
+    simArea = []
     simTime = []
     print('filling in simulation #{}'.format(simNum))
 
@@ -281,17 +288,7 @@ for simNum in range(100):
 
         tempIceSlpBmus = simIceSlpGroupsChopped[simNum][i][0]
         tempTimeMonth = simTimeGroupsChopped[simNum][i][0]
-
-        # if tempIceSlpBmus == 1:
-        #     if tempTimeMonth < 9:
-        #         tempBmu = int(simBmuChopped[simNum][i]-1)+49+49
-        #     else:
-        #         tempBmu = int(simBmuChopped[simNum][i]-1)+49+49+49
-        # else:
-        #     if tempTimeMonth < 9:
-        #         tempBmu = int(simBmuChopped[simNum][i]-1)
-        #     else:
-        #         tempBmu = int(simBmuChopped[simNum][i]-1)+49
+        tempArea = simIceAreaGroupsChopped[simNum][i][0]
 
         if tempIceSlpBmus == 1:
             tempBmu = int(simBmuChopped[simNum][i]-1)+49
@@ -299,14 +296,38 @@ for simNum in range(100):
             tempBmu = int(simBmuChopped[simNum][i]-1)
 
 
-        # if tempBmu == 60:
-        #     tempBmu = 120
+        if tempBmu == 91:
+            tempBmu = 42
+        elif tempBmu ==43:
+            tempBmu = 42
+        elif tempBmu ==36:
+            tempBmu = 37
+        elif tempBmu ==85:
+            tempBmu = 37
+        elif tempBmu ==77:
+            tempBmu = 35
+        elif tempBmu ==86:
+            tempBmu = 37
+
         #
         # if tempBmu == 62:
         #     tempBmu = 122
+
         # so i think at this stage we need to know what the correspond ICE dwt is... then whether its a 0 or 1, and then choose from the gevCopulaSims based on that
-        randStorm = random.randint(0, 9999)
+        randStorm = [random.randint(0, 49999) for n in range(100)]
+
         stormDetails = gevCopulaSims[tempBmu][randStorm]
+
+        possibleAreas = stormDetails[:,5]
+
+
+        def find_nearest(array, value):
+            array = np.asarray(array)
+            idx = (np.abs(array - value)).argmin()
+            #return array[idx]
+            return idx
+        chosen = find_nearest(possibleAreas,tempArea)
+        stormDetails = stormDetails[chosen]
         if stormDetails[0] > 10:
             print('oh boy, we''ve picked a {}m storm wave in BMU #{}'.format(stormDetails[0],tempBmu))
         durSim = simBmuLengthChopped[simNum][i]
@@ -322,6 +343,8 @@ for simNum in range(100):
         # simDmNorm = (stormDetails[4] - np.asarray(bmuDataMin)[tempBmu,0]) / (np.asarray(bmuDataMax)[tempBmu,0]-np.asarray(bmuDataMin)[tempBmu,0])
         # simSsNorm = (stormDetails[5] - np.asarray(bmuDataMin)[tempBmu,1]) / (np.asarray(bmuDataMax)[tempBmu,1]-np.asarray(bmuDataMin)[tempBmu,1])
         # test, closeIndex = closest_node([simDmNorm,simSsNorm],np.asarray(bmuDataNormalized)[tempBmu])
+
+
         test, closeIndex = closest_node([simHsNorm,simTpNorm],np.asarray(bmuDataNormalized)[tempBmu])
 
         actualIndex = closeIndex#int(np.asarray(copulaDataNoNaNs[tempBmu])[closeIndex,6])
@@ -366,7 +389,7 @@ for simNum in range(100):
         #     print('Now Ss is longer than Time in bmu {}, index {}'.format(tempBmu,actualIndex))
         #     print('{} vs. {}'.format(len(tempSs),len(normalizedHydros[tempBmu][actualIndex]['timeNorm'])))
         #     tempSs = tempSs[0:-1]
-            simTime.append(np.hstack((np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim), np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim)[-1])))
+        simTime.append(np.hstack((np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim), np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim)[-1])))
 
         if simIceGroupsChopped[simNum][i][0] > 0:
             simHs.append(tempHs)
@@ -421,7 +444,7 @@ for simNum in range(100):
     # testTime2 = testTime.to_pydatetime()
 
     # simsPickle = ('/home/dylananderson/projects/atlanticClimate/Sims/simulation{}.pickle'.format(simNum))
-    simsPickle = ('/media/dylananderson/Elements/historicSims/simulationOnlyWaves{}.pickle'.format(simNum))
+    simsPickle = ('/volumes/macDrive/historicalSims2/simulationOnlyWaves{}.pickle'.format(simNum))
 
     outputSims= {}
     outputSims['simulationData'] = simDataInterp.T

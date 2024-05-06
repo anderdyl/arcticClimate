@@ -280,7 +280,7 @@ iceTime = [dt.datetime(np.array(year)[i],np.array(month)[i],np.array(day)[i]) fo
 
 st = dt.datetime(1979, 1, 1)
 # end = dt.datetime(2021,12,31)
-end = dt.datetime(2022,6,1)
+end = dt.datetime(2023,10,3)
 step = relativedelta(days=1)
 dayTime = []
 while st < end:
@@ -454,7 +454,8 @@ X = PCsub_norm  #  predictor
 # PREDICTAND: WAVES data
 #wd = np.array([xds_WAVES[vn].values[:] for vn in name_vars]).T
 # wd = np.vstack((iceWaves['wh_all'],iceWaves['tp_all'],np.multiply(iceWaves['wh_all']**2,iceWaves['tp_all'])**(1.0/3))).T
-wd = np.vstack((dayOfYearSine,dayOfYearCosine,iceConcentration)).T
+# wd = np.vstack((dayOfYearSine,dayOfYearCosine,iceConcentration)).T
+wd = np.vstack((dayOfYearSine,dayOfYearCosine)).T
 
 wd_std = np.nanstd(wd, axis=0)
 wd_norm = np.divide(wd, wd_std)

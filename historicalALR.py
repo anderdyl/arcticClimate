@@ -60,8 +60,8 @@ import pickle
 #    slpDWTs = pickle.load(input_file)
 
 # with open(r"dwts49ClustersArcticRGy2022.pickle", "rb") as input_file:
-
-with open(r"dwts81ClustersArcticRGy2022.pickle", "rb") as input_file:
+with open(r"dwts49ClustersArctic2023.pickle", "rb") as input_file:
+# with open(r"dwts81ClustersArcticRGy2022.pickle", "rb") as input_file:
    slpDWTs = pickle.load(input_file)
 
 timeDWTs = slpDWTs['SLPtime']
@@ -74,6 +74,9 @@ bmus_dates = dateDay2datetimeDate(timeDWTs)
 bmus_dates_months = np.array([d.month for d in bmus_dates])
 bmus_dates_days = np.array([d.day for d in bmus_dates])
 # bmus_dates = dateDay2datetime(dayTime)
+
+
+
 
 bmus = bmus[120:]+1
 timeDWTs = timeDWTs[120:]
@@ -89,11 +92,18 @@ xds_KMA_fit = xr.Dataset(
 
 
 
-with open(r"averageArcticTemp.pickle", "rb") as input_file:
-   historicalTemp = pickle.load(input_file)
+# Loading historical Arctic Temperatures for 1979 to 2022
+with open(r"predictedArctic1978to2023.pickle", "rb") as input_file:
+   arcticTemperatures = pickle.load(input_file)
 
-timeTemp = historicalTemp['dailyDate']
-arcticTemp = historicalTemp['arcticTemp']
+timeTemp = arcticTemperatures['futureDate']
+arcticTemp = np.array(arcticTemperatures['futureSims'][0])
+#
+# with open(r"averageArcticTemp.pickle", "rb") as input_file:
+#    historicalTemp = pickle.load(input_file)
+#
+# timeTemp = historicalTemp['dailyDate']
+# arcticTemp = historicalTemp['arcticTemp']
 
 xds_Temp_fit = xr.Dataset(
     {
@@ -103,12 +113,12 @@ xds_Temp_fit = xr.Dataset(
 )
 
 # reindex to daily data after 1979-01-01 (avoid NaN)
-xds_Temp_fit = xr_daily(xds_Temp_fit, datetime(1979, 6, 1),datetime(2021,5,31))
+xds_Temp_fit = xr_daily(xds_Temp_fit, datetime(1979, 6, 1),datetime(2023,5,31))
 
 
 
 
-with open(r"mjo1979to2022.pickle", "rb") as input_file:
+with open(r"arcticMJO.pickle", "rb") as input_file:
    mjoData = pickle.load(input_file)
 
 
@@ -117,7 +127,7 @@ timeMJO = mjoData['mjoTime']
 # yearsDWTS = historicalDWTs['month']
 # daysDWTS = historicalDWTs['month']
 
-bmusMJO = mjoData['bmusMJO']
+bmusMJO = mjoData['bmus']
 bmus_datesMJO = timeMJO#dateDay2datetimeDate(timeMJO)
 bmus_dates_yearsMJO = np.array([d.year for d in bmus_datesMJO])
 bmus_dates_monthsMJO = np.array([d.month for d in bmus_datesMJO])
@@ -138,11 +148,11 @@ xds_MJO_fit = xr.Dataset(
     #coords = {'time': timeMJO}
 )
 # reindex to daily data after 1979-01-01 (avoid NaN)
-xds_MJO_fit = xr_daily(xds_MJO_fit, datetime(1979, 6, 1),datetime(2021,5,31))
+xds_MJO_fit = xr_daily(xds_MJO_fit, datetime(1979, 6, 1),datetime(2023,5,31))
 
 
 #### AWT FROM ENSO SSTs
-with open(r"AWT1880to2020.pickle", "rb") as input_file:
+with open(r"AWT1880to2023.pickle", "rb") as input_file:
    historicalAWTs = pickle.load(input_file)
 awtClusters = historicalAWTs['clusters']
 awtPredictor = historicalAWTs['predictor']
@@ -156,7 +166,7 @@ awtVariance = awtPredictor['variance'].values
 nPercent = awtVariance / np.sum(awtVariance)
 
 dt = datetime(1880, 6, 1)
-end = datetime(2021, 6, 1)
+end = datetime(2023, 6, 1)
 #step = datetime.timedelta(months=1)
 step = relativedelta(years=1)
 sstTime = []
@@ -164,8 +174,8 @@ while dt < end:
     sstTime.append(dt)
     dt += step
 
-years = np.arange(1979,2021)
-awtYears = np.arange(1880,2021)
+years = np.arange(1979,2023)
+awtYears = np.arange(1880,2023)
 
 awtDailyBmus = np.nan * np.ones(np.shape(bmus))
 PC1 = np.nan * np.ones(np.shape(bmus))
@@ -190,7 +200,7 @@ xds_PCs_fit = xr.Dataset(
     coords = {'time': [datetime(int(r[0]),int(r[1]),int(r[2])) for r in timeDWTs]}
 )
 # reindex annual data to daily data
-xds_PCs_fit = xr_daily(xds_PCs_fit, datetime(1979,6,1),datetime(2021,5,31))
+xds_PCs_fit = xr_daily(xds_PCs_fit, datetime(1979,6,1),datetime(2023,5,31))
 
 
 # with open(r"mwtPCs3.pickle", "rb") as input_file:
@@ -386,10 +396,10 @@ xds_bmus_fit = xds_KMA_fit.sel(
 
 
 # Autoregressive logistic wrapper
-num_clusters = 81
+num_clusters = 49
 sim_num = 100
 fit_and_save = True # False for loading
-p_test_ALR = '/media/dylananderson/Elements/pointHope/testALR/'
+p_test_ALR = '/Users/dylananderson/Documents/data/testALR/'
 
 # ALR terms
 d_terms_settings = {
@@ -406,7 +416,7 @@ ALRW = ALR_WRP(p_test_ALR)
 ALRW.SetFitData(
     num_clusters, xds_bmus_fit, d_terms_settings)
 
-ALRW.FitModel(max_iter=20000)
+ALRW.FitModel(max_iter=5000)
 
 
 #p_report = op.join(p_data, 'r_{0}'.format(name_test))
@@ -415,7 +425,7 @@ ALRW.Report_Fit() #'/media/dylananderson/Elements/NC_climate/testALR/r_Test', te
 
 
 # ALR model simulations
-sim_years = 42
+sim_years = 44
 # start simulation at PCs available data
 d1 = x2d(xds_cov_fit.time[0])
 d2 = datetime(d1.year+sim_years, d1.month, d1.day)
@@ -438,7 +448,7 @@ dates_sim = dates_sim[0:-2]
 evbmus_sim = xds_ALR.evbmus_sims.values
 # evbmus_probcum = xds_ALR.evbmus_probcum.values
 
-p_mat_output = ('/media/dylananderson/Elements/pointHope/testALR/testWithAWTandATemp81RG_y{0}s{1}.h5'.format(
+p_mat_output = ('/Users/dylananderson/Documents/data/testALR/testWithAWTandATemp49RG_y{0}s{1}.h5'.format(
         sim_years, sim_num))
 import h5py
 with h5py.File(p_mat_output, 'w') as hf:
@@ -450,7 +460,7 @@ with h5py.File(p_mat_output, 'w') as hf:
         [d.day for d in dates_sim])).T
 
 
-samplesPickle = 'dwt81RGHistoricalSimulations100withTemp.pickle'
+samplesPickle = 'dwt49HistoricalSimulations100withTemp2023.pickle'
 outputSamples = {}
 outputSamples['evbmus_sim'] = evbmus_sim
 # outputSamples['evbmus_probcum'] = evbmus_probcum

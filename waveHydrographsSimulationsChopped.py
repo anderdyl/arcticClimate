@@ -46,7 +46,7 @@ iceSims = iceSimulations['evbmus_sim']
 iceDates = iceSimulations['dates_sim']
 
 
-with open(r"processedWaveWaterLevels49DWTs25IWTs2022.pickle", "rb") as input_file:
+with open(r"processedWaveWaterLevels49DWTs25IWTs2022v2.pickle", "rb") as input_file:
    onOffData = pickle.load(input_file)
 percentWaves = onOffData['percentWaves']
 percentIce = onOffData['percentIce']
@@ -54,10 +54,12 @@ percentIce = onOffData['percentIce']
 
 # with open(r"iceData36ClustersMin60.pickle", "rb") as input_file:
 #    iceDWTs = pickle.load(input_file)
-with open(r"iceData25ClustersMediumishMin150withDayNumRG.pickle", "rb") as input_file:
+# with open(r"iceData25ClustersMediumishMin150withDayNumRG.pickle", "rb") as input_file:
+
+with open(r"iceData25ClustersDayNumRGAdjusted.pickle", "rb") as input_file:
    iceDWTs = pickle.load(input_file)
 
-with open(r"iceFetchSims.pickle", "rb") as input_file:
+with open(r"iceFetchSimsv2.pickle", "rb") as input_file:
    fwtchSimsPickle = pickle.load(input_file)
 fetchSims = fwtchSimsPickle['fetchSims']
 
@@ -215,6 +217,33 @@ for hh in range(100):
     iceArea.append(np.concatenate([x for xs in yearsIceStitched for x in xs]).ravel())
 
 
+def running_mean(x, N):
+    cumsum = np.cumsum(np.insert(x, 0, 0))
+    return (cumsum[N:] - cumsum[:-N]) / float(N)
+
+
+# tempIceArea = iceArea[0]
+# smoothedIce = running_mean(tempIceArea,30)
+# smoothedIce2 = running_mean(tempIceArea,60)
+#
+# plt.figure()
+#
+# plt.plot(dates_sim,tempIceArea[0:len(dates_sim)])
+# plt.plot(dates_sim[15:len(dates_sim)-15],smoothedIce[0:len(dates_sim)-30])
+# plt.plot(dates_sim[30:len(dates_sim)-30],smoothedIce2[0:len(dates_sim)-60])
+
+startIce = np.array([8,9,10,12,14,16,18,20,22,24,26,29,32,35,39,43,47,51,55,60,65,70,75,80,85,90,95,100,106,112])
+endIce = np.array([10,12,13,14,15,16,17,16,15,14,13,14,15,16,16,17,18,19,20,16,17,15,14,20,22,16,18,22,26])
+
+# contIce = np.hstack((startIce,smoothedIce2,endIce))
+
+iceAreaSmooth = []
+for n in range(100):
+    print('smoothing ice area simulation {}'.format(n))
+    tempIceArea = iceArea[n]
+    smoothedIce2 = running_mean(tempIceArea, 60)
+    contIce = np.hstack((startIce,smoothedIce2,endIce))
+    iceAreaSmooth.append(contIce)
 #
 # def GenOneYearDaily(yy=1981, month_ini=1):
 #    'returns one generic year in a list of datetimes. Daily resolution'
@@ -352,7 +381,7 @@ for hh in range(100):
     bmus = evbmus_sim[:,hh]
     iceBmus = iceOnOff[hh]
     actualIceBmus = iceSims[:,hh]
-    iceAreaBmus = iceArea[hh]
+    iceAreaBmus = iceAreaSmooth[hh]
 
     tempBmusGroup = [[e[0] for e in d[1]] for d in itertools.groupby(enumerate(bmus), key=operator.itemgetter(1))]
 
@@ -452,7 +481,10 @@ for pp in range(numRealizations):
         simIceGrouped.append(iceGroup[i][counter:])
         simIceSlpGrouped.append(iceSlpGroup[i][counter:])
         simTimeGrouped.append(timeGroup[i][counter:])
+        simIceAreaGrouped.append(iceAreaGroup[i][counter:])
+
         simBmu.append(tempBmu)
+
     simBmuLengthChopped.append(np.asarray(simGroupLength))
     simBmuGroupsChopped.append(simGrouped)
     simIceGroupsChopped.append(simIceGrouped)

@@ -110,11 +110,13 @@ def moving_average(a, n=3):
    return ret[n - 1:] / n
 
 
-with open(r"realWavesPtLay.pickle", "rb") as input_file:
+with open(r"realWavesPointHope.pickle", "rb") as input_file:
+# with open(r"realWavesShishmaref.pickle", "rb") as input_file:
+# with open(r"realWavesWainwright.pickle", "rb") as input_file:
    wavesInput = pickle.load(input_file)
 
 tWave = wavesInput['tWave']#[5:]
-tC = tWave[0:-(2929+(365*24))]
+tC = tWave#[0:-(2929+(365*24))]
 # tC = wavesInput['tC'][5:]
 
 hsCombined = wavesInput['hsCombined']
@@ -130,7 +132,7 @@ dmCombined = wavesInput['dmCombined']#[5:]
 nanInd = np.where((dmCombined==0))
 dmCombined[nanInd] = np.nan * np.ones((len(nanInd)))
 
-waveNorm = wavesInput['waveNorm']
+# waveNorm = wavesInput['waveNorm']
 # wlFRF = wavesInput['wlFRF']
 # tFRF = wavesInput['tWl']
 # resFRF = wavesInput['res']
@@ -165,15 +167,18 @@ fourDayMaxHs = np.asarray(fourDayMax)
 
 simSeasonalMean = np.nan * np.ones((100,12))
 simSeasonalStd = np.nan * np.ones((100,12))
-simYearlyMax = np.nan * np.ones((100,43))
+simYearlyMax = np.nan * np.ones((100,45))
 yearArray = []
 zNArray = []
 ciArray = []
-for hh in range(100):
+for hh in range(30):
    # file = r"/home/dylananderson/projects/atlanticClimate/Sims/simulation{}.pickle".format(hh)
    # file = r"/media/dylananderson/Elements/historicSims/simulationOnlyWaves{}.pickle".format(hh)
    # file = r"/users/dylananderson/Documents/projects/historicalSims/simulationOnlyWaves{}.pickle".format(hh)
-   file = r"/volumes/macDrive/historicalSims2/simulationOnlyWaves{}.pickle".format(hh)
+   # file = r"/volumes/macDrive/historicalSims2/simulationOnlyWaves{}.pickle".format(hh)
+   # file = r"/Users/dylananderson/Documents/data/wainwright/simulation{}.pickle".format(hh)
+   # file = r"/Users/dylananderson/Documents/data/shishmaref/simulation{}.pickle".format(hh)
+   file = r"/Users/dylananderson/Documents/data/pointHope/simulation{}.pickle".format(hh)
 
 
    with open(file, "rb") as input_file:
@@ -213,7 +218,8 @@ for hh in range(100):
       c = c + 96
    fourDayMaxHsSim = np.asarray(fourDayMaxSim)
 
-   sim = return_value(np.asarray(fourDayMaxHsSim)[0:365*40], 4, 0.05, 365/4, 36525/4, 'mle')
+   # sim = return_value(np.asarray(fourDayMaxHsSim)[0:365*40], 3, 0.05, 365/4, 36525/4, 'mle')
+   sim = return_value(np.asarray(fourDayMaxHsSim)[0:365*44], 3, 0.05, 365/4, int((365*45)/4), 'mle')
 
    yearArray.append(sim['year_array'])
    zNArray.append(sim['z_N'])
@@ -247,37 +253,152 @@ for hh in range(100):
 #    simYearlyMaxNotInterped[hh,:] = simdf.groupby('year').max()['hs']
 #
 
-hh = 1
-# file = r"/media/dylananderson/Elements/historicSims/simulationOnlyWaves{}.pickle".format(hh)
-file = r"/volumes/macDrive/historicalSims2/simulation{}.pickle".format(hh)
+import datetime as dt
+st = dt.datetime(1980, 1, 1)
+end = dt.datetime(2023,1,1)
+from dateutil.relativedelta import relativedelta
+step = relativedelta(days=1)
+dailyTimeEval = []
+while st < end:
+    dailyTimeEval.append(st)#.strftime('%Y-%m-%d'))
+    st += step
 
-with open(file, "rb") as input_file:
-   simsInput = pickle.load(input_file)
-   # simulationData = simsInput['futureSimulationData']
-simulationData = simsInput['simulationData']#[0:156000,:]
+years = np.arange(1980,2023)
+numDays = 14
+st = dt.datetime(2022, 1, 1)
+end = dt.datetime(2023, 1, 1)
+step = relativedelta(days=numDays)
+plotTimeW = []
+while st < end:
+    plotTimeW.append(st)#.strftime('%Y-%m-%d'))
+    st += step
 
-df = simsInput['df']
 
-df.loc[df['hs'] == 0, 'hs'] = np.nan
-df.loc[df['tp'] == 0, 'tp'] = np.nan
-df.loc[df['dm'] == 0, 'dm'] = np.nan
+ogHsClimatologyMean = np.nan * np.ones((len(years),int(366/numDays)))
+ogHsClimatologyUpper = np.nan * np.ones((len(years),int(366/numDays)))
+ogHsClimatologyLower = np.nan * np.ones((len(years),int(366/numDays)))
+yCounter = 0
+for hh in years:
+   ogTimeIndex = np.where((tC >= dt.datetime(hh,1,1)) & (tC < dt.datetime(hh+1,1,1)))
+   ogYearlyDf = ogdf.hs[ogTimeIndex[0]]
+   step = numDays*24
+   c = 0
+   for qq in range(int(366/numDays)):
+      tempOG = np.where((ogYearlyDf[c:(c+numDays*24)]>0))
 
-time = simsInput['time']
-year = np.array([tt.year for tt in time])
-df['year'] = year
-month = np.array([tt.month for tt in time])
-df['month'] = month
+      if len(tempOG[0]) > (numDays*18):
+         ogHsClimatologyMean[yCounter,qq] = np.nanmean(ogYearlyDf[c:(c+numDays*24)])
+         ogHsClimatologyUpper[yCounter,qq] = np.nanpercentile(ogYearlyDf[c:(c+numDays*24)],90)
+         ogHsClimatologyLower[yCounter,qq] = np.nanpercentile(ogYearlyDf[c:(c+numDays*24)],10)
 
+      else:
+         ogHsClimatologyMean[yCounter,qq] = np.nan
+         ogHsClimatologyUpper[yCounter,qq] = np.nan
+         ogHsClimatologyLower[yCounter,qq] = np.nan
+
+      c = c + (numDays*24)
+   yCounter = yCounter+1
+simHsClimatologyMean = []
+simHsClimatologyUpper = []
+simHsClimatologyLower = []
+for hh in range(10):
+   # file = r"/media/dylananderson/Elements/historicSims/simulationOnlyWaves{}.pickle".format(hh)
+   # file = r"/Users/dylananderson/Documents/data/wainwright/simulation{}.pickle".format(hh)
+   # file = r"/Users/dylananderson/Documents/data/shishmaref/simulation{}.pickle".format(hh)
+   file = r"/Users/dylananderson/Documents/data/pointHope/simulation{}.pickle".format(hh)
+
+   with open(file, "rb") as input_file:
+      simsInput = pickle.load(input_file)
+      # simulationData = simsInput['futureSimulationData']
+   simulationData = simsInput['simulationData']#[0:156000,:]
+
+   df = simsInput['df']
+
+   df.loc[df['hs'] == 0, 'hs'] = np.nan
+   df.loc[df['tp'] == 0, 'tp'] = np.nan
+   df.loc[df['dm'] == 0, 'dm'] = np.nan
+
+   time = simsInput['time']
+   year = np.array([tt.year for tt in time])
+   df['year'] = year
+   month = np.array([tt.month for tt in time])
+   df['month'] = month
+   timeArray = np.asarray(time)
+
+   simHsClimatologyMeanTemp = np.nan * np.ones((len(years),int(366/numDays)))
+   simHsClimatologyUpperTemp = np.nan * np.ones((len(years),int(366/numDays)))
+   simHsClimatologyLowerTemp = np.nan * np.ones((len(years),int(366/numDays)))
+
+   yCounter = 0
+   for hh in years:
+      timeIndex = np.where((timeArray >= dt.datetime(hh,1,1)) & (timeArray < dt.datetime(hh+1,1,1)))
+      simYearlyDf = df.hs[timeIndex[0]]
+
+      step = numDays*24
+      c = 0
+      for qq in range(int(366/numDays)):
+         tempSim = np.where((simYearlyDf[c:(c+numDays*24)]>0))
+         tempOG = np.where((ogYearlyDf[c:(c+numDays*24)]>0))
+         if len(tempSim[0]) > (numDays*18):
+            simHsClimatologyMeanTemp[yCounter,qq] = np.nanmean(simYearlyDf[c:(c+numDays*24)])
+            simHsClimatologyUpperTemp[yCounter,qq] = np.nanpercentile(simYearlyDf[c:(c+numDays*24)],90)
+            simHsClimatologyLowerTemp[yCounter,qq] = np.nanpercentile(simYearlyDf[c:(c+numDays*24)],10)
+
+         else:
+            simHsClimatologyMeanTemp[yCounter,qq] = np.nan
+            simHsClimatologyUpperTemp[yCounter,qq] = np.nan
+            simHsClimatologyLowerTemp[yCounter,qq] = np.nan
+
+         c = c + (numDays*24)
+      yCounter = yCounter+1
+
+   simHsClimatologyMean.append(simHsClimatologyMeanTemp)
+   simHsClimatologyUpper.append(simHsClimatologyUpperTemp)
+   simHsClimatologyLower.append(simHsClimatologyLowerTemp)
+
+simHsClimatologyMean = np.concatenate(simHsClimatologyMean, axis=0 )
+simHsClimatologyUpper = np.concatenate(simHsClimatologyUpper, axis=0 )
+simHsClimatologyLower = np.concatenate(simHsClimatologyLower, axis=0 )
+
+plt.figure()
+ax1 = plt.subplot2grid((1,2),(0,0))
+for hh in range(len(years)):
+   ax1.plot(plotTimeW[0:-1],ogHsClimatologyMean[hh,:],color=[0.5,0.5,0.5],alpha=0.2)
+   ax1.plot(plotTimeW[0:-1],ogHsClimatologyUpper[hh,:],color=[1,0.25,0.25],alpha=0.2)
+   ax1.plot(plotTimeW[0:-1],ogHsClimatologyLower[hh,:],color=[0.25,0.25,1],alpha=0.2)
+
+ax2 = plt.subplot2grid((1, 2), (0, 1))
+for hh in range(len(simHsClimatologyMean)):
+   ax2.plot(plotTimeW[0:-1],simHsClimatologyUpper[hh,:],color=[1,0.25,0.25],alpha=0.2)
+   ax2.plot(plotTimeW[0:-1],simHsClimatologyLower[hh,:],color=[0.25,0.25,1],alpha=0.2)
+   ax2.plot(plotTimeW[0:-1],simHsClimatologyMean[hh,:],color=[0.5,0.5,0.5],alpha=0.2)
+
+
+si = 12
+ei = -4
+ax1.plot(plotTimeW[si:ei-1], np.nanmean(ogHsClimatologyMean,axis=0)[si:ei], color=[0.05, 0.05, 0.05],linewidth=2)
+ax1.plot(plotTimeW[si:ei-1], np.nanmean(ogHsClimatologyUpper,axis=0)[si:ei], color=[1, 0.05, 0.05],linewidth=2)
+ax1.plot(plotTimeW[si:ei-1], np.nanmean(ogHsClimatologyLower,axis=0)[si:ei], color=[0.05, 0.205, 1],linewidth=2)
+ax2.plot(plotTimeW[si:ei-1], np.nanmean(simHsClimatologyMean,axis=0)[si:ei], color=[0.05, 0.05, 0.05],linewidth=2)
+ax2.plot(plotTimeW[si:ei-1], np.nanmean(simHsClimatologyUpper,axis=0)[si:ei], color=[1, 0.05, 0.05],linewidth=2)
+ax2.plot(plotTimeW[si:ei-1], np.nanmean(simHsClimatologyLower,axis=0)[si:ei], color=[0.05, 0.05, 1],linewidth=2)
+ax1.set_xlim([plotTimeW[9],plotTimeW[-3]])
+ax2.set_xlim([plotTimeW[9],plotTimeW[-3]])
+ax1.set_ylim([0,3.5])
+ax2.set_ylim([0,3.5])
+
+
+#
 # plt.figure()
-# plt.plot(time,df['hs'])
+# plt.plot(time[0:-4],df['hs'])
 
-dt = datetime(2022, 1, 1)
+st = datetime(2022, 1, 1)
 end = datetime(2023, 1, 1)
 step = relativedelta(months=1)
 plotTime = []
-while dt < end:
-    plotTime.append(dt)#.strftime('%Y-%m-%d'))
-    dt += step
+while st < end:
+    plotTime.append(st)#.strftime('%Y-%m-%d'))
+    st += step
 
 plt.style.use('default')
 # plt.style.use('dark_background')
@@ -302,8 +423,8 @@ result = newDf.groupby([newDf.index.month, newDf.index.day]).mean()
 
 
 import datetime as dt
-st = dt.datetime(1979, 1, 1)
-end = dt.datetime(2021,1,1)
+st = dt.datetime(1979, 2, 1)
+end = dt.datetime(2023,6,1)
 from dateutil.relativedelta import relativedelta
 step = relativedelta(days=1)
 dailyTime = []
@@ -314,7 +435,7 @@ while st < end:
 
 import datetime as dt
 st = dt.datetime(1979, 6, 1)
-end = dt.datetime(2021,1,1)
+end = dt.datetime(2023,6,1)
 from dateutil.relativedelta import relativedelta
 step = relativedelta(days=1)
 dailyTimeSim = []
@@ -330,7 +451,7 @@ plt.figure()
 plt.plot(dailyMeanHs)
 plt.plot(dailyMeanHsSim)
 
-years = np.arange(1979,2020)
+years = np.arange(1980,2022)
 for n in range(len(years)):
    ind = np.where((np.asarray(dailyTime) == dt.datetime(years[n],1,1))) # & (dailyTime < dt.datetime(year[n],12,31)))
    if n == 0:
@@ -341,7 +462,7 @@ for n in range(len(years)):
 
 
 
-years = np.arange(1980,2020)
+years = np.arange(1980,2022)
 for n in range(len(years)):
    ind2 = np.where((np.asarray(dailyTimeSim) == dt.datetime(years[n],1,1))) # & (dailyTime < dt.datetime(year[n],12,31)))
    if n == 0:
@@ -354,19 +475,19 @@ for n in range(len(years)):
 avgYearlyHs = np.nanmean(yearlyHsMat,axis=0)
 avgYearlyHsSim = np.nanmean(yearlyHsSimMat,axis=0)
 
-plt.figure()
-plt.plot(dailyTime[ind[0][0]:ind[0][0]+365],avgYearlyHs)
-plt.plot(dailyTimeSim[ind2[0][0]:ind2[0][0]+365],avgYearlyHsSim)
+# plt.figure()
+# plt.plot(dailyTime[ind[0][0]:ind[0][0]+365],avgYearlyHs)
+# plt.plot(dailyTimeSim[ind2[0][0]:ind2[0][0]+365],avgYearlyHsSim)
+#
 
-
-# dailyMeanHs = []
-# for n in range(len(dailyTime)):
-#    ind = np.where((tWave >= dailyTime[n]) & (tWave < dailyTime[n+1]))
-#    dailyMeanHs.append(np.nanmean(hsCombined))
-plt.figure()
-plt.plot(time[5136:5136+366*24],simulationData[5136:5136+366*24,0])
-for n in range(38):
-   plt.plot(time[5136:5136+365*24],simulationData[5136+365*24*(n+1):5136+365*24*(n+2),0])
+# # dailyMeanHs = []
+# # for n in range(len(dailyTime)):
+# #    ind = np.where((tWave >= dailyTime[n]) & (tWave < dailyTime[n+1]))
+# #    dailyMeanHs.append(np.nanmean(hsCombined))
+# plt.figure()
+# plt.plot(time[5136:5136+366*24],simulationData[5136:5136+366*24,0])
+# for n in range(38):
+#    plt.plot(time[5136:5136+365*24],simulationData[5136+365*24*(n+1):5136+365*24*(n+2),0])
 
 
 #
@@ -418,10 +539,10 @@ for n in range(38):
 
 
 
-simMaxHs = np.nan*np.ones((100,43))
+simMaxHs = np.nan*np.ones((100,44))
 # simMaxHsNotInterped = np.nan*np.ones((50,100))
 for hh in range(100):
-   simMaxHs[hh,:] = np.sort(simYearlyMax[hh,0:43])
+   simMaxHs[hh,:] = np.sort(simYearlyMax[hh,0:44])
    # simMaxHsNotInterped[hh,:] = np.sort(simYearlyMaxNotInterped[hh,0:-1])
 
 plt.style.use('default')
@@ -434,7 +555,7 @@ maxHs = np.sort(yearlyMax['hs'])
 returnPeriod = np.flipud((len(maxHs)+1)/np.arange(1,len(maxHs)+1))
 # simMaxHs = np.sort(simYearlyMax['hs'][0:-1])
 # simReturnPeriod = np.flipud(100/np.arange(1,101))
-simReturnPeriod = np.flipud(43/np.arange(1,44))
+simReturnPeriod = np.flipud(44/np.arange(1,45))
 
 ax2.fill_between(simReturnPeriod, np.min(simMaxHs,axis=0), np.max(simMaxHs,axis=0), color='orange', alpha=0.2)
 ax2.plot(returnPeriod[0:-1],maxHs[1:],'o',label='ERA5')
@@ -481,7 +602,8 @@ data = np.asarray(dailyMaxHs)
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
 
-historical = return_value(np.asarray(fourDayMax), 4, 0.05, 365/4, 36525/4, 'mle')
+# historical = return_value(np.asarray(fourDayMax), 3, 0.05, 365/4, 36525/4, 'mle')
+historical = return_value(np.asarray(fourDayMax), 3, 0.05, 365/4, (365*45)/4, 'mle')
 
 plt.style.use('dark_background')
 
@@ -496,10 +618,15 @@ for qq in range(len(zNArray)):
    color = colormap(normalize(colorparam[qq]))
    plt.plot(yearArray[qq],zNArray[qq],color=color,alpha=0.75)#color=[0.5,0.5,0.5],alpha=0.5)
 
+# returnPeriod = np.flipud((len(maxHs)+1)/np.arange(1,len(maxHs)+1))
+# # simMaxHs = np.sort(simYearlyMax['hs'][0:-1])
+# # simReturnPeriod = np.flipud(100/np.arange(1,101))
+# simReturnPeriod = np.flipud(45/np.arange(1,46))
+
 plt.plot(historical['year_array'], historical['CI_z_N_high_year'], linestyle='--', color='red', alpha=0.8, lw=0.9, label='Confidence Bands')
 plt.plot(historical['year_array'], historical['CI_z_N_low_year'], linestyle='--', color='red', alpha=0.8, lw=0.9)
 plt.plot(historical['year_array'], historical['z_N'], color='orange', label='Theoretical Return Level')
-plt.scatter(historical['N'], historical['sample_over_thresh'], color='orange',label='Empirical Return Level',zorder=10)
+# plt.scatter(historical['N'], historical['sample_over_thresh'], color='orange',label='Empirical Return Level',zorder=10)
 plt.xscale('log')
 plt.xlabel('Return Period')
 plt.ylabel('Return Level')

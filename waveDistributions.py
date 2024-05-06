@@ -28,7 +28,7 @@ import scipy.io as sio
 
 
 
-with open(r"normalizedWaveHydrographsHope.pickle", "rb") as input_file:
+with open(r"normalizedWaveHydrographsPointHope.pickle", "rb") as input_file:
    normalizedWaveHydrographs = pickle.load(input_file)
 normalizedHydros = normalizedWaveHydrographs['normalizedHydros']
 bmuDataMin = normalizedWaveHydrographs['bmuDataMin']
@@ -37,22 +37,22 @@ bmuDataStd = normalizedWaveHydrographs['bmuDataStd']
 bmuDataNormalized = normalizedWaveHydrographs['bmuDataNormalized']
 
 
-with open(r"waveHydrographsHope.pickle", "rb") as input_file:
+with open(r"waveHydrographsPointHope.pickle", "rb") as input_file:
    waveHydrographs = pickle.load(input_file)
 hydros = waveHydrographs['hydros']
 
-with open(r"hydrographCopulaDataHope.pickle", "rb") as input_file:
+with open(r"hydrographCopulaDataPointHope.pickle", "rb") as input_file:
    hydrographCopulaData = pickle.load(input_file)
 copulaData = hydrographCopulaData['copulaData']
 
-with open(r"historicalDataHope.pickle", "rb") as input_file:
+with open(r"historicalDataPointHope.pickle", "rb") as input_file:
    historicalData = pickle.load(input_file)
 grouped = historicalData['grouped']
 groupLength = historicalData['groupLength']
 bmuGroup = historicalData['bmuGroup']
 timeGroup = historicalData['timeGroup']
 
-with open(r"dwts49ClustersArctic2y2022.pickle", "rb") as input_file:
+with open(r"dwts49ClustersArctic2023.pickle", "rb") as input_file:
    historicalDWTs = pickle.load(input_file)
 
 order = historicalDWTs['kma_order']
@@ -70,6 +70,8 @@ numDWTs=49
 
 dwtcolors = cm.rainbow(np.linspace(0, 1, 49))
 from mpl_toolkits.basemap import Basemap
+import cartopy.crs as ccrs
+from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 
 fig2 = plt.figure(figsize=(10,10))
 gs1 = gridspec.GridSpec(int(np.sqrt(49)), int(np.sqrt(49)))
@@ -82,10 +84,10 @@ plotIndy = 0
 for hh in range(49):
     #ax = plt.subplot2grid((3,3),(c1,c2),projection=ccrs.NorthPolarStereo(central_longitude=-45))
     #ax = plt.subplot2grid((3,3),(c1,c2))#,projection=ccrs.NorthPolarStereo(central_longitude=-45))
-    ax = plt.subplot(gs1[hh])
+    ax = plt.subplot(gs1[hh],projection=ccrs.NorthPolarStereo(central_longitude=-45))
     num = order[hh]
 
-    # m = Basemap(projection='merc',llcrnrlat=-40,urcrnrlat=55,llcrnrlon=255,urcrnrlon=375,lat_ts=10,resolution='c')
+    # # m = Basemap(projection='merc',llcrnrlat=-40,urcrnrlat=55,llcrnrlon=255,urcrnrlon=375,lat_ts=10,resolution='c')
     m = Basemap(projection='npstere', boundinglat=50, lon_0=180, resolution='l')
 
     cx,cy =m(lon,lat)
@@ -93,7 +95,7 @@ for hh in range(49):
 
     # spatialField = np.multiply(EOFs[hh,0:(len(Xsea))],np.sqrt(variance[hh]))
     # spatialField = Km_slp[(hh), :] / 100 - np.nanmean(SLP, axis=0) / 100
-    spatialField = km[(num), 0:3975] / 100 - np.nanmean(SLP, axis=0) / 100
+    spatialField = km[(num), 0:6529] / 100 - np.nanmean(SLP, axis=0) / 100
 
     rectField = np.ones((np.shape(X_in))) * np.nan
     for tt in range(len(sea_nodes)):
@@ -104,12 +106,15 @@ for hh in range(49):
     clevels = np.arange(-35,35,1)
 
     #ax.pcolormesh(cx, cy, rectField)#, cmap=cmocean.cm.ice)
-    CS = m.contourf(cx, cy, rectField, clevels, vmin=-24, vmax=24, cmap=cm.RdBu_r, shading='gouraud')
+    # CS = m.contourf(cx, cy, rectField, clevels, vmin=-24, vmax=24, cmap=cm.RdBu_r, shading='gouraud')
+    CS = ax.pcolormesh(cx, cy, rectField, vmin=-24, vmax=24, cmap=cm.RdBu_r)#, cmap=cmocean.cm.ice)
 
-    ax.set_xlim([np.min(cx)+10000, np.max(cx)+10000])
-    ax.set_ylim([np.min(cy)+10000, np.max(cy)+10000])
-    #tx, ty = m(320, -30)
-    ax.text(np.min(cx)+(np.max(cx)-np.min(cx))/3.2*2, np.min(cy)+(np.max(cy)-np.min(cy))/9, '{}'.format(group_size[num]))
+    ax.set_xlim([1911000, 7428000])
+    ax.set_ylim([-392400, 6986000])
+    # ax.set_xlim([np.min(cx)-1000, np.max(cx)-1000])
+    # ax.set_ylim([np.min(cy)-1000, np.max(cy)-1000])
+    # #tx, ty = m(320, -30)
+    # ax.text(np.min(cx)+(np.max(cx)-np.min(cx))/3.2*2, np.min(cy)+(np.max(cy)-np.min(cy))/9, '{}'.format(group_size[num]))
 
     #ax.set_title('{}'.format(group_size[num]))
 
@@ -133,7 +138,7 @@ for hh in range(49):
 
 
 
-asdrf
+
 
 dwtcolors = cm.rainbow(np.linspace(0, 1, numDWTs))
 #plt.style.use('dark_background')
