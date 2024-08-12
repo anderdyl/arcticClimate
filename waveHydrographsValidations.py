@@ -173,7 +173,8 @@ for hh in range(100):
    # file = r"/home/dylananderson/projects/atlanticClimate/Sims/simulation{}.pickle".format(hh)
    # file = r"/media/dylananderson/Elements/historicSims/simulationOnlyWaves{}.pickle".format(hh)
    # file = r"/users/dylananderson/Documents/projects/historicalSims/simulationOnlyWaves{}.pickle".format(hh)
-   file = r"/volumes/macDrive/historicalSims2/simulationOnlyWaves{}.pickle".format(hh)
+   # file = r"/volumes/macDrive/historicalSims2/simulationOnlyWaves{}.pickle".format(hh)
+   file = r"/volumes/macDrive/pointHopeHistoricalSims/simulation{}.pickle".format(hh)
 
 
    with open(file, "rb") as input_file:

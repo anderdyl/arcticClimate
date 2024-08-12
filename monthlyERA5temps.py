@@ -36,6 +36,9 @@ print(df4.dims)
 df5 = xr.open_dataset('ERA5monthlyArcticDecToNov1978.nc')
 print(df5.dims)
 
+
+
+
 temps = df['t2m']-273.15
 temps2 = df2['t2m']-273.15
 temps3 = df3['t2m']-273.15
@@ -427,7 +430,7 @@ plt.plot(ts,pdf)
 plt.plot(DAILYDATE2,seasonalSineFuture+futureTrend)
 
 futureTemps = seasonalSineFuture+futureTrend
-alternateFutureTemps = futureTemps#seasonalSineFuture+alternateFuture
+alternateFutureTemps = np.copy(futureTemps)#seasonalSineFuture+alternateFuture
 alternateFutureTemps[-(3655*5+365*3):] = alternateFuture[-(3655*5+365*3):] + seasonalSineFuture[-(3655*5+365*3):]
 plt.plot(DAILYDATE2,alternateFutureTemps)
 
@@ -526,6 +529,8 @@ outputDWTs['dailyDate'] = dayTime
 outputDWTs['arcticTemp'] = interpTemp
 outputDWTs['futureDate'] = dayTime2
 outputDWTs['futureTemp'] = futureTemps
+outputDWTs['futureTrend'] = futureTrend
+
 outputDWTs['alternateFutureTemp'] = alternateFutureTemps
 outputDWTs['futureSims'] = sims
 outputDWTs['alternateFutureSims'] = simsNoChange

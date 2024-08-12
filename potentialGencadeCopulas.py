@@ -606,8 +606,8 @@ gevCopulaSims = list()
 for i in range(len(np.unique(bmuGroup))):
     tempCopula = np.asarray(copulaData[i])
     if len(tempCopula) == 0:
-        # Hsmax, Hsmin, Tpmax, Tpmin, Dmmean, u10max, u10min, v10max, v10min, Ssrmean, T2mmean, Fetch, NTRmean, Sstmean, time, kk
-        data2 = [[np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]]
+        # Hsmax, Hsmin, Tpmax, Tpmin, Dmmean, u10max, u10min, v10max, v10min, Ssrmean, T2mmean, Fetch, NTRmean, Sstmean,T2mMax,T2mMin time, kk
+        data2 = [[np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]]
         data = data2
     else:
         dataHs = np.array([sub[0] for sub in copulaData[i]])
@@ -622,17 +622,17 @@ for i in range(len(np.unique(bmuGroup))):
         #
         #     kernels = ['KDE', 'KDE', 'KDE', 'KDE', 'KDE', 'KDE', ]
         # else:
-        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
+        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
     elif len(data2) == 3 or len(data2) == 2:
-        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
+        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
         data2 = np.vstack((data2,data2-data2*0.1))
     else:
-        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
+        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
 
     if len(data2) <= 1:
-        samples5 = np.zeros((100000,13))
+        samples5 = np.zeros((100000,15))
     else:
-        samples = CopulaSimulation(data2[:,0:13],kernels,100000)
+        samples = CopulaSimulation(data2[:,0:16],kernels,100000)
 
         negIndex1 = np.where(samples[:,0] > 0.1)
         samples2 = samples[negIndex1]

@@ -4,9 +4,9 @@ import cmocean
 import datetime as dt
 import pickle
 
-with open(r"ice18FutureSimulations1000Utqiagvik.pickle", "rb") as input_file:
+# with open(r"ice18FutureSimulations1000Utqiagvik.pickle", "rb") as input_file:
 # with open(r"ice18FutureSimulations100Wainwright.pickle", "rb") as input_file:
-# with open(r"ice18FutureSimulations1000PointHope.pickle", "rb") as input_file:
+with open(r"ice18FutureSimulations1000PointHope.pickle", "rb") as input_file:
 # with open(r"ice18FutureSimulations100Shishmaref.pickle", "rb") as input_file:
     inputIce = pickle.load(input_file)
 

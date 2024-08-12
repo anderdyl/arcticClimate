@@ -161,11 +161,12 @@ bmus_dates_days = np.array([d.day for d in bmus_dates])
 
 # with open(r"ice18FutureSimulations1000PointHope.pickle", "rb") as input_file:
 # with open(r"ice18FutureSimulations1000Shishmaref.pickle", "rb") as input_file:
-with open(r"ice18FutureSimulations1000Wainwright.pickle", "rb") as input_file:
+# with open(r"ice18FutureSimulations1000Wainwright.pickle", "rb") as input_file:
 # with open(r"ice18FutureSimulations1000Wales.pickle", "rb") as input_file:
 # with open(r"ice18FutureSimulations1000Wevok.pickle", "rb") as input_file:
 # with open(r"ice18FutureSimulations1000PointLay.pickle", "rb") as input_file:
 # with open(r"ice18FutureSimulations1000Kivalina.pickle", "rb") as input_file:
+with open(r"ice18FutureSimulations1000Utqiagvik.pickle", "rb") as input_file:
 
     historicalICEs = pickle.load(input_file)
 
@@ -246,7 +247,7 @@ u10 = wavesWinds['metOcean'].u10[beginTime[0][0]:endingTime[0][0]+24]
 v10 = wavesWinds['metOcean'].v10[beginTime[0][0]:endingTime[0][0]+24]
 sst = wavesWinds['metOcean'].sst[beginTime[0][0]:endingTime[0][0]+24]
 ssr = wavesWinds['metOcean'].ssr[beginTime[0][0]:endingTime[0][0]+24]
-t2m = wavesWinds['metOcean'].u10[beginTime[0][0]:endingTime[0][0]+24]
+t2m = wavesWinds['metOcean'].t2m[beginTime[0][0]:endingTime[0][0]+24]
 
 # # Point Hope
 # waveNorm = dm - 334
@@ -310,6 +311,7 @@ outputReal['dmCombined'] = dmOG
 outputReal['waveNorm'] = waveNorm
 outputReal['ntr'] = ntr
 outputReal['tNTR'] = tNTR
+outputReal['t2m'] = t2m
 # outputReal['res'] = res
 
 with open(realWavesPickle, 'wb') as f:
@@ -399,7 +401,7 @@ for p in range(len(np.unique(bmuGroup))):
                                               np.nanmean(dm[waveInd[0]]),np.nanmean(u10[waveInd[0]]),
                                               np.nanmean(v10[waveInd[0]]),np.nanmean(sst[waveInd[0]]),
                                               np.nanmean(ssr[waveInd[0]]),np.nanmean(t2m[waveInd[0]]),
-                                              areaBelow[fetchInd[0][0]], np.nanmean(ntr[ntrInd[0]])])
+                                              areaBelow[fetchInd[0][0]], np.nanmean(ntr[ntrInd[0]]),np.nanmin(t2m[waveInd[0]]),np.nanmax(t2m[waveInd[0]])])
 
                 tempDict['hsMin'] = np.nanmin(wh[waveInd[0]])
                 tempDict['hsMax'] = np.nanmax(wh[waveInd[0]])
@@ -451,7 +453,7 @@ for p in range(len(np.unique(bmuGroup))):
                                               np.nanmean(dm[waveInd[0]]),np.nanmean(u10[waveInd[0]]),
                                               np.nanmean(v10[waveInd[0]]),np.nanmean(sst[waveInd[0]]),
                                               np.nanmean(ssr[waveInd[0]]),np.nanmean(t2m[waveInd[0]]),
-                                              areaBelow[fetchInd[0][0]], np.nanmean(ntr[ntrInd[0]])])
+                                              areaBelow[fetchInd[0][0]], np.nanmean(ntr[ntrInd[0]]),np.nanmin(t2m[waveInd[0]]),np.nanmax(t2m[waveInd[0]])])
                 tempDict['hsMin'] = np.nanmin(wh[waveInd[0]])
                 tempDict['hsMax'] = np.nanmax(wh[waveInd[0]])
                 tempDict['tpMin'] = np.nanmin(tp[waveInd[0]])
@@ -556,7 +558,7 @@ for i in range(len(np.unique(bmuGroup))):
                              tempHydros[kk]['tpMin'], tempHydros[kk]['dmMean'], tempHydros[kk]['u10Max'],
                              tempHydros[kk]['u10Min'], tempHydros[kk]['v10Max'], tempHydros[kk]['v10Min'],
                               tempHydros[kk]['ssrMean'], tempHydros[kk]['t2mMean'],
-                             tempHydros[kk]['fetch'], tempHydros[kk]['ntrMean'], tempHydros[kk]['sstMean'],len(tempHydros[kk]['time']), kk]))
+                             tempHydros[kk]['fetch'], tempHydros[kk]['ntrMean'], tempHydros[kk]['sstMean'],tempHydros[kk]['t2mMax'],tempHydros[kk]['t2mMin'],len(tempHydros[kk]['time']), kk]))
 
         if np.isnan(tempHydros[kk]['hsMax'])==1:
             print('no waves here')
@@ -566,7 +568,7 @@ for i in range(len(np.unique(bmuGroup))):
                              tempHydros[kk]['tpMin'], tempHydros[kk]['dmMean'], tempHydros[kk]['u10Max'],
                              tempHydros[kk]['u10Min'], tempHydros[kk]['v10Max'], tempHydros[kk]['v10Min'],
                              tempHydros[kk]['ssrMean'], tempHydros[kk]['t2mMean'],
-                             tempHydros[kk]['fetch'], tempHydros[kk]['ntrMean'], tempHydros[kk]['sstMean'],len(tempHydros[kk]['time']),kk]))
+                             tempHydros[kk]['fetch'], tempHydros[kk]['ntrMean'], tempHydros[kk]['sstMean'],tempHydros[kk]['t2mMax'],tempHydros[kk]['t2mMin'],len(tempHydros[kk]['time']),kk]))
 
     copulaData.append(dataCop)
     copulaDataOnlyWaves.append(dataCopOnlyWaves)
@@ -655,6 +657,19 @@ for i in range(len(np.unique(bmuGroup))):
             bmuDataMin.append([minDm,minSs])
             bmuDataMax.append([maxDm,maxSs])
             bmuDataStd.append([stdDm,stdSs])
+
+
+# interDailyTemps = list()
+# for i in range(len(np.unique(bmuGroup))):
+#     plt.figure()
+#
+#     tempHydros = hydros[i]
+#     numHydros = len(tempHydros)
+#     tempTemps = np.nan * np.ones((numHydros,24))
+#     for qq in range(numHydros):
+#         tempTemps[qq,:] = tempHydros[qq]['t2m']
+#         plt.plot(tempTemps[qq,:])
+#     meanDaily = np.mean(tempTemps,axis=0)
 #
 #
 # bmuDataNormalized2 = list()
@@ -704,6 +719,7 @@ for i in range(len(np.unique(bmuGroup))):
                         tempHydros[mm]['v10Max'] - tempHydros[mm]['v10Min'])
             # tempDict['ntrNorm'] = (tempHydros[mm]['ntr'] - tempHydros[mm]['ntrMin']) / (tempHydros[mm]['ntrMax']- tempHydros[mm]['ntrMin'])
             tempDict['ntrNorm'] = (tempHydros[mm]['ntr'] - tempHydros[mm]['ntrMean'])
+            tempDict['t2mNorm'] = (tempHydros[mm]['t2m'] - tempHydros[mm]['t2mMin']) / (tempHydros[mm]['t2mMax']- tempHydros[mm]['t2mMin'])
 
             tempList.append(tempDict)
     normalizedHydros.append(tempList)

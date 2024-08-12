@@ -10,9 +10,10 @@ wisPath = '/users/dylananderson/documents/data/WIS_ST63218/'
 wlPath = '/users/dylananderson/documents/data/frfWaterLevel/'
 from weatherTypes import weatherTypes
 
-startTime = [2023, 1, 1]
+startTime = [2023, 8, 1]
 # endTime = [1980,12,31]
-endTime = [2023, 8, 31]
+# endTime = [2023, 8, 31]
+endTime = [2023, 9, 30]
 
 import plotting
 
@@ -84,18 +85,18 @@ from metOcean import getMetOcean
 # latBot = 70.7
 # latTop = 70.8
 
-# # Barter Island
-# lonLeft = -143.8
-# lonRight = -143.7
-# latBot = 70.4
-# latTop = 70.6
+# Barter Island
+lonLeft = -143.8
+lonRight = -143.7
+latBot = 70.4
+latTop = 70.6
 
 
-# FRF
-lonLeft = -75.6
-lonRight = -75.4
-latBot = 36.2
-latTop = 36.3
+# # FRF
+# lonLeft = -75.6
+# lonRight = -75.4
+# latBot = 36.2
+# latTop = 36.3
 
 
 # stAugMET = getMetOcean(shoreNormal=90,lonLeft=lonLeft, lonRight=lonRight, latBot=latBot, latTop=latTop, wlPath=wlPath, wisPath=wisPath, startTime=startTime, endTime=endTime)
@@ -103,6 +104,7 @@ latTop = 36.3
 metOcean = getMetOcean(shoreNormal=0,lonLeft=lonLeft, lonRight=lonRight, latBot=latBot, latTop=latTop, wlPath=wlPath, wisPath=wisPath, startTime=startTime, endTime=endTime)
 metOcean.getERA5WavesAndWinds(printToScreen=True)
 # plotting.plotOceanConditions(struct=purdhoeWaves)
+metOcean.getERA5Bathymetry(printToScreen=True)
 
 #
 import pickle

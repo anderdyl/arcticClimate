@@ -171,14 +171,15 @@ simYearlyMax = np.nan * np.ones((100,45))
 yearArray = []
 zNArray = []
 ciArray = []
-for hh in range(30):
+for hh in range(50):
    # file = r"/home/dylananderson/projects/atlanticClimate/Sims/simulation{}.pickle".format(hh)
    # file = r"/media/dylananderson/Elements/historicSims/simulationOnlyWaves{}.pickle".format(hh)
    # file = r"/users/dylananderson/Documents/projects/historicalSims/simulationOnlyWaves{}.pickle".format(hh)
    # file = r"/volumes/macDrive/historicalSims2/simulationOnlyWaves{}.pickle".format(hh)
    # file = r"/Users/dylananderson/Documents/data/wainwright/simulation{}.pickle".format(hh)
    # file = r"/Users/dylananderson/Documents/data/shishmaref/simulation{}.pickle".format(hh)
-   file = r"/Users/dylananderson/Documents/data/pointHope/simulation{}.pickle".format(hh)
+   # file = r"/Users/dylananderson/Documents/data/pointHope/simulation{}.pickle".format(hh)
+   file = r"/Volumes/macDrive/pointHopeHistoricalSims/simulation{}.pickle".format(hh)
 
 
    with open(file, "rb") as input_file:
@@ -305,7 +306,8 @@ for hh in range(10):
    # file = r"/media/dylananderson/Elements/historicSims/simulationOnlyWaves{}.pickle".format(hh)
    # file = r"/Users/dylananderson/Documents/data/wainwright/simulation{}.pickle".format(hh)
    # file = r"/Users/dylananderson/Documents/data/shishmaref/simulation{}.pickle".format(hh)
-   file = r"/Users/dylananderson/Documents/data/pointHope/simulation{}.pickle".format(hh)
+   # file = r"/Users/dylananderson/Documents/data/pointHope/simulation{}.pickle".format(hh)
+   file = r"/Volumes/macDrive/pointHopeHistoricalSims/simulation{}.pickle".format(hh)
 
    with open(file, "rb") as input_file:
       simsInput = pickle.load(input_file)
@@ -557,9 +559,9 @@ returnPeriod = np.flipud((len(maxHs)+1)/np.arange(1,len(maxHs)+1))
 # simReturnPeriod = np.flipud(100/np.arange(1,101))
 simReturnPeriod = np.flipud(44/np.arange(1,45))
 
-ax2.fill_between(simReturnPeriod, np.min(simMaxHs,axis=0), np.max(simMaxHs,axis=0), color='orange', alpha=0.2)
+ax2.fill_between(simReturnPeriod, np.nanmin(simMaxHs,axis=0), np.nanmax(simMaxHs,axis=0), color='orange', alpha=0.2)
 ax2.plot(returnPeriod[0:-1],maxHs[1:],'o',label='ERA5')
-ax2.plot(simReturnPeriod,np.mean(simMaxHs,axis=0),'.-',label='Mean of Simulations')
+ax2.plot(simReturnPeriod,np.nanmean(simMaxHs,axis=0),'.-',label='Mean of Simulations')
 
 # ax2.fill_between(simReturnPeriod, np.min(simMaxHsNotInterped,axis=0), np.max(simMaxHsNotInterped,axis=0), color='green', alpha=0.2)
 # ax2.plot(simReturnPeriod,np.mean(simMaxHsNotInterped,axis=0),'.-')

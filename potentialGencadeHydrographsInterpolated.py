@@ -63,17 +63,17 @@ def max_rolling(a, window, axis=1):
     rolling = np.lib.stride_tricks.as_strided(a, shape=shape, strides=strides)
     return np.nanmax(rolling, axis=axis)
 
-# with open(r"gevCopulaSims100000pointHope.pickle", "rb") as input_file:
+with open(r"gevCopulaSims100000pointHope.pickle", "rb") as input_file:
 # with open(r"gevCopulaSims100000pointLay.pickle", "rb") as input_file:
 # with open(r"gevCopulaSims100000shishmaref.pickle", "rb") as input_file:
-with open(r"gevCopulaSims100000wainwright.pickle", "rb") as input_file:
+# with open(r"gevCopulaSims100000wainwright.pickle", "rb") as input_file:
    gevCopulaSimsInput = pickle.load(input_file)
 gevCopulaSims = gevCopulaSimsInput['gevCopulaSims']
 
-# with open(r"normalizedWaveHydrographsPointHope.pickle", "rb") as input_file:
+with open(r"normalizedWaveHydrographsPointHope.pickle", "rb") as input_file:
 # with open(r"normalizedWaveHydrographsPointLay.pickle", "rb") as input_file:
 # with open(r"normalizedWaveHydrographsShishmaref.pickle", "rb") as input_file:
-with open(r"normalizedWaveHydrographsWainwright.pickle", "rb") as input_file:
+# with open(r"normalizedWaveHydrographsWainwright.pickle", "rb") as input_file:
    normalizedWaveHydrographs = pickle.load(input_file)
 normalizedHydros = normalizedWaveHydrographs['normalizedHydros']
 bmuDataMin = normalizedWaveHydrographs['bmuDataMin']
@@ -81,20 +81,20 @@ bmuDataMax = normalizedWaveHydrographs['bmuDataMax']
 bmuDataStd = normalizedWaveHydrographs['bmuDataStd']
 bmuDataNormalized = normalizedWaveHydrographs['bmuDataNormalized']
 
-# with open(r"hydrographCopulaDataPointHope.pickle", "rb") as input_file:
+with open(r"hydrographCopulaDataPointHope.pickle", "rb") as input_file:
 # with open(r"hydrographCopulaDataPointLay.pickle", "rb") as input_file:
 # with open(r"hydrographCopulaDataShishmaref.pickle", "rb") as input_file:
-with open(r"hydrographCopulaDataWainwright.pickle", "rb") as input_file:
+# with open(r"hydrographCopulaDataWainwright.pickle", "rb") as input_file:
    hydrographCopulaData = pickle.load(input_file)
 copulaData = hydrographCopulaData['copulaData']
 copulaDataNoNaNs = hydrographCopulaData['copulaDataNoNaNs']
 
 
 # with open(r"iceTempWith2PCsNAO36DWTsSimulations100.pickle", "rb") as input_file:
-# with open(r"ice18FutureSimulations100PointHope.pickle", "rb") as input_file:
+with open(r"ice18FutureSimulations100PointHope.pickle", "rb") as input_file:
 # with open(r"ice18FutureSimulations100PointLay.pickle", "rb") as input_file:
 # with open(r"ice18FutureSimulations100Shishmaref.pickle", "rb") as input_file:
-with open(r"ice18FutureSimulations1000Wainwright.pickle", "rb") as input_file:
+# with open(r"ice18FutureSimulations1000Wainwright.pickle", "rb") as input_file:
    iceSimulations = pickle.load(input_file)
 iceSims = iceSimulations['evbmus_simHist'][212:,:]
 iceDates = iceSimulations['dates_simHist'][212:]
@@ -113,7 +113,7 @@ iceOnOffSims = iceSimulations['iceOnOffSims']
 #    iceDWTs = pickle.load(input_file)
 
 st = datetime(1979, 6, 1, 0, 0, 0)
-end = datetime(2023, 5, 31, 23, 0, 0)
+end = datetime(2023, 6, 1, 0, 0, 0)
 step = timedelta(days=1)
 dailyTime = []
 while st < end:
@@ -122,7 +122,7 @@ while st < end:
 
 
 st = datetime(1979, 6, 1, 0, 0, 0)
-end = datetime(2023, 5, 31, 23, 0, 0)
+end = datetime(2023, 6, 1, 0, 0, 0)
 step = timedelta(hours=1)
 hourlyTime = []
 while st < end:
@@ -130,6 +130,7 @@ while st < end:
     st += step
 
 hourlyMonths = month = np.array([tt.month for tt in hourlyTime])
+hourlyHours = np.array([tt.hour for tt in hourlyTime])
 
 deltaT = [(tt - hourlyTime[0]).total_seconds() / (3600*24) for tt in hourlyTime]
 
@@ -150,7 +151,7 @@ simulationsSSR = list()
 simulationsT2M = list()
 import random
 
-for simNum in range(1):
+for simNum in range(100):
 
     simHs = []
     simTp = []
@@ -296,12 +297,48 @@ for simNum in range(1):
     interpT2M = np.interp(deltaT,simDailyDeltaT,np.hstack(simT2M))
     interpNTR = np.interp(deltaT,simDeltaT,np.hstack(simNTR))
 
+    beginOfDayIndex = np.where(hourlyHours == 0)
+    beginOfDayIndexPlus1 = np.where(hourlyHours == 1)
+    beginOfDayIndexPlus2 = np.where(hourlyHours == 2)
+    beginOfDayIndexPlus3 = np.where(hourlyHours == 3)
 
-    interpHsMax = np.hstack([0,0,max_rolling(interpHs,5),0,0])
+    endOfDayIndex = np.where(hourlyHours == 23)
+    endOfDayIndexMinus1 = np.where(hourlyHours == 22)
+    endOfDayIndexMinus2 = np.where(hourlyHours == 21)
+    endOfDayIndexMinus3 = np.where(hourlyHours == 20)
+
+    endOfDayHsMinus3 = interpHs[endOfDayIndexMinus3]
+    endOfDayHsMinus2 = interpHs[endOfDayIndexMinus2]
+    endOfDayHsMinus1 = interpHs[endOfDayIndexMinus1]
+    endOfDayHs = interpHs[endOfDayIndex]
+    beginOfDayHs = interpHs[beginOfDayIndex]
+    beginOfDayHsPlus1 = interpHs[beginOfDayIndexPlus1]
+    beginOfDayHsPlus2 = interpHs[beginOfDayIndexPlus2]
+    beginOfDayHsPlus3 = interpHs[beginOfDayIndexPlus3]
+
+    newEndOfDayHsMinus1 = np.divide(
+        endOfDayHsMinus3[0:-1] + 2 * endOfDayHsMinus2[0:-1] + 2 * endOfDayHsMinus1[0:-1] + 2 * endOfDayHs[
+                                                                                               0:-1] + beginOfDayHs[1:],
+        8)
+    newEndOfDayHs = np.divide(
+        beginOfDayHs[1:] + beginOfDayHsPlus1[1:] + endOfDayHsMinus2[0:-1] + endOfDayHsMinus1[0:-1] + endOfDayHs[0:-1],
+        5)
+    newBeginOfDayHs = np.divide(
+        beginOfDayHs[1:] + beginOfDayHsPlus1[1:] + beginOfDayHsPlus2[1:] + endOfDayHs[0:-1] + endOfDayHsMinus1[0:-1], 5)
+    newBeginOfDayHsPlus1 = np.divide(
+        2 * beginOfDayHs[1:] + 2 * beginOfDayHsPlus1[1:] + 2 * beginOfDayHsPlus2[1:] + beginOfDayHsPlus3[
+                                                                                       1:] + endOfDayHs[0:-1], 8)
+
+    interpHs[endOfDayIndexMinus1[0][0:-1]] = newEndOfDayHsMinus1
+    interpHs[endOfDayIndex[0][0:-1]] = newEndOfDayHs
+    interpHs[beginOfDayIndex[0][1:]] = newBeginOfDayHs
+    interpHs[beginOfDayIndexPlus1[0][1:]] = newBeginOfDayHsPlus1
+
+    interpHsMax = np.hstack([0, 0, max_rolling(interpHs, 5), 0, 0])
     # interpTpMax = np.hstack([0,0,max_rolling(interpTp,5),0,0])
     # interpDmMax = np.hstack([0,0,max_rolling(interpDm,5),0,0])
 
-    interpHsMin = np.hstack([0,0,min_rolling(interpHs,5),0,0])
+    interpHsMin = np.hstack([0, 0, min_rolling(interpHs, 5), 0, 0])
     # interpTpMin = np.hstack([0,0,min_rolling(interpTp,5),0,0])
     # interpDmMin = np.hstack([0,0,min_rolling(interpDm,5),0,0])
 
@@ -311,7 +348,66 @@ for simNum in range(1):
     Hs[earlyYear] = interpHsMin[earlyYear]
     Hs[lateYear] = interpHsMax[lateYear]
 
+    endOfDayTpMinus3 = interpTp[endOfDayIndexMinus3]
+    endOfDayTpMinus2 = interpTp[endOfDayIndexMinus2]
+    endOfDayTpMinus1 = interpTp[endOfDayIndexMinus1]
+    endOfDayTp = interpTp[endOfDayIndex]
+    beginOfDayTp = interpTp[beginOfDayIndex]
+    beginOfDayTpPlus1 = interpTp[beginOfDayIndexPlus1]
+    beginOfDayTpPlus2 = interpTp[beginOfDayIndexPlus2]
+    beginOfDayTpPlus3 = interpTp[beginOfDayIndexPlus3]
 
+    newEndOfDayTpMinus1 = np.divide(
+        endOfDayTpMinus3[0:-1] + 2 * endOfDayTpMinus2[0:-1] + 2 * endOfDayTpMinus1[0:-1] + 2 * endOfDayTp[
+                                                                                               0:-1] + beginOfDayTp[1:],
+        8)
+    newEndOfDayTp = np.divide(
+        beginOfDayTp[1:] + beginOfDayTpPlus1[1:] + endOfDayTpMinus2[0:-1] + endOfDayTpMinus1[0:-1] + endOfDayTp[0:-1],
+        5)
+    newBeginOfDayTp = np.divide(
+        beginOfDayTp[1:] + beginOfDayTpPlus1[1:] + beginOfDayTpPlus2[1:] + endOfDayTp[0:-1] + endOfDayTpMinus1[0:-1], 5)
+    newBeginOfDayTpPlus1 = np.divide(
+        2 * beginOfDayTp[1:] + 2 * beginOfDayTpPlus1[1:] + 2 * beginOfDayTpPlus2[1:] + beginOfDayTpPlus3[
+                                                                                       1:] + endOfDayTp[0:-1], 8)
+
+    interpTp[endOfDayIndexMinus1[0][0:-1]] = newEndOfDayTpMinus1
+    interpTp[endOfDayIndex[0][0:-1]] = newEndOfDayTp
+    interpTp[beginOfDayIndex[0][1:]] = newBeginOfDayTp
+    interpTp[beginOfDayIndexPlus1[0][1:]] = newBeginOfDayTpPlus1
+
+    # # plt.plot(hourlyTime,interpHs)
+    # plt.figure()
+    # plt.plot(hourlyTime,interpNTR)
+
+    endOfDayNTRMinus3 = interpNTR[endOfDayIndexMinus3]
+    endOfDayNTRMinus2 = interpNTR[endOfDayIndexMinus2]
+    endOfDayNTRMinus1 = interpNTR[endOfDayIndexMinus1]
+    endOfDayNTR = interpNTR[endOfDayIndex]
+    beginOfDayNTR = interpNTR[beginOfDayIndex]
+    beginOfDayNTRPlus1 = interpNTR[beginOfDayIndexPlus1]
+    beginOfDayNTRPlus2 = interpNTR[beginOfDayIndexPlus2]
+    beginOfDayNTRPlus3 = interpNTR[beginOfDayIndexPlus3]
+
+    newEndOfDayNTRMinus1 = np.divide(
+        endOfDayNTRMinus3[0:-1] + 2 * endOfDayNTRMinus2[0:-1] + 2 * endOfDayNTRMinus1[0:-1] + 2 * endOfDayNTR[
+                                                                                                  0:-1] + beginOfDayNTR[
+                                                                                                          1:], 8)
+    newEndOfDayNTR = np.divide(
+        beginOfDayNTR[1:] + beginOfDayNTRPlus1[1:] + endOfDayNTRMinus2[0:-1] + endOfDayNTRMinus1[0:-1] + endOfDayNTR[
+                                                                                                         0:-1], 5)
+    newBeginOfDayNTR = np.divide(
+        beginOfDayNTR[1:] + beginOfDayNTRPlus1[1:] + beginOfDayNTRPlus2[1:] + endOfDayNTR[0:-1] + endOfDayNTRMinus1[
+                                                                                                  0:-1], 5)
+    newBeginOfDayNTRPlus1 = np.divide(
+        2 * beginOfDayNTR[1:] + 2 * beginOfDayNTRPlus1[1:] + 2 * beginOfDayNTRPlus2[1:] + beginOfDayNTRPlus3[
+                                                                                          1:] + endOfDayNTR[0:-1], 8)
+
+    interpNTR[endOfDayIndexMinus1[0][0:-1]] = newEndOfDayNTRMinus1
+    interpNTR[endOfDayIndex[0][0:-1]] = newEndOfDayNTR
+    interpNTR[beginOfDayIndex[0][1:]] = newBeginOfDayNTR
+    interpNTR[beginOfDayIndexPlus1[0][1:]] = newBeginOfDayNTRPlus1
+
+    # plt.plot(hourlyTime,interpNTR)
 
     # interpSs = np.interp(deltaT,simDeltaT,np.hstack(simSs))
 
@@ -324,11 +420,11 @@ for simNum in range(1):
     # simulationData = interped.values
     # testTime = interped.index  # to_pydatetime()
     # testTime2 = testTime.to_pydatetime()
-    simsPickle = ('/Users/dylananderson/Documents/data/wainwright/simulation{}.pickle'.format(simNum))
+    # simsPickle = ('/Users/dylananderson/Documents/data/wainwright/simulation{}.pickle'.format(simNum))
     # simsPickle = ('/Users/dylananderson/Documents/data/shishmaref/simulation{}.pickle'.format(simNum))
     # simsPickle = ('/Users/dylananderson/Documents/data/pointLay/simulation{}.pickle'.format(simNum))
     # simsPickle = ('/Users/dylananderson/Documents/data/pointHope/simulation{}.pickle'.format(simNum))
-    # simsPickle = ('/volumes/macDrive/historicalSims2/simulation{}.pickle'.format(simNum))
+    simsPickle = ('/volumes/macDrive/pointHopeHistoricalSims/simulation{}.pickle'.format(simNum))
 
     outputSims= {}
     outputSims['simulationData'] = simDataInterp.T
