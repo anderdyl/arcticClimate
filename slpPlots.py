@@ -34,7 +34,8 @@ from mpl_toolkits.basemap import Basemap
 
 import mat73
 
-SLPs = mat73.loadmat('/media/dylananderson/Elements/pointHope/slpsPolarGrid2v4y2022.mat')
+# SLPs = mat73.loadmat('/volumes/Elements/pointHope/slpsPolarGrid2v4y2022.mat')
+SLPs = mat73.loadmat('/volumes/Elements/pointHope/slpsPolarGrid3y2023.mat')
 
 X_in = SLPs['X_in']
 Y_in = SLPs['Y_in']

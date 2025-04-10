@@ -165,24 +165,25 @@ if __name__ == '__main__':
 
     for hh in inputDir:
 
-        # try:
-        #     ifn = Path(sys.argv[1])
-        #     assert ifn.is_file()
-        # except IndexError:
-        #     print(f'Usage: python {Path(__file__).name} <fn>')
-        #     raise RuntimeError('No filename given')
-        # except AssertionError:
-        #     print(f'Not a file: {ifn}')
-        #     raise RuntimeError('Given filename is not a file')
-        #
+        if hh.endswith(".nc"):
+            # try:
+            #     ifn = Path(sys.argv[1])
+            #     assert ifn.is_file()
+            # except IndexError:
+            #     print(f'Usage: python {Path(__file__).name} <fn>')
+            #     raise RuntimeError('No filename given')
+            # except AssertionError:
+            #     print(f'Not a file: {ifn}')
+            #     raise RuntimeError('Given filename is not a file')
+            #
 
-        outdir = Path('./')
-        """
-        # Code which can be used to write outputs to a different directory
-        outdir = Path('./extracted_bins')
-        outdir.mkdir(parents=True, exist_ok=True)
-        print(f'Writing extracted output to directory: {outdir}')
-        """
+            outdir = Path('./')
+            """
+            # Code which can be used to write outputs to a different directory
+            outdir = Path('./extracted_bins')
+            outdir.mkdir(parents=True, exist_ok=True)
+            print(f'Writing extracted output to directory: {outdir}')
+            """
 
-        # extract_legacy_siconc(str(ifn), outdir)
-        extract_legacy_siconc(os.path.join(filePath,hh), outdir)
+            # extract_legacy_siconc(str(ifn), outdir)
+            extract_legacy_siconc(os.path.join(filePath,hh), outdir)

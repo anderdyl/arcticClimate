@@ -68,7 +68,7 @@ def running_mean(x, N, mode_str='mean'):
 
 
 
-with open(r"AWT1880to2021.pickle", "rb") as input_file:
+with open(r"AWT1880to2023.pickle", "rb") as input_file:
    sstPacific = pickle.load(input_file)
 
 PCs = sstPacific['predictor']['PCs'].values
@@ -78,8 +78,8 @@ nPercent = variance/np.sum(variance)
 awt_bmus = sstPacific['clusters']['bmus'].values
 n_components = sstPacific['predictor']['n_components'].values
 # annualTime = sstPacific['clusters']['time']
-
-
+time = sstPacific['predictor']['time'].values
+cent = sstPacific['clusters']['centroids'].values
 
 years = np.arange(1880,2022)
 annualTime = [datetime.datetime(yr,6,1) for yr in years]
@@ -124,6 +124,12 @@ for hh in np.arange(0,6):
     indexOR = np.where(awt_bmus==order[hh])
     awt_bmus2[indexOR] = np.ones((len(indexOR[0],)))*hh
 awt_bmus = awt_bmus2
+
+
+
+asdfg
+
+
 
 ### TODO: Plot the AWT's spatially
 # plt.figure()

@@ -16,7 +16,7 @@ getSims = np.arange(0,500)
 for hh in range(len(getSims)):
    numSim = getSims[hh]
 
-   file = ('/volumes/macDrive/arcticSims/utqiagvik/futureSimulation{}.pickle'.format(numSim))
+   file = ('/volumes/macDrive/arcticSims/pointHope/futureSimulation{}.pickle'.format(numSim))
 
    with open(file, "rb") as input_file:
       simsInput = pickle.load(input_file)
@@ -62,7 +62,7 @@ allSs = np.stack(ss, axis=0)
 
 
 
-with open(r"realWavesUtqiagvik.pickle", "rb") as input_file:
+with open(r"realWavesPointHope.pickle", "rb") as input_file:
    wavesInput = pickle.load(input_file)
 
 tWave = wavesInput['tWave']#[5:]

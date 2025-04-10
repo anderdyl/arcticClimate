@@ -136,7 +136,6 @@ dmCombined = wavesInput['dmCombined']#[5:]
 nanInd = np.where((dmCombined==0))
 dmCombined[nanInd] = np.nan * np.ones((len(nanInd)))
 
-
 # waveNorm = wavesInput['waveNorm']
 # wlFRF = wavesInput['wlFRF']
 # tFRF = wavesInput['tWl']
@@ -170,9 +169,9 @@ while c < len(hsCombined):
    c = c + 96
 fourDayMaxHs = np.asarray(fourDayMax)
 
-simSeasonalMean = np.nan * np.ones((100,12))
-simSeasonalStd = np.nan * np.ones((100,12))
-simYearlyMax = np.nan * np.ones((100,45))
+simSeasonalMean = np.nan * np.ones((50,12))
+simSeasonalStd = np.nan * np.ones((50,12))
+simYearlyMax = np.nan * np.ones((50,45))
 yearArray = []
 zNArray = []
 ciArray = []
@@ -226,7 +225,7 @@ for hh in range(50):
    fourDayMaxHsSim = np.asarray(fourDayMaxSim)
 
    # sim = return_value(np.asarray(fourDayMaxHsSim)[0:365*40], 3, 0.05, 365/4, 36525/4, 'mle')
-   sim = return_value(np.asarray(fourDayMaxHsSim)[0:365*44], 2.5, 0.05, 365/4, int((365*45)/4), 'mle')
+   sim = return_value(np.asarray(fourDayMaxHsSim)[0:365*44], 3.5, 0.05, 365/4, int((365*45)/4), 'mle')
 
    yearArray.append(sim['year_array'])
    zNArray.append(sim['z_N'])
@@ -280,14 +279,6 @@ while st < end:
     plotTimeW.append(st)#.strftime('%Y-%m-%d'))
     st += step
 
-st = dt.datetime(2022, 2, 1)
-end = dt.datetime(2023, 2, 1)
-step = relativedelta(days=numDays)
-plotTimeW2 = []
-while st < end:
-    plotTimeW2.append(st)#.strftime('%Y-%m-%d'))
-    st += step
-
 
 ogHsClimatologyMean = np.nan * np.ones((len(years),int(366/numDays)))
 ogHsClimatologyUpper = np.nan * np.ones((len(years),int(366/numDays)))
@@ -316,12 +307,11 @@ for hh in years:
 simHsClimatologyMean = []
 simHsClimatologyUpper = []
 simHsClimatologyLower = []
-for hh in range(20):
+for hh in range(10):
    # file = r"/media/dylananderson/Elements/historicSims/simulationOnlyWaves{}.pickle".format(hh)
    # file = r"/Users/dylananderson/Documents/data/wainwright/simulation{}.pickle".format(hh)
    # file = r"/Users/dylananderson/Documents/data/shishmaref/simulation{}.pickle".format(hh)
    # file = r"/Users/dylananderson/Documents/data/pointHope/simulation{}.pickle".format(hh)
-   # file = r"/Volumes/macDrive/pointHopeHistoricalSims/simulation{}.pickle".format(hh)
    file = r"/Volumes/macDrive/arcticSims/tukHistorical/simulation{}.pickle".format(hh)
 
    with open(file, "rb") as input_file:
@@ -381,19 +371,19 @@ simHsClimatologyLower = np.concatenate(simHsClimatologyLower, axis=0 )
 
 
 
-futureHsClimatologyMeanTemp = np.nan*np.ones((51,366,50))
-futureHsClimatologyUpperTemp = np.nan*np.ones((51,366,50))
-futureHsClimatologyLowerTemp = np.nan*np.ones((51,366,50))
-futureHsClimatologyMaxTemp = np.nan*np.ones((51,366,50))
+futureHsClimatologyMeanTemp = np.nan*np.ones((45,366,50))
+futureHsClimatologyUpperTemp = np.nan*np.ones((45,366,50))
+futureHsClimatologyLowerTemp = np.nan*np.ones((45,366,50))
+futureHsClimatologyMaxTemp = np.nan*np.ones((45,366,50))
 
 futureHsClimatologyYearlyMean = []
 futureHsClimatologyYearlyUpper = []
 futureHsClimatologyYearlyLower = []
-futureTpClimatologyMeanTemp = np.nan*np.ones((51,366,50))
-futureDmClimatologyMeanTemp = np.nan*np.ones((51,366,50))
-futureWPClimatologyMeanTemp = np.nan*np.ones((51,366,50))
+futureTpClimatologyMeanTemp = np.nan*np.ones((45,366,50))
+futureDmClimatologyMeanTemp = np.nan*np.ones((45,366,50))
+futureWPClimatologyMeanTemp = np.nan*np.ones((45,366,50))
 
-for yy in range(20):
+for yy in range(50):
    # file = r"/media/dylananderson/Elements/historicSims/simulationOnlyWaves{}.pickle".format(hh)
    # file = r"/Users/dylananderson/Documents/data/wainwright/simulation{}.pickle".format(hh)
    # file = r"/Users/dylananderson/Documents/data/shishmaref/simulation{}.pickle".format(hh)
@@ -401,7 +391,7 @@ for yy in range(20):
    # file = r"/Volumes/macDrive/pointHopeHistoricalSims/simulation{}.pickle".format(hh)
 
    # file = r"/Volumes/macDrive/arcticSims/pointHope/futureSimulation{}.pickle".format(yy*5)
-   file = r"/Volumes/macDrive/arcticSims/tuk/futureSimulation{}.pickle".format(yy)
+   file = r"/Volumes/macDrive/arcticSims/tukHistorical/simulation{}.pickle".format(yy)
 
    print(file)
    with open(file, "rb") as input_file:
@@ -418,7 +408,9 @@ for yy in range(20):
    month = np.array([tt.month for tt in time])
    df['month'] = month
    timeArray = np.asarray(time)
-   years = np.arange(2024,2075)
+   # years = np.arange(2024,2075)
+   years = np.arange(1980,2023)
+
    simHsClimatologyMeanTemp = np.nan * np.ones((len(years),int(366)))
    simHsClimatologyUpperTemp = np.nan * np.ones((len(years),int(366)))
    simHsClimatologyLowerTemp = np.nan * np.ones((len(years),int(366)))
@@ -482,24 +474,24 @@ yearArrayFutureOct = []
 zNArrayFutureOct = []
 ciArrayFutureOct = []
 yearArrayFutureNov = []
-# zNArrayFutureNov = []
-# ciArrayFutureNov = []
+zNArrayFutureNov = []
+ciArrayFutureNov = []
 tempAvgMax = []
 tempAvgMax2 = []
 tempAvgMax3 = []
-# tempAvgMax4 = []
+tempAvgMax4 = []
 
 above1 = []
 above2 = []
 above3 = []
-# above4 = []
-for hh in range(20):
+above4 = []
+for hh in range(50):
 
 
    tempSim = futureHsClimatologyMaxTemp[hh,244:274,0:100].flatten('F')
    tempSim2 = futureHsClimatologyMaxTemp[hh,274:304,0:100].flatten('F')
-   # tempSim3 = futureHsClimatologyMaxTemp[hh,304:334,0:100].flatten('F')
-   # tempSim4 = futureHsClimatologyMaxTemp[hh,334:364,0:100].flatten('F')
+   tempSim3 = futureHsClimatologyMaxTemp[hh,304:334,0:100].flatten('F')
+   tempSim4 = futureHsClimatologyMaxTemp[hh,334:364,0:100].flatten('F')
 
    putInZeros = np.where(np.isnan(tempSim))
    tempSim[putInZeros] = np.zeros((len(putInZeros[0])))
@@ -507,11 +499,11 @@ for hh in range(20):
    putInZeros2 = np.where(np.isnan(tempSim2))
    tempSim2[putInZeros2] = np.zeros((len(putInZeros2[0])))
 
-   # putInZeros3 = np.where(np.isnan(tempSim3))
-   # tempSim3[putInZeros3] = np.zeros((len(putInZeros3[0])))
+   putInZeros3 = np.where(np.isnan(tempSim3))
+   tempSim3[putInZeros3] = np.zeros((len(putInZeros3[0])))
 
-   # putInZeros4 = np.where(np.isnan(tempSim4))
-   # tempSim4[putInZeros4] = np.zeros((len(putInZeros4[0])))
+   putInZeros4 = np.where(np.isnan(tempSim4))
+   tempSim4[putInZeros4] = np.zeros((len(putInZeros4[0])))
 
    # avgMax=futureHsClimatologyMaxTemp[hh,244:275,:]
    # putInZeros = np.where(np.isnan(avgMax))
@@ -539,32 +531,32 @@ for hh in range(20):
    c = 0
    fourDayMaxSim = []
    fourDayMaxSim2 = []
-   # fourDayMaxSim3 = []
-   # fourDayMaxSim4 = []
+   fourDayMaxSim3 = []
+   fourDayMaxSim4 = []
 
    while c < len(tempSim)-4:
       fourDayMaxSim.append(np.max(tempSim[c:c + 4]))
       fourDayMaxSim2.append(np.max(tempSim2[c:c + 4]))
-      # fourDayMaxSim3.append(np.max(tempSim3[c:c + 4]))
-      # fourDayMaxSim4.append(np.max(tempSim4[c:c + 4]))
+      fourDayMaxSim3.append(np.max(tempSim3[c:c + 4]))
+      fourDayMaxSim4.append(np.max(tempSim4[c:c + 4]))
 
       c = c + 4
    fourDayMaxHsSim = np.asarray(fourDayMaxSim)
    fourDayMaxHsSim2 = np.asarray(fourDayMaxSim2)
-   # fourDayMaxHsSim3 = np.asarray(fourDayMaxSim3)
-   # fourDayMaxHsSim4 = np.asarray(fourDayMaxSim4)
+   fourDayMaxHsSim3 = np.asarray(fourDayMaxSim3)
+   fourDayMaxHsSim4 = np.asarray(fourDayMaxSim4)
 
 
    above1.append(len(np.where(fourDayMaxHsSim>2.5)[0]))
    above2.append(len(np.where(fourDayMaxHsSim2>2.5)[0]))
-   # above3.append(len(np.where(fourDayMaxHsSim3>2.5)[0]))
-   # above4.append(len(np.where(fourDayMaxHsSim4>2.5)[0]))
+   above3.append(len(np.where(fourDayMaxHsSim3>2.5)[0]))
+   above4.append(len(np.where(fourDayMaxHsSim4>2.5)[0]))
 
 
    # sim = return_value(np.asarray(fourDayMaxHsSim)[0:365*40], 3, 0.05, 365/4, 36525/4, 'mle')
-   sim = return_value(np.asarray(fourDayMaxHsSim), 2, 0.05, 30/4, int((365*100)/4), 'mle')
-   sim2 = return_value(np.asarray(fourDayMaxHsSim2), 2, 0.05, 30/4, int((365*100)/4), 'mle')
-   # sim3 = return_value(np.asarray(fourDayMaxHsSim3), 2, 0.05, 30/4, int((365*100)/4), 'mle')
+   sim = return_value(np.asarray(fourDayMaxHsSim), 3, 0.05, 30/4, int((365*100)/4), 'mle')
+   sim2 = return_value(np.asarray(fourDayMaxHsSim2), 3, 0.05, 30/4, int((365*100)/4), 'mle')
+   sim3 = return_value(np.asarray(fourDayMaxHsSim3), 3, 0.05, 30/4, int((365*100)/4), 'mle')
 
    yearArrayFutureSept.append(sim['year_array'])
    zNArrayFutureSept.append(sim['z_N'])
@@ -572,9 +564,9 @@ for hh in range(20):
    yearArrayFutureOct.append(sim2['year_array'])
    zNArrayFutureOct.append(sim2['z_N'])
    ciArrayFutureOct.append(sim2['CI'])
-   # yearArrayFutureNov.append(sim3['year_array'])
-   # zNArrayFutureNov.append(sim3['z_N'])
-   # ciArrayFutureNov.append(sim3['CI'])
+   yearArrayFutureNov.append(sim3['year_array'])
+   zNArrayFutureNov.append(sim3['z_N'])
+   ciArrayFutureNov.append(sim3['CI'])
 
 
 
@@ -614,9 +606,9 @@ for hh in range(len(years)):
 
 ax2 = plt.subplot2grid((3, 2), (0, 1))
 for hh in range(len(simHsClimatologyMean)):
-   ax2.plot(plotTimeW2[0:-1],simHsClimatologyUpper[hh,:],color=[1,0.25,0.25],alpha=0.2)
-   ax2.plot(plotTimeW2[0:-1],simHsClimatologyLower[hh,:],color=[0.25,0.25,1],alpha=0.2)
-   ax2.plot(plotTimeW2[0:-1],simHsClimatologyMean[hh,:],color=[0.5,0.5,0.5],alpha=0.2)
+   ax2.plot(plotTimeW[0:-1],simHsClimatologyUpper[hh,:],color=[1,0.25,0.25],alpha=0.2)
+   ax2.plot(plotTimeW[0:-1],simHsClimatologyLower[hh,:],color=[0.25,0.25,1],alpha=0.2)
+   ax2.plot(plotTimeW[0:-1],simHsClimatologyMean[hh,:],color=[0.5,0.5,0.5],alpha=0.2)
 
 
 si = 12
@@ -624,9 +616,9 @@ ei = -4
 l2 = ax1.plot(plotTimeW[si:ei-1], np.nanmean(ogHsClimatologyUpper,axis=0)[si:ei], color=[1, 0.05, 0.05],linewidth=2,label='Mean of $90^{th}$')
 l1 = ax1.plot(plotTimeW[si:ei-1], np.nanmean(ogHsClimatologyMean,axis=0)[si:ei], color=[0.05, 0.05, 0.05],linewidth=2,label='Mean of $50^{th}$')
 l2 = ax1.plot(plotTimeW[si:ei-1], np.nanmean(ogHsClimatologyLower,axis=0)[si:ei], color=[0.05, 0.205, 1],linewidth=2,label='Mean of $10^{th}$')
-ax2.plot(plotTimeW2[si:ei-1], np.nanmean(simHsClimatologyMean,axis=0)[si:ei], color=[0.05, 0.05, 0.05],linewidth=2)
-ax2.plot(plotTimeW2[si:ei-1], np.nanmean(simHsClimatologyUpper,axis=0)[si:ei], color=[1, 0.05, 0.05],linewidth=2)
-ax2.plot(plotTimeW2[si:ei-1], np.nanmean(simHsClimatologyLower,axis=0)[si:ei], color=[0.05, 0.05, 1],linewidth=2)
+ax2.plot(plotTimeW[si:ei-1], np.nanmean(simHsClimatologyMean,axis=0)[si:ei], color=[0.05, 0.05, 0.05],linewidth=2)
+ax2.plot(plotTimeW[si:ei-1], np.nanmean(simHsClimatologyUpper,axis=0)[si:ei], color=[1, 0.05, 0.05],linewidth=2)
+ax2.plot(plotTimeW[si:ei-1], np.nanmean(simHsClimatologyLower,axis=0)[si:ei], color=[0.05, 0.05, 1],linewidth=2)
 ax1.set_xlim([plotTimeW[7],plotTimeW[-2]])
 ax2.set_xlim([plotTimeW[7],plotTimeW[-2]])
 ax1.set_ylim([0,3.5])
@@ -734,7 +726,7 @@ import matplotlib.cm as cm
 import matplotlib.colors as mcolors
 
 # historical = return_value(np.asarray(fourDayMax), 3, 0.05, 365/4, 36525/4, 'mle')
-historical = return_value(np.asarray(fourDayMax), 2, 0.05, 365/4, (365*45)/4, 'mle')
+historical = return_value(np.asarray(fourDayMax), 3.5, 0.05, 365/4, (365*45)/4, 'mle')
 
 # plt.style.use('dark_background')
 # return_value(sample_real, threshold, alpha, block_size, return_period,
@@ -1153,14 +1145,4 @@ plt.ylim([3.5,7.5])
 plt.legend()
 
 plt.show()
-
-
-
-
-
-plt.figure()
-ax1 = plt.subplot2grid((2,1),(0,0))
-ax2 = plt.subplot2grid((2,1),(1,0))
-ax1.plot(wavesInput['tNTR'],wavesInput['ntr'])
-ax2.plot(simsInput['time'],simsInput['df']['ntr'])
 

@@ -341,6 +341,8 @@ def testSine(x, a, b, c):
 # the estimated covariance of param in param_cov
 dailyNumber = np.array(dtime)/(3600*24*365.25*10)
 param, param_cov = curve_fit(testSine, dailyNumber, rd2)
+print('y = %.5f * x + %.5f' % (param[0], param[1]))
+
 ansSine = (param[0]*(np.sin(param[1]*dailyNumber+param[2])))
 # ansSine = (0.5*(np.sin((2*np.pi/20)*dailyNumber)))
 dailyNumber2 = np.array(dailyTime2)/(3600*24*365.25*10)
@@ -355,6 +357,8 @@ ax3.plot(ts,rd3)
 
 dailyNumber = np.array(dtime)/(3600*24*365.25*1)
 param, param_cov = curve_fit(testSine, dailyNumber, rd3)
+print('y = %.5f * x + %.5f' % (param[0], param[1]))
+
 ansSine2 = (param[0]*(np.sin(param[1]*dailyNumber+param[2])))
 # ansSine = (0.5*(np.sin((2*np.pi/20)*dailyNumber)))
 dailyNumber2 = np.array(dailyTime2)/(3600*24*365.25*1)
@@ -370,6 +374,8 @@ ax4.plot(ts,rd4)
 
 dailyNumber = np.array(dtime)/(3600*24*365.25*1)
 param, param_cov = curve_fit(testSine, dailyNumber, rd4)
+print('y = %.5f * x + %.5f' % (param[0], param[1]))
+
 ansSine3 = (param[0]*(np.sin(param[1]*dailyNumber+param[2])))
 # ansSine = (0.5*(np.sin((2*np.pi/20)*dailyNumber)))
 dailyNumber2 = np.array(dailyTime2)/(3600*24*365.25*1)
@@ -385,6 +391,8 @@ ax5.plot(ts,rd5)
 
 dailyNumber = np.array(dtime)/(3600*24*365.25*0.255)
 param, param_cov = curve_fit(testSine, dailyNumber, rd5)
+print('y = %.5f * x + %.5f' % (param[0], param[1]))
+
 ansSine4 = (param[0]*(np.sin(param[1]*dailyNumber+param[2])))
 # ansSine = (0.5*(np.sin((2*np.pi/20)*dailyNumber)))
 dailyNumber2 = np.array(dailyTime2)/(3600*24*365.25*0.255)
@@ -403,8 +411,11 @@ ax6.plot(DAILYDATE2[-(3655*5+365*3):],alternateFuture[-(3655*5+365*3):])
 
 futureTrend = ansSineFuture+ansSine2Future+ansSine3Future+ansSine4Future+y_lineFuture
 
-
-
+figX = plt.figure()
+axX = plt.subplot2grid((1,1),(0,0))
+axX.plot(ts,tr.values-np.mean(tr.values))
+axX.plot(DAILYDATE2,ansSineFuture+ansSine2Future+ansSine3Future+ansSine4Future+y_lineFuture-np.mean(tr.values))
+axX.plot(ts,ansSine+ansSine2+ansSine3+ansSine4+y_lineMonthlyHistorical-np.mean(tr.values))
 
 
 def testSineSeasonal(x, a, b, c, d):
@@ -480,6 +491,7 @@ lengthHistory = len(possibleRes)
 numSims = 100
 sims = []
 simsNoChange = []
+residuals = []
 for hh in range(numSims):
     # simInts = np.random.randint(521, size=337)
     simInts = np.random.randint(539, size=636)
@@ -489,7 +501,9 @@ for hh in range(numSims):
 
     interpTempFuture = np.interp(np.array(dailyTime2), np.array(dtimeFuture), combinedRes)+futureTemps
     interpAlternateTempFuture = np.interp(np.array(dailyTime2), np.array(dtimeFuture), combinedRes)+alternateFutureTemps
+    interpTempResiduals = np.interp(np.array(dailyTime2), np.array(dtimeFuture), combinedRes)
 
+    residuals.append(interpTempResiduals)
     sims.append(interpTempFuture)
     simsNoChange.append(interpAlternateTempFuture)
 
@@ -517,8 +531,35 @@ interpTemp = np.interp(np.array(dailyTime),np.array(dtime),temp1.values)
 # plt.figure()
 # plt.plot(ts,temp1.values,'o')
 # plt.plot(DAILYDATE,interpTemp)
+fullLength = residuals[0]+ansSineFuture+ansSine2Future+ansSine3Future+ansSine4Future+y_lineFuture-np.mean(tr.values)
+figX = plt.figure()
+axX = plt.subplot2grid((1,1),(0,0))
+
+for ff in range(50):
+    axX.plot(DAILYDATE2, residuals[ff]+ansSineFuture+ansSine2Future+ansSine3Future+ansSine4Future+y_lineFuture-np.mean(tr.values),color=[0.5,0.5,0.5])
+resLine = axX.plot(DAILYDATE2, residuals[ff]+ansSineFuture+ansSine2Future+ansSine3Future+ansSine4Future+y_lineFuture-np.mean(tr.values),color=[0.5,0.5,0.5],label='50 Simulations')
+
+axX.plot(DAILYDATE2[0:16100],fullLength[0:16100],color='k',label='Historical Residuals')
+futureTrendLine = ansSineFuture+ansSine2Future+ansSine3Future+ansSine4Future+y_lineFuture-np.mean(tr.values)
+# axX.plot(ts,tr.values-np.mean(tr.values),color='red',linewidth=2,label='Historical Trend')
+axX.plot(ts,ansSine+ansSine2+ansSine3+ansSine4+y_lineMonthlyHistorical-np.mean(tr.values),linewidth=2,color='red',label='Historical Trend')
+axX.plot(DAILYDATE2[16100:],futureTrendLine[16100:],linewidth=2,color='orange',label='Extrapolated Trend Fit')
+leg = plt.legend()
+axX.set_xticks([datetime(1980,1,1),datetime(2000,1,1),datetime(2020,1,1),datetime(2040,1,1),datetime(2060,1,1),datetime(2080,1,1)])
+axX.set_xticklabels(['1980','2000','2020','2040','2060','2080'],fontweight='bold')
+axX.set_yticks([-6,-4,-2,0,2,4,6,8,10])
+axX.set_yticklabels(['-6','-4','-2','0','2','4','6','8','10'],fontweight='bold')
+axX.set_ylabel('Temperature Anomaly (C)',fontweight='bold')
 
 
+figY = plt.figure()
+axY = plt.subplot2grid((1,1),(0,0))
+# axY.plot(dayTime2,sims[4])
+# axY.plot(dayTime2,futureTemps)
+axY.plot(monthlyTime,residuals[4])
+
+
+asdf
 
 
 import pickle

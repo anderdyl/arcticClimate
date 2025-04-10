@@ -74,12 +74,17 @@ ax2 = plt.subplot2grid((1,2),(0,1))
 p2 = ax2.pcolor(stackedAreaHist.T,cmap=cmocean.cm.ice_r,vmin=0,vmax=1300*.25)
 
 # ax2.set_ylabel('Wave Basin ($10^3 km^2$)')
-ax2.xaxis.set_ticklabels(['Jan','Mar','May','Jul','Sep','Nov','Jan'])
+# ax2.xaxis.set_ticklabels(['Jan','Mar','May','Jul','Sep','Nov','Jan'])
 cax2 = ax2.inset_axes([20, 8, 55, 4], transform=ax2.transData)
 cb2 = fig.colorbar(p2, cax=cax2, orientation='horizontal')
 cb2.ax.set_title(r'Wave Basin ($10^{3} km^{2}$)',fontsize=8)
 ax2.set_title('Historical Wave Basin Size ($10^{3} km^{2}$)')
+ax2.yaxis.set_ticks([1,11,21,31,41])
+ax2.yaxis.set_ticklabels(['1980', '1990', '2000','2010','2020'])
 
+ax2.xaxis.set_ticks([1,30,61,92,122,153,
+                    183,214,244,275,305,336])
+ax2.xaxis.set_ticklabels(['Jan', 'Feb', 'Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])
 
 
 
@@ -147,7 +152,7 @@ cb.ax.set_title('Ice Concentration',fontsize=8)
 
 
 
-areaSmoothed = iceOnOff[0]
+areaSmoothed = iceOnOff[1]
 areaBelow2 = areaBelow[6:-14]
 
 years = np.arange(1979,2023)
@@ -168,7 +173,7 @@ ax1.fill_between(dayTime[61:(61+365)], np.percentile(stackedAreaHist,14,axis=1),
 
 ax1.plot(dayTime[61:(61+365)],np.mean(stackedAreaSim,axis=1),color='r',label='Single Simulation')
 # ax1.fill_between(dayTime[61:(61+365)], np.mean(stackedAreaSim,axis=1) - np.std(stackedAreaSim,axis=1), np.mean(stackedAreaSim,axis=1) + np.std(stackedAreaSim,axis=1), color='r', alpha=0.2)
-ax1.fill_between(dayTime[61:(61+365)], np.percentile(stackedAreaSim,14,axis=1), np.percentile(stackedAreaSim,86,axis=1), color='r', alpha=0.2)
+ax1.fill_between(dayTime[61:(61+365)], np.percentile(stackedAreaSim,12,axis=1), np.percentile(stackedAreaSim,88,axis=1), color='r', alpha=0.2)
 ax1.set_ylabel('Wave Basin ($10^3 km^2$)')
 ax1.xaxis.set_ticks([dayTime[61],dayTime[61+61],dayTime[61+122],
                     dayTime[61+183],dayTime[61+244],dayTime[61+305],dayTime[61+365]])
@@ -242,36 +247,140 @@ cb.ax.set_title(r'Wave Basin ($10^{3} km^{2}$)',fontsize=8)
 
 testHist = evbmus_sim[:,0]-num_clusters+1
 
+from dateutil.relativedelta import relativedelta
+import datetime as dt
+
+st = dt.datetime(2024, 1, 1)
+# end = dt.datetime(2021,12,31)
+end = dt.datetime(2025, 1, 1)
+step = relativedelta(days=1)
+yearByDay = []
+while st < end:
+    yearByDay.append(st)  # .strftime('%Y-%m-%d'))
+    st += step
+
+
 # multi-year
 wavesYearly = np.nan*np.ones((95,365))
+meltDayOfYear = []
+meltDatesOfYear = []
+meltDayOfYear2 = []
+meltDatesOfYear2 = []
+meltDayOfYear2b = []
+meltDatesOfYear2b = []
+meltDayOfYear3 = []
+meltDatesOfYear3 = []
+meltDayOfYear3b = []
+meltDatesOfYear3b = []
 c = 214
-ax2b = plt.subplot2grid((1,2),(0,0))
+meltDaysFirst = np.zeros((1000,95))*np.nan
+freezeDaysSecond = np.zeros((1000,95))*np.nan
+
 for hh in range(95):
     pastDates = np.where((np.array(dates_sim)>=dt.datetime(1980+hh,1,1)) & (np.array(dates_sim)<dt.datetime(1981+hh,1,1)))
+
+    firstHalfOfYear = evbmus_sim[pastDates[0][75:200], :] - 8
+    secondHalfOfYear = np.vstack((evbmus_sim[pastDates[0][200:], :] - 8,evbmus_sim[pastDates[0][:30], :] - 8))
+    zeroConcFirstHalf = np.where(firstHalfOfYear < 2)
+    firstHalfOfYear[zeroConcFirstHalf] = 1
+    zeroConcSecondHalf = np.where(secondHalfOfYear < 2)
+    secondHalfOfYear[zeroConcSecondHalf] = 1
+    for rrr in range(1000):
+        finderFirst = np.where(np.min(np.abs(firstHalfOfYear[:,rrr] - 5)) == np.abs(firstHalfOfYear[:,rrr] - 5))
+        meltDaysFirst[rrr,hh] = finderFirst[0][-1]#np.median(finderFirst[0])##[0]
+        finderSecond = np.where(np.min(np.abs(secondHalfOfYear[:,rrr] - 5)) == np.abs(secondHalfOfYear[:,rrr] - 5))
+        freezeDaysSecond[rrr,hh] = np.median(finderSecond[0])#finderSecond[0][0]#[-1]
+
+
     temp2 = evbmus_sim[pastDates[0][0:365],:]-8
     zeroConc = np.where(temp2 < 2)
     temp2[zeroConc] = 1
     temp3 = np.mean(temp2,axis=1)
+    temp4 = np.min(temp2,axis=1)
+    temp5 = np.max(temp2,axis=1)
+    temp6 = np.percentile(temp2,16,axis=1)
+    temp7 = np.percentile(temp2,84,axis=1)
+
     wavesYearly[hh,:]=temp3/10
+    finder = np.where(np.min(np.abs(temp3-5)) == np.abs(temp3-5))
+    meltDayOfYear.append(finder[0])
+    meltDatesOfYear.append(yearByDay[finder[0][0]])
+    finder2 = np.where(temp6==1)
+    meltDayOfYear2.append(finder2[0][0])
+    meltDatesOfYear2.append(yearByDay[finder2[0][0]])
+    meltDayOfYear2b.append(finder2[0][-1])
+    meltDatesOfYear2b.append(yearByDay[finder2[0][-1]])
+    finder3 = np.where(temp7==1)
+    meltDayOfYear3.append(finder3[0][0])
+    meltDatesOfYear3.append(yearByDay[finder3[0][0]])
+    meltDayOfYear3b.append(finder3[0][-1])
+    meltDatesOfYear3b.append(yearByDay[finder3[0][-1]])
     c = c + 365
-p2b = ax2b.pcolor(wavesYearly,cmap=cmocean.cm.ice,vmin=0,vmax=1)
 
 
-ax2b.xaxis.set_ticks([1,30,61,92,122,153,
-                    183,214,244,275,305,336])
-ax2b.xaxis.set_ticklabels(['Jan', 'Feb', 'Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])
-ax2b.yaxis.set_ticks([1,11,21,31,41,51,61,71,81,91])
-ax2b.yaxis.set_ticklabels(['1980', '1990', '2000','2010','2020','2030','2040','2050','2060','2070'])
-ax2b.set_title('Average of 1000 Sea Ice Concentrations')
-caxb = ax2b.inset_axes([20, 8, 55, 4], transform=ax2b.transData)
+
+
+wavesYearlyHist = np.nan*np.ones((43,365))
+
+meltDaysFirstHist = []
+freezeDaysSecondHist = []
+for hh in range(43):
+    pastDates = np.where((np.array(dates_simHist)>=dt.datetime(1980+hh,1,1)) & (np.array(dates_simHist)<dt.datetime(1981+hh,1,1)))
+    # temp2 = resetBmus[c:c+365]]
+    temp2 = resetBmus[pastDates[0][0:365]]
+    wavesYearlyHist[hh,:]=temp2/10
+    wavesYearlyHistFirst = temp2[50:200]/10
+    wavesYearlyHistSecond = temp2[200:]/10
+
+    finderFirst = np.where(np.min(np.abs(wavesYearlyHistFirst - 4)) == np.abs(wavesYearlyHistFirst - 4))
+    meltDaysFirstHist.append(np.median(finderFirst[0]))  # finderFirst[0][-1]##[0]
+    finderSecond = np.where(np.min(np.abs(wavesYearlyHistSecond - 4)) == np.abs(wavesYearlyHistSecond - 4))
+    freezeDaysSecondHist.append(np.median(finderSecond[0]))  # finderSecond[0][0]#[-1]
+
+
+
+
+plt.figure()
+ax2b = plt.subplot2grid((1, 1), (0, 0))
+# p2b = ax2b.pcolor(wavesYearly.T,cmap=cmocean.cm.ice,vmin=0,vmax=1)
+p2b = ax2b.pcolor(np.vstack((wavesYearly.T,wavesYearly.T)),cmap=cmocean.cm.ice,vmin=0,vmax=1)
+p2bb = ax2b.pcolor(np.vstack((wavesYearlyHist.T,wavesYearlyHist.T)),cmap=cmocean.cm.ice,vmin=0,vmax=1)
+
+ax2b.set_ylim([0,400])
+ax2b.yaxis.set_ticks([1,30,61,92,122,153,
+                    183,214,244,275,305,336,367])
+ax2b.yaxis.set_ticklabels(['Jan', 'Feb', 'Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan'],fontweight='bold',fontsize=12)
+ax2b.xaxis.set_ticks([1,11,21,31,41,51,61,71,81,91])
+ax2b.xaxis.set_ticklabels(['1980', '1990', '2000','2010','2020','2030','2040','2050','2060','2070'],fontweight='bold',fontsize=12)
+# ax2b.set_title('Average of 1000 Sea Ice Concentrations')
+ax2b.set_title('Historical                                             Simulations',fontweight='bold',fontsize=12)
+caxb = ax2b.inset_axes([50, 19, 35, 4], transform=ax2b.transData)
+# caxb = ax2b.inset_axes([20, 8, 55, 4], transform=ax2b.transData)
 cb = fig.colorbar(p2b, cax=caxb, orientation='horizontal')
-cb.ax.set_title('Ice Concentration',fontsize=8)
+cb.ax.set_title('Ice Concentration',fontsize=10,fontweight='bold')
+
+ttt = 8
+# plt.figure()
+for fff in range(50):
+    ax2b.plot(np.arange(43,96),meltDaysFirst[fff+ttt,42:]+75,color=[0.5,0.5,0.5])
+    ax2b.plot(np.arange(43,96),freezeDaysSecond[fff+ttt,42:]+200,color=[0.5,0.5,0.5])
+
+leglab = ax2b.plot(np.arange(43,96),meltDaysFirst[fff+ttt,42:]+75,color=[0.5,0.5,0.5],label='50 Simulations')
+leglabMean = ax2b.plot(np.arange(43,96),np.mean(meltDaysFirst[:,42:],axis=0)+75,color='black')
+leglabMean2 = ax2b.plot(np.arange(43,96),np.mean(freezeDaysSecond[:,42:],axis=0)+200,color='black',label='Mean')
+
+plt.legend(loc='center right')#[leglab,leglabMean2],['25 simulations','Mean'])
+# ax2b.plot(np.arange(0,43),np.asarray(meltDaysFirstHist)+50,color='blue')
+# ax2b.plot(np.arange(0,43),np.asarray(freezeDaysSecondHist)+200,color='blue')
 
 
 
 
 asdfg
 
+
+plt.plot(np.asarray(meltDayOfYear2b)-np.asarray(meltDayOfYear3b))
+plt.plot(np.asarray(meltDayOfYear3)-np.asarray(meltDayOfYear2))
 
 
 wavesYearly = np.nan*np.ones((43,365))

@@ -64,14 +64,15 @@ def max_rolling(a, window, axis=1):
     return np.nanmax(rolling, axis=axis)
 
 
-directoryDict = ['/volumes/macDrive/arcticSims/shishmaref/',
-                 '/volumes/macDrive/arcticSims/wainwright/',
-                 '/volumes/macDrive/arcticSims/pointHope/',
-                 '/volumes/macDrive/arcticSims/pointLay/',
-                 '/volumes/macDrive/arcticSims/kivalina/',
-                 '/volumes/macDrive/arcticSims/wales/',
-                 '/volumes/macDrive/arcticSims/wevok/',
-                 '/volumes/macDrive/arcticSims/utqiagvik/',
+directoryDict = ['/volumes/macDrive/arcticSims/tuk/'
+                 #'/volumes/macDrive/arcticSims/shishmaref/',
+                 #'/volumes/macDrive/arcticSims/wainwright/',
+                 #'/volumes/macDrive/arcticSims/pointHope/',
+                 #'/volumes/macDrive/arcticSims/pointLay/',
+                 #'/volumes/macDrive/arcticSims/kivalina/',
+                 #'/volumes/macDrive/arcticSims/wales/',
+                 #'/volumes/macDrive/arcticSims/wevok/',
+                 #'/volumes/macDrive/arcticSims/utqiagvik/',
                  ]
 # directoryDict = ['/Users/dylananderson/Documents/data/shishmaref/',
 #                 '/Users/dylananderson/Documents/data/wainwright/',
@@ -81,44 +82,48 @@ directoryDict = ['/volumes/macDrive/arcticSims/shishmaref/',
 #                 '/Users/dylananderson/Documents/data/wales/',
 #                 '/Users/dylananderson/Documents/data/wevok/',]
 
-gevCopulaDict = ['gevCopulaSims100000shishmaref.pickle',
-                 'gevCopulaSims100000wainwright.pickle',
-                 'gevCopulaSims100000pointHope.pickle',
-                 'gevCopulaSims100000pointLay.pickle',
-                 'gevCopulaSims100000kivalina.pickle',
-                 'gevCopulaSims100000wales.pickle',
-                 'gevCopulaSims100000wevok.pickle',
-                 'gevCopulaSims100000utqiagvik.pickle',
+gevCopulaDict = ['gevCopulaSims100000Tuk.pickle',
+                 #'gevCopulaSims100000shishmaref.pickle',
+                 #'gevCopulaSims100000wainwright.pickle',
+                 #'gevCopulaSims100000pointHope.pickle',
+                 #'gevCopulaSims100000pointLay.pickle',
+                 #'gevCopulaSims100000kivalina.pickle',
+                 #'gevCopulaSims100000wales.pickle',
+                 #'gevCopulaSims100000wevok.pickle',
+                 #'gevCopulaSims100000utqiagvik.pickle',
                  ]
 
-normHyDict = ['normalizedWaveHydrographsShishmaref.pickle',
-                 'normalizedWaveHydrographsWainwright.pickle',
-                 'normalizedWaveHydrographsPointHope.pickle',
-                 'normalizedWaveHydrographsPointLay.pickle',
-                 'normalizedWaveHydrographsKivalina.pickle',
-                 'normalizedWaveHydrographsWales.pickle',
-                 'normalizedWaveHydrographsWevok.pickle',
-                 'normalizedWaveHydrographsUtqiagvik.pickle',
+normHyDict = ['normalizedWaveHydrographsTuk.pickle',
+              #'normalizedWaveHydrographsShishmaref.pickle',
+              #   'normalizedWaveHydrographsWainwright.pickle',
+              #   'normalizedWaveHydrographsPointHope.pickle',
+              #   'normalizedWaveHydrographsPointLay.pickle',
+              #   'normalizedWaveHydrographsKivalina.pickle',
+              #   'normalizedWaveHydrographsWales.pickle',
+              #   'normalizedWaveHydrographsWevok.pickle',
+              #   'normalizedWaveHydrographsUtqiagvik.pickle',
               ]
 
-hyCopDict = ['hydrographCopulaDataShishmaref.pickle',
-              'hydrographCopulaDataWainwright.pickle',
-              'hydrographCopulaDataPointHope.pickle',
-              'hydrographCopulaDataPointLay.pickle',
-              'hydrographCopulaDataKivalina.pickle',
-              'hydrographCopulaDataWales.pickle',
-              'hydrographCopulaDataWevok.pickle',
-              'hydrographCopulaDataUtqiagvik.pickle',
+hyCopDict = ['hydrographCopulaDataTuk.pickle',
+             #'hydrographCopulaDataShishmaref.pickle',
+             # 'hydrographCopulaDataWainwright.pickle',
+             # 'hydrographCopulaDataPointHope.pickle',
+             # 'hydrographCopulaDataPointLay.pickle',
+             # 'hydrographCopulaDataKivalina.pickle',
+             # 'hydrographCopulaDataWales.pickle',
+             # 'hydrographCopulaDataWevok.pickle',
+             # 'hydrographCopulaDataUtqiagvik.pickle',
             ]
 
-iceSimDict = ['ice18FutureSimulations1000Shishmaref.pickle',
-                'ice18FutureSimulations1000Wainwright.pickle',
-                'ice18FutureSimulations1000PointHope.pickle',
-                'ice18FutureSimulations1000PointLay.pickle',
-                'ice18FutureSimulations1000Kivalina.pickle',
-                'ice18FutureSimulations1000Wales.pickle',
-                'ice18FutureSimulations1000Wevok.pickle',
-                'ice18FutureSimulations1000Utqiagvik.pickle',
+iceSimDict = ['ice18FutureSimulations1000Tuk.pickle',
+              #'ice18FutureSimulations1000Shishmaref.pickle',
+              #  'ice18FutureSimulations1000Wainwright.pickle',
+              #  'ice18FutureSimulations1000PointHope.pickle',
+              #  'ice18FutureSimulations1000PointLay.pickle',
+              #  'ice18FutureSimulations1000Kivalina.pickle',
+              #  'ice18FutureSimulations1000Wales.pickle',
+              #  'ice18FutureSimulations1000Wevok.pickle',
+              #  'ice18FutureSimulations1000Utqiagvik.pickle',
               ]
 
 
@@ -198,13 +203,13 @@ for site in range(len(gevCopulaDict)):
     simulationsT2M = list()
     import random
 
-
-    diffSims = 100
+    diffSims = 10
+    # diffSims = 10
     sim_num = 10
 
-    simCounter = 0
-    for simNum in range(diffSims):
-
+    simCounter = 400
+    for simTemp in range(diffSims):
+        simNum = simTemp+40
         print('saving to ' + directoryDict[site])
         print('filling in simulation #{}'.format(simCounter))
         print('which is a variation of large scale climate #{}'.format(simNum))
@@ -218,7 +223,7 @@ for site in range(len(gevCopulaDict)):
             simV10 = []
             simU10 = []
             simT2M = []
-            simSSR = []
+            # simSSR = []
             simTime = []
             for i in range(len(evbmus_sim[:,int(np.floor(np.divide(simCounter,2)))])):
                 if np.remainder(i,2000) == 0:
@@ -231,7 +236,7 @@ for site in range(len(gevCopulaDict)):
 
                 stormDetails = gevCopulaSims[tempBmu][randStorm]
 
-                tempSimAreaVar = stormDetails[:,11]-iceAreaBelowTemp
+                tempSimAreaVar = stormDetails[:,10]-iceAreaBelowTemp
                 tempSimAreaFinder = np.where(np.abs(tempSimAreaVar) == np.min(np.abs(tempSimAreaVar)))
                 stormDetails = stormDetails[tempSimAreaFinder[0][0],:]
 
@@ -247,28 +252,40 @@ for site in range(len(gevCopulaDict)):
                 # simTpNorm = (stormDetails[1] - np.asarray(bmuDataMin)[tempBmu,1]) / (np.asarray(bmuDataMax)[tempBmu,1]-np.asarray(bmuDataMin)[tempBmu,1])
                 simHsNorm = (stormDetails[4] - np.asarray(bmuDataMin)[tempBmu, 0]) / (
                             np.asarray(bmuDataMax)[tempBmu, 0] - np.asarray(bmuDataMin)[tempBmu, 0])
-                simTpNorm = (stormDetails[12] - np.asarray(bmuDataMin)[tempBmu, 1]) / (
+                simTpNorm = (stormDetails[11] - np.asarray(bmuDataMin)[tempBmu, 1]) / (
                             np.asarray(bmuDataMax)[tempBmu, 1] - np.asarray(bmuDataMin)[tempBmu, 1])
 
                 test, closeIndex = closest_node([simHsNorm,simTpNorm],np.asarray(bmuDataNormalized)[tempBmu])
 
                 actualIndex = closeIndex#int(np.asarray(copulaDataNoNaNs[tempBmu])[closeIndex,6])
+                if tempBmu== 45:
+                    tempHs = np.zeros((24,))
+                    tempTp = np.zeros((24,))
+                    tempDm = np.zeros((24,))
+                    tempU10 = np.zeros((24,))
+                    tempV10 = np.zeros((24,))
+                    tempNTR = np.zeros((24,))
+                    tempT2M = stormDetails[9]
+                    simTime.append(np.array([0.04166667, 0.04166667, 0.04166667, 0.04166667, 0.04166667,0.04166667, 0.04166667, 0.04166667, 0.04166667, 0.04166667,
+                                    0.04166667, 0.04166667, 0.04166667, 0.04166667, 0.04166667,0.04166667, 0.04166667, 0.04166667, 0.04166667, 0.04166667,0.04166667, 0.04166667, 0.04166667, 0.04166667]))
 
-                tempHs = ((normalizedHydros[tempBmu][actualIndex]['hsNorm']) * (stormDetails[0]-stormDetails[1]) + stormDetails[1])#.filled()
-                tempTp = ((normalizedHydros[tempBmu][actualIndex]['tpNorm']) * (stormDetails[2]-stormDetails[3]) + stormDetails[3])#.filled()
-                tempDm = ((normalizedHydros[tempBmu][actualIndex]['dmNorm']) + stormDetails[4])
+                else:
+                    tempHs = ((normalizedHydros[tempBmu][actualIndex]['hsNorm']) * (stormDetails[0]-stormDetails[1]) + stormDetails[1])#.filled()
+                    tempTp = ((normalizedHydros[tempBmu][actualIndex]['tpNorm']) * (stormDetails[2]-stormDetails[3]) + stormDetails[3])#.filled()
+                    tempDm = ((normalizedHydros[tempBmu][actualIndex]['dmNorm']) + stormDetails[4])
+                    tempU10 = ((normalizedHydros[tempBmu][actualIndex]['uNorm']) * (stormDetails[5]-stormDetails[6]) + stormDetails[6])#.filled()
+                    tempV10 = ((normalizedHydros[tempBmu][actualIndex]['vNorm']) * (stormDetails[7]-stormDetails[8]) + stormDetails[8])#.filled()
+                    tempNTR = (normalizedHydros[tempBmu][actualIndex]['ntrNorm']) + stormDetails[11]
+                    # tempSSR = stormDetails[9]
+                    tempT2M = stormDetails[9]
+                    simTime.append(np.hstack((np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm'] * durSim),
+                                              np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm'] * durSim)[
+                                                  -1])))
 
-                tempU10 = ((normalizedHydros[tempBmu][actualIndex]['uNorm']) * (stormDetails[5]-stormDetails[6]) + stormDetails[6])#.filled()
-                tempV10 = ((normalizedHydros[tempBmu][actualIndex]['vNorm']) * (stormDetails[7]-stormDetails[8]) + stormDetails[8])#.filled()
-                tempSSR = stormDetails[9]
-                tempT2M = stormDetails[10]
-                # tempT2M = ((normalizedHydros[tempBmu][actualIndex]['t2mNorm']) * (stormDetails[14]-stormDetails[15]) + stormDetails[15])#.filled()
-
-                tempNTR = (normalizedHydros[tempBmu][actualIndex]['ntrNorm']) + stormDetails[12]
-
-                # tempSs = ((normalizedHydros[tempBmu][actualIndex]['ssNorm']) + stormDetails[5])
-                if len(normalizedHydros[tempBmu][actualIndex]['hsNorm']) < len(normalizedHydros[tempBmu][actualIndex]['timeNorm']):
-                    print('Time is shorter than Hs in bmu {}, index {}'.format(tempBmu,actualIndex))
+                    # tempT2M = ((normalizedHydros[tempBmu][actualIndex]['t2mNorm']) * (stormDetails[14]-stormDetails[15]) + stormDetails[15])#.filled()
+                    # tempSs = ((normalizedHydros[tempBmu][actualIndex]['ssNorm']) + stormDetails[5])
+                    if len(normalizedHydros[tempBmu][actualIndex]['hsNorm']) < len(normalizedHydros[tempBmu][actualIndex]['timeNorm']):
+                        print('Time is shorter than Hs in bmu {}, index {}'.format(tempBmu,actualIndex))
                 if stormDetails[1] < 0:
                     print('woah, we''re less than 0 over here')
                     asdfg
@@ -288,7 +305,7 @@ for site in range(len(gevCopulaDict)):
                     simDm.append(tempDm)
                     simV10.append(tempV10)
                     simU10.append(tempU10)
-                    simSSR.append(tempSSR)
+                    # simSSR.append(tempSSR)
                     simT2M.append(tempT2M)
                     simNTR.append(tempNTR)
 
@@ -298,14 +315,13 @@ for site in range(len(gevCopulaDict)):
                     simDm.append(tempDm*0)
                     simV10.append(tempV10)
                     simU10.append(tempU10)
-                    simSSR.append(tempSSR)
+                    # simSSR.append(tempSSR)
                     simT2M.append(tempT2M)
                     simNTR.append(tempNTR)
 
                     # simSs.append(tempSs)
                 #simTime.append(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim)
                 #dt = np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim)
-                simTime.append(np.hstack((np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim), np.diff(normalizedHydros[tempBmu][actualIndex]['timeNorm']*durSim)[-1])))
 
 
             cumulativeHours = np.cumsum(np.hstack(simTime))
@@ -345,7 +361,7 @@ for site in range(len(gevCopulaDict)):
             interpDm = np.interp(deltaT, simDeltaTWaves, simDm)
             interpU10 = np.interp(deltaT,simDeltaT,np.hstack(simU10))
             interpV10 = np.interp(deltaT,simDeltaT,np.hstack(simV10))
-            interpSSR = np.interp(deltaT,simDailyDeltaT,np.hstack(simSSR))
+            # interpSSR = np.interp(deltaT,simDailyDeltaT,np.hstack(simSSR))
             # interpT2M = np.interp(deltaT, simDeltaT, np.hstack(simT2M))
             # interpT2M = np.interp(deltaT,simDailyDeltaT,np.hstack(simT2M))
             interpNTR = np.interp(deltaT, simDeltaT, np.hstack(simNTR))
@@ -383,18 +399,25 @@ for site in range(len(gevCopulaDict)):
             interpHs[beginOfDayIndexPlus1[0][1:]] = newBeginOfDayHsPlus1
 
             interpHsMax = np.hstack([0,0,max_rolling(interpHs,5),0,0])
+            interpHsMax2 = np.hstack([0,max_rolling(interpHs,3),0])
+
             # interpTpMax = np.hstack([0,0,max_rolling(interpTp,5),0,0])
             # interpDmMax = np.hstack([0,0,max_rolling(interpDm,5),0,0])
+            interpHsMin2 = np.hstack([0,min_rolling(interpHs,3),0])
 
             interpHsMin = np.hstack([0,0,min_rolling(interpHs,5),0,0])
             # interpTpMin = np.hstack([0,0,min_rolling(interpTp,5),0,0])
             # interpDmMin = np.hstack([0,0,min_rolling(interpDm,5),0,0])
 
             earlyYear = np.where(hourlyMonths < 7)
+            earlyYear2 = np.where(hourlyMonths == 7)
+            lateYear2 = np.where(hourlyMonths == 8)
             lateYear = np.where(hourlyMonths >= 9)
             Hs = interpHs
             Hs[earlyYear] = interpHsMin[earlyYear]
+            Hs[earlyYear2] = interpHsMin2[earlyYear2]
             Hs[lateYear] = interpHsMax[lateYear]
+            Hs[lateYear2] = interpHsMax2[lateYear2]
 
 
 
@@ -474,10 +497,11 @@ for site in range(len(gevCopulaDict)):
 
             # interpSs = np.interp(deltaT,simDeltaT,np.hstack(simSs))
 
-            simDataInterp = np.array([Hs,interpTp,interpDm,interpU10,interpV10,interpSSR,interpT2M,interpNTR])
+            # simDataInterp = np.array([Hs,interpTp,interpDm,interpU10,interpV10,interpSSR,interpT2M,interpNTR])
+            simDataInterp = np.array([Hs,interpTp,interpDm,interpU10,interpV10,interpT2M,interpNTR])
 
             # df = pandas.DataFrame(data=simDataInterp.T,index=hourlyTime,columns=["hs","tp","dm"])
-            df = pandas.DataFrame(data=simDataInterp.T,index=hourlyTime,columns=["hs","tp","dm","u10","v10","ssr","t2m","ntr"])
+            df = pandas.DataFrame(data=simDataInterp.T,index=hourlyTime,columns=["hs","tp","dm","u10","v10","t2m","ntr"])
             # resampled = df.resample('H')
             # interped = resampled.interpolate()
             # simulationData = interped.values

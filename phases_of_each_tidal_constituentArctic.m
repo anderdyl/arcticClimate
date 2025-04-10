@@ -10,10 +10,10 @@ addpath(genpath('/Users/dylananderson/Documents/projects/serdp/'))
 clear
 
 % load('frfTideFitting.mat')
-load('arcticTides.mat')
+load('arcticTides2.mat')
 
-tide = purdoeDailyData.tide;
-time = purdoeDailyData.time;
+tide = tukDailyData.tide;
+time = tukDailyData.time;
 
 % for fff = 1:length(timeStampHours)
 % 
@@ -26,7 +26,7 @@ hourlyTime = time;%[datenum(1999,1,1,0,0,0):1/24:datenum(2019,12,31,23,0,0)];
 hourlyTide = tide;%interp1q(time',predTide',hourlyTime');
 
 
-ind = find(hourlyTime >= datenum(1990,1,1,0,0,0) & hourlyTime <= datenum(2024,12,31,23,0,0));
+ind = find(hourlyTime >= datenum(1979,1,1,0,0,0) & hourlyTime <= datenum(2024,12,31,23,0,0));
 tide = hourlyTide(ind);
 time = hourlyTime(ind)+4/24;
 
@@ -394,4 +394,4 @@ plot(time_emulator,fourtides)
 
 
 %}
-save('tide_emulation_Purdoe.mat','time_emulator','tideOut','synTime','synTide')
+save('tide_emulation_Tuk.mat','time_emulator','tideOut','synTime','synTide')

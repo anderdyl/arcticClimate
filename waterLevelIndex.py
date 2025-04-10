@@ -57,22 +57,27 @@ def matlab_to_datetime(matlab_date_num_seconds):
 
 
 data = ReadMatfile('/users/dylananderson/documents/projects/arcticClimate/arcticTides.mat')
+data2 = ReadMatfile('/users/dylananderson/documents/projects/arcticClimate/arcticTides2.mat')
 
 tidePurdoe = ReadMatfile('/users/dylananderson/documents/projects/arcticClimate/tide_emulation_Purdoe.mat')
 tideNome = ReadMatfile('/users/dylananderson/documents/projects/arcticClimate/tide_emulation_Nome.mat')
 tideRed = ReadMatfile('/users/dylananderson/documents/projects/arcticClimate/tide_emulation_Red.mat')
+tideTuk = ReadMatfile('/users/dylananderson/documents/projects/arcticClimate/tide_emulation_Tuk.mat')
 
 tideTimeEmPurdoe = np.array([matlab_to_datetime(tempTime * 24 * 60 * 60) for tempTime in tidePurdoe['time_emulator']])
 tideTimeEmNome = np.array([matlab_to_datetime(tempTime * 24 * 60 * 60) for tempTime in tideNome['time_emulator']])
 tideTimeEmRed = np.array([matlab_to_datetime(tempTime * 24 * 60 * 60) for tempTime in tideRed['time_emulator']])
+tideTimeEmTuk = np.array([matlab_to_datetime(tempTime * 24 * 60 * 60) for tempTime in tideTuk['time_emulator']])
 
 mslEmNome = data['nomeDailyData']['B']['msl'][1]*tideNome['time_emulator']+data['nomeDailyData']['B']['msl'][0]
 mslEmPurdoe = data['purdoeDailyData']['B']['msl'][1]*tidePurdoe['time_emulator']+data['purdoeDailyData']['B']['msl'][0]
 mslEmRed = data['redDailyData']['B']['msl'][1]*tideRed['time_emulator']+data['redDailyData']['B']['msl'][0]
+mslEmTuk = data2['tukDailyData']['B']['msl'][1]*tideTuk['time_emulator']+data2['tukDailyData']['B']['msl'][0]
 
 tideEmPurdoe = tidePurdoe['tideOut']
 tideEmNome = tideNome['tideOut']
 tideEmRed = tideRed['tideOut']
+tideEmTuk = tideTuk['tideOut']
 
 
 #
@@ -127,6 +132,20 @@ dslaPurdoe = data['purdoeDailyData']['dsla'][startTime:endTime]
 mslPurdoe = data['purdoeDailyData']['msl'][startTime:endTime]
 
 
+
+tidePredTuk = data2['tukDailyData']['tide']
+tideWlTuk = data2['tukDailyData']['wl']
+tideTimeTuk = np.array([matlab_to_datetime(tempTime * 24 * 60 * 60) for tempTime in data2['tukDailyData']['time']])
+mslPredTuk = data2['tukDailyData']['B']['msl'][1]*data2['tukDailyData']['time']+data2['tukDailyData']['B']['msl'][0]
+startTime = 82511
+endTime = -15500
+timeDataTuk = np.array([matlab_to_datetime(tempTime * 24 * 60 * 60) for tempTime in data2['tukDailyData']['time']])[startTime:endTime]
+wlTuk = data2['tukDailyData']['wl'][startTime:endTime]
+ssTuk = data2['tukDailyData']['ss'][startTime:endTime]
+seasonalTuk = data2['tukDailyData']['seasonal'][startTime:endTime]
+mmslaTuk = data2['tukDailyData']['mmsla'][startTime:endTime]
+dslaTuk = data2['tukDailyData']['dsla'][startTime:endTime]
+mslTuk = data2['tukDailyData']['msl'][startTime:endTime]
 
 
 
@@ -250,11 +269,41 @@ dailyTimeNome = ogdfNome.resample("d")
 
 
 
+
+plt.figure(figsize=(12,7))
+p1 = plt.subplot2grid((1,1),(0,0))
+p1.plot(timeDataTuk,wlTuk)
+p1.plot(timeDataTuk,ssTuk)
+p1.plot(timeDataTuk,seasonalTuk)
+p1.plot(timeDataTuk,mmslaTuk)
+
+tCTuk = list(timeDataTuk)
+import pandas as pd
+dataTuk= np.array([wlTuk,ssTuk,seasonalTuk,mmslaTuk,dslaTuk,mslTuk])
+ogdfTuk = pd.DataFrame(data=dataTuk.T, index=tCTuk, columns=["wl", "ss", "seasonal","mmsla","dsla","msl"])
+ogdfTuk= ogdfTuk.loc[SLPdatetime[0]:SLPdatetime[-1]]
+# dailySSTuk = ogdfTuk.resample("d")["ss"].max()
+dailySSTuk = ogdfTuk.resample("d")["ss"].median()
+
+dailyMMSLATuk = ogdfTuk.resample("d")["mmsla"].mean()
+dailySEASONALTuk = ogdfTuk.resample("d")["seasonal"].mean()
+dailyMSLTuk = ogdfTuk.resample("d")["msl"].mean()
+dailyDSLATuk = ogdfTuk.resample("d")["dsla"].mean()
+badIndTuk = np.where(np.isnan(dailyDSLATuk.values))
+dailyDSLATuk.values[badIndTuk] = 0
+badIndssTuk = np.where(np.isnan(dailySSTuk.values))
+dailySSTuk.values[badIndssTuk] = 0
+dailyNTRTuk = dailySSTuk+dailySEASONALTuk+dailyMMSLATuk
+dailyTimeTuk = ogdfTuk.resample("d")
+
+
+
 ogdfSLPs = pd.DataFrame(data=SLPpcs, index=SLPdatetime)
 
 dailySLPtrimmedNome = ogdfSLPs.loc[timeDataNome[0]:timeDataNome[-1],:]
 dailySLPtrimmedPurdoe = ogdfSLPs.loc[timeDataPurdoe[0]:timeDataPurdoe[-1],:]
 dailySLPtrimmedRed = ogdfSLPs.loc[timeDataRed[0]:timeDataRed[-1],:]
+dailySLPtrimmedTuk = ogdfSLPs.loc[timeDataTuk[0]:timeDataTuk[-1],:]
 
 
 # outputDWTs = {}
@@ -387,7 +436,7 @@ y1 = 1979
 y2 = 2023
 m1 = 1
 m2 = 10
-subset = xds_predictor.sel(longitude=slice(180, 225), latitude=slice(62, 75))
+subset = xds_predictor.sel(longitude=slice(180, 245), latitude=slice(62, 75))
 
 Xs = subset.longitude.values
 Ys = subset.latitude.values
@@ -397,7 +446,7 @@ plt.figure()
 p1 = plt.subplot2grid((1, 1), (0, 0))
 # spatialField = np.fliplr(subset["SST"][:,:,10])#np.reshape(var_anom_mean.values,(33,36))
 spatialField = subset["SST"][:,:,10]#np.reshape(var_anom_mean.values,(33,36))
-m = Basemap(projection='merc', llcrnrlat=62, urcrnrlat=75, llcrnrlon=175, urcrnrlon=225, lat_ts=65, resolution='l')
+m = Basemap(projection='merc', llcrnrlat=62, urcrnrlat=77, llcrnrlon=175, urcrnrlon=245, lat_ts=65, resolution='l')
 m.drawcoastlines()
 cx, cy = m(XR, YR)
 CS = m.contourf(cx, cy, spatialField.T),# np.arange(0,0.023,.003), cmap=cm.RdBu_r, shading='gouraud')
@@ -442,7 +491,7 @@ nterm = np.where(APEV <= 0.999 * 100)[0][-1]
 
 
 
-data = PCs[:,0:6]
+data = PCs[:,0:25]
 sstdf = pd.DataFrame(data=data, index=ogTime)
 dailySST = sstdf.resample('d').interpolate()
 
@@ -455,6 +504,7 @@ dailySST = sstdf.resample('d').interpolate()
 dailySSTtrimmedNome = dailySST.loc[ogdfNome.index[0]:ogdfNome.index[-1],:]
 dailySSTtrimmedPurdoe = dailySST.loc[ogdfPurdoe.index[0]:ogdfPurdoe.index[-1],:]
 dailySSTtrimmedRed = dailySST.loc[ogdfRed.index[0]:ogdfRed.index[-1],:]
+dailySSTtrimmedTuk = dailySST.loc[ogdfTuk.index[0]:ogdfTuk.index[-1],:]
 
 
 
@@ -468,19 +518,24 @@ dailySSTtrimmedRed = dailySST.loc[ogdfRed.index[0]:ogdfRed.index[-1],:]
 dailyVarsRed = np.hstack((dailySSTtrimmedRed,dailySLPtrimmedRed))
 dailyVarsPurdoe = np.hstack((dailySSTtrimmedPurdoe,dailySLPtrimmedPurdoe))
 dailyVarsNome = np.hstack((dailySSTtrimmedNome,dailySLPtrimmedNome))
+dailyVarsTuk = np.hstack((dailySSTtrimmedTuk,dailySLPtrimmedTuk))
 
 
 nanPurdoe = np.where(np.isnan(dailyNTRPurdoe.values))
 nanRed = np.where(np.isnan(dailyNTRRed.values))
 nanNome = np.where(np.isnan(dailyNTRNome.values))
+nanTuk = np.where(np.isnan(dailyNTRTuk.values))
 
 dailyVarsRed = np.delete(dailyVarsRed,nanRed[0],axis=0)
 dailyVarsPurdoe = np.delete(dailyVarsPurdoe,nanPurdoe[0],axis=0)
 dailyVarsNome = np.delete(dailyVarsNome,nanNome[0],axis=0)
+dailyVarsTuk = np.delete(dailyVarsTuk,nanTuk[0],axis=0)
 
 ntrPurdoe = np.delete(dailyNTRPurdoe.values,nanPurdoe[0])
 ntrNome = np.delete(dailyNTRNome.values,nanNome[0])
 ntrRed = np.delete(dailyNTRRed.values,nanRed[0])
+ntrTuk = np.delete(dailyNTRTuk.values,nanTuk[0])
+
 # ntrPurdoe = np.delete(dailySSPurdoe.values,nanPurdoe[0])
 # ntrNome = np.delete(dailySSNome.values,nanNome[0])
 # ntrRed = np.delete(dailySSRed.values,nanRed[0])
@@ -505,7 +560,7 @@ from sklearn.linear_model import LinearRegression
 
 
 
-allPCsToTry = np.arange(0,200)
+allPCsToTry = np.arange(0,400)
 
 bestPCPurdoe = []
 improvingScorePurdoe = []
@@ -544,7 +599,7 @@ for qq in range(50):
     improvingScorePurdoe.append(np.max(np.array(allScoresPurdoe)))
     print('Iter {}: Adding PC#{}, cumulative score:{}'.format(qq,bestAddition,np.max(np.array(allScoresPurdoe))))
 
-allPCsToTry = np.arange(0, 200)
+allPCsToTry = np.arange(0, 400)
 
 bestPCNome = []
 improvingScoreNome = []
@@ -580,7 +635,7 @@ for qq in range(50):
     improvingScoreNome.append(np.max(np.array(allScoresNome)))
     print('Iter {}: Adding PC#{}, cumulative score:{}'.format(qq, bestAddition, np.max(np.array(allScoresNome))))
 
-allPCsToTry = np.arange(0, 200)
+allPCsToTry = np.arange(0, 400)
 
 bestPCRed = []
 improvingScoreRed = []
@@ -615,6 +670,47 @@ for qq in range(50):
     allPCsToTry = np.delete(allPCsToTry, removeIndex)
     improvingScoreRed.append(np.max(np.array(allScoresRed)))
     print('Iter {}: Adding PC#{}, cumulative score:{}'.format(qq, bestAddition, np.max(np.array(allScoresRed))))
+
+
+
+
+allPCsToTry = np.arange(0, 400)
+
+bestPCTuk = []
+improvingScoreTuk = []
+for qq in range(50):
+
+    allScoresTuk = []
+    for yy in range(len(allPCsToTry)):
+        if qq == 0:
+            tryPCs = yy
+            xTuk = dailyVarsTuk[:, yy].reshape((-1, 1))
+            yTuk = np.array(ntrTuk)
+
+
+        else:
+            tryPCs = np.hstack([np.asarray(bestPCTuk).flatten(), np.asarray(allPCsToTry[yy]).flatten()])
+            xTuk = dailyVarsTuk[:, tryPCs]  # .reshape((-1,1))
+            yTuk = np.array(ntrTuk)
+
+        modelTuk = LinearRegression().fit(xTuk, yTuk)
+
+        r_sqTuk = modelTuk.score(xTuk, yTuk)
+
+        # print(f"coefficient of determination: {r_sqTuk}")
+        # print(f"intercept: {modelTuk.intercept_}")
+        # print(f"coefficients: {modelTuk.coef_}")
+        allScoresTuk.append(r_sqTuk)
+
+    bestAdditionIndex = np.argmax(np.array(allScoresTuk))
+    bestAddition = allPCsToTry[bestAdditionIndex]
+    bestPCTuk.append(bestAddition)
+    removeIndex = np.where(allPCsToTry == bestAddition)
+    allPCsToTry = np.delete(allPCsToTry, removeIndex)
+    improvingScoreTuk.append(np.max(np.array(allScoresTuk)))
+    print('Iter {}: Adding PC#{}, cumulative score:{}'.format(qq, bestAddition, np.max(np.array(allScoresTuk))))
+
+
 
 
 
@@ -693,27 +789,56 @@ ax3b.set_xlabel('Nome Tide Gauge (m, MSL)')
 ax3b.set_ylabel('Predicted Non-tidal Residual (m, MSL)')
 
 
+plt.figure()
+ax3c = plt.subplot2grid((2,3),(0,0))
+ax3c.plot(yTuk,modelTuk.predict(xTuk),'.')
+ax3c.plot([-2.5,2.5],[-2.5,2.5],'k--')
+ax3c.plot([-2.5,2.5],[0,0],'k--')
+ax3c.plot([0,0],[-2.5,2.5],'k--')
+ax3c.set_xlabel('Tuk Tide Gauge (m, MSL)')
+ax3c.set_ylabel('Predicted Non-tidal Residual (m, MSL)')
+
+
+ax3bc = plt.subplot2grid((2,3),(1,0))
+yTukStd = np.std(yTuk)
+yTukMean = np.mean(yTuk)
+yModTuk = modelTuk.predict(xTuk)
+yModTukStd = np.std(yModTuk)
+yModTukMean = np.mean(yModTuk)
+
+ax3bc.plot(yTuk,((yModTuk-yModTukMean)/yModTukStd)*yTukStd+yTukMean,'.')
+ax3bc.plot([-2.5,2.5],[-2.5,2.5],'k--')
+ax3bc.plot([-2.5,2.5],[0,0],'k--')
+ax3bc.plot([0,0],[-2.5,2.5],'k--')
+ax3bc.set_xlabel('Tuk Tide Gauge (m, MSL)')
+ax3bc.set_ylabel('Predicted Non-tidal Residual (m, MSL)')
+
 
 
 plt.figure()
-ax10 = plt.subplot2grid((3,1),(0,0))
+ax10 = plt.subplot2grid((4,1),(0,0))
 # plt.plot(timeData,ss+mmsla+seasonal)
 ax10.plot(predTime,((modelNome.predict(predVars[:, bestPCNome])-yModNomeMean)/yModNomeStd)*yNomeStd+yNomeMean)
 ax10.set_xlabel('time')
 ax10.set_ylabel('Nome NTR Prediction')
 
-ax11 = plt.subplot2grid((3,1),(1,0))
+ax11 = plt.subplot2grid((4,1),(1,0))
 # plt.plot(timeData,ss+mmsla+seasonal)
 ax11.plot(predTime,((modelRed.predict(predVars[:, bestPCRed])-yModRedMean)/yModRedStd)*yRedStd+yRedMean)
 ax11.set_xlabel('time')
 ax11.set_ylabel('Red NTR Prediction')
 
-ax12 = plt.subplot2grid((3,1),(2,0))
+ax12 = plt.subplot2grid((4,1),(2,0))
 # plt.plot(timeData,ss+mmsla+seasonal)
 ax12.plot(predTime,((modelPurdoe.predict(predVars[:, bestPCPurdoe])-yModPurdoeMean)/yModPurdoeStd)*yPurdoeStd+yPurdoeMean)
 ax12.set_xlabel('time')
 ax12.set_ylabel('Purdoe NTR Prediction')
 
+ax13 = plt.subplot2grid((4,1),(3,0))
+# plt.plot(timeData,ss+mmsla+seasonal)
+ax13.plot(predTime,((modelTuk.predict(predVars[:, bestPCTuk])-yModTukMean)/yModTukStd)*yTukStd+yTukMean)
+ax13.set_xlabel('time')
+ax13.set_ylabel('Tuk NTR Prediction')
 
 
 
@@ -870,6 +995,55 @@ ax24.set_ylim([-1.5,1.5])
 
 
 
+
+plt.figure()
+ax20b = plt.subplot2grid((5,1),(0,0))
+ax20b.plot(tideTimeTuk,tideWlTuk)
+ax20b.set_xlim([datetime(1979,1,1),datetime(2023,5,1)])
+ax20b.set_ylim([-1.75,1.75])
+ax20b.set_ylabel('Observed Tuk TG (m)')
+
+ax21b = plt.subplot2grid((5,1),(1,0))
+ax21b.plot(tideTimeEmTuk,mslEmTuk)
+ax21b.set_xlim([datetime(1979,1,1),datetime(2023,5,1)])
+ax21b.set_ylim([-0.3,0.2])
+ax21b.set_ylabel('MSL (m)')
+
+ax22b = plt.subplot2grid((5,1),(2,0))
+ax22b.plot(tideTimeEmTuk,tideEmTuk)
+ax22b.set_xlim([datetime(1979,1,1),datetime(2023,5,1)])
+ax22b.set_ylim([-0.2,0.2])
+ax22b.set_ylabel('Tide (m)')
+
+ax23b = plt.subplot2grid((5,1),(3,0))
+# plt.plot(timeData,ss+mmsla+seasonal)
+ax23b.plot(predTime,modelTuk.predict(predVars[:, bestPCTuk]))
+# ax23.plot(predTime,((modelPurdoe.predict(predVars[:, tryPCs])-yModPurdoeMean)/yModPurdoeStd)*yPurdoeStd+yPurdoeMean)
+
+ax23b.set_xlabel('time')
+ax23b.set_ylabel('NTR (m)')
+ax23b.set_xlim([datetime(1979,1,1),datetime(2023,5,1)])
+ax23b.set_ylim([-0.5,1])
+
+
+ax24b = plt.subplot2grid((5,1),(4,0))
+
+predTuk = ((modelTuk.predict(predVars[:, bestPCTuk])-yModTukMean)/yModTukStd)*yTukStd+yTukMean
+TukInd = np.where((predTime>datetime(1979,1,1)) & (predTime<datetime(2024,1,1)))
+TukInd2 = np.where((tideTimeEmTuk>datetime(1979,1,1)) & (tideTimeEmTuk<datetime(2024,1,1)))
+simDailyDeltaPredTime = [(tt - predTime[0]).total_seconds() / (3600 * 24) for tt in predTime]
+simHourlyDeltaTime = [(tt - tideTimeEmTuk[0]).total_seconds() / (3600 * 24) for tt in tideTimeEmTuk[TukInd2]]
+interpWLTuk = np.interp(simHourlyDeltaTime, simDailyDeltaPredTime, predTuk)
+TukExtendedWL = interpWLTuk + tideEmTuk[TukInd2] + mslEmTuk[TukInd2]
+ax24b.plot(tideTimeEmTuk[TukInd2],TukExtendedWL)
+ax24b.set_xlabel('time')
+ax24b.set_ylabel('Extended WL (m)')
+ax24b.set_xlim([datetime(1979,1,1),datetime(2023,5,1)])
+ax24b.set_ylim([-1.5,1.5])
+
+
+
+
 ## Ok so we need to fill the gaps....
 histTimeRed = tideTimeEmRed[RedInd2]
 hoursWithNoWLRed = [x for x in histTimeRed if x not in timeDataRed]
@@ -936,6 +1110,28 @@ badSS = np.where(np.isnan(gapFilledPurdoeNTR))
 gapFilledPurdoeNTR[badSS] = interpWLPurdoe[badSS]
 
 
+## Ok so we need to fill the gaps....
+histTimeTuk = tideTimeEmTuk[TukInd2]
+hoursWithNoWLTuk = [x for x in histTimeTuk if x not in timeDataTuk]
+ind_dictTuk = dict((k,i) for i,k in enumerate(histTimeTuk))
+interTuk = set(hoursWithNoWLTuk).intersection(histTimeTuk)
+indicesTuk = [ ind_dictTuk[x] for x in interTuk ]
+indicesTuk.sort()
+
+hoursWithWLTuk = [x for x in histTimeTuk if x in timeDataTuk]
+ind_dictTuk = dict((k,i) for i,k in enumerate(histTimeTuk))
+inter2Tuk = set(hoursWithWLTuk).intersection(histTimeTuk)
+indices2Tuk = [ ind_dictTuk[x] for x in inter2Tuk]
+indices2Tuk.sort()
+
+gapFilledTukNTR = np.nan * np.ones((len(histTimeTuk),))
+gapFilledTukNTR[indicesTuk] = interpWLTuk[indicesTuk]
+gapFilledTukNTR[indices2Tuk] = ssTuk
+badSS = np.where(np.isnan(gapFilledTukNTR))
+gapFilledTukNTR[badSS] = interpWLTuk[badSS]
+
+
+
 # %distance weight (roughly) all tide locations
 shish_wl = gapFilledNomeNTR *(170/370) + gapFilledRedNTR*(200/370)
 pthope_wl = gapFilledPurdoeNTR *(160/920) + gapFilledRedNTR*(760/920)
@@ -946,6 +1142,9 @@ wales_wl = gapFilledNomeNTR *(269/450) + gapFilledRedNTR*(181/450)
 kivalina_wl = gapFilledRedNTR
 ptlay_wl = gapFilledPurdoeNTR *(556/716) + gapFilledRedNTR*(160/716)
 
+tuk_wl = gapFilledTukNTR
+
+
 
 # shish_wl2 = gapFilledNomeNTR *(865/1065) + gapFilledPurdoeNTR*(200/1065)
 # pthope_wl2 = gapFilledPurdoeNTR *(430/1190) + gapFilledNomeNTR*(760/1190)
@@ -953,6 +1152,17 @@ ptlay_wl = gapFilledPurdoeNTR *(556/716) + gapFilledRedNTR*(160/716)
 #
 # wevok_wl = gapFilledPurdoeNTR *(690/1178) + gapFilledNomeNTR*(488/1178)
 # wales_wl = gapFilledPurdoeNTR *(690/856) + gapFilledRedNTR*(166/856)
+
+
+historicalPickle = 'historicalNTRDataTuk.pickle'
+outputHistorical = {}
+outputHistorical['time'] = histTimeTuk
+outputHistorical['ntr1'] = tuk_wl
+# outputHistorical['ntr2'] = pthope_wl2
+# outputHistorical['timeGroup'] = timeGroup
+
+with open(historicalPickle,'wb') as f:
+    pickle.dump(outputHistorical, f)
 
 
 historicalPickle = 'historicalNTRDataPointHope.pickle'

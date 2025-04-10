@@ -2,19 +2,28 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3790cb9a-306f-4a6d-a2a2-1e9574428de0" name="Changes" comment="synthetic climates">
-      <change afterPath="$PROJECT_DIR$/potentialGencadeHydrographs2Days.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/temperatureValidations.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/collectSimulationsTuk.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dwtDistributionsFigure.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dwtPaperFigure.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expandedArcticHydrographs.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pointHopeHindcastInput.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/potentialGencadeValidationsTuk.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/seaIceSimulations.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/collectSimulations.py" beforeDir="false" afterPath="$PROJECT_DIR$/collectSimulations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/era5metOceanDownloads.py" beforeDir="false" afterPath="$PROJECT_DIR$/era5metOceanDownloads.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/futureAWTs.py" beforeDir="false" afterPath="$PROJECT_DIR$/futureAWTs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/iceSimulationFigure.py" beforeDir="false" afterPath="$PROJECT_DIR$/iceSimulationFigure.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/monthlyERA5temps.py" beforeDir="false" afterPath="$PROJECT_DIR$/monthlyERA5temps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nc2bin_siconc.py" beforeDir="false" afterPath="$PROJECT_DIR$/nc2bin_siconc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phases_of_each_tidal_constituentArctic.m" beforeDir="false" afterPath="$PROJECT_DIR$/phases_of_each_tidal_constituentArctic.m" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/potentialGencadeCopulas.py" beforeDir="false" afterPath="$PROJECT_DIR$/potentialGencadeCopulas.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/potentialGencadeFutureHydrographsInterpolated.py" beforeDir="false" afterPath="$PROJECT_DIR$/potentialGencadeFutureHydrographsInterpolated.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/potentialGencadeHydrographs.py" beforeDir="false" afterPath="$PROJECT_DIR$/potentialGencadeHydrographs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/potentialGencadeHydrographsInterpolated.py" beforeDir="false" afterPath="$PROJECT_DIR$/potentialGencadeHydrographsInterpolated.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/potentialGencadeValidations.py" beforeDir="false" afterPath="$PROJECT_DIR$/potentialGencadeValidations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/waveHydrographsValidations.py" beforeDir="false" afterPath="$PROJECT_DIR$/waveHydrographsValidations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/slpPlots.py" beforeDir="false" afterPath="$PROJECT_DIR$/slpPlots.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utqiagvikFutureWaves.py" beforeDir="false" afterPath="$PROJECT_DIR$/utqiagvikFutureWaves.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/waterLevelIndex.py" beforeDir="false" afterPath="$PROJECT_DIR$/waterLevelIndex.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/waveDistributions.py" beforeDir="false" afterPath="$PROJECT_DIR$/waveDistributions.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +62,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.iceSimulationFigure">
+  <component name="RunManager" selected="Python.collectSimulationsTuk">
     <configuration name="alrForIceCoverage" type="PythonConfigurationType" factoryName="Python">
       <module name="arcticClimate" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -201,7 +210,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="collectSimulations" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+    <configuration name="collectSimulationsTuk" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="arcticClimate" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -213,7 +222,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/collectSimulations.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/collectSimulationsTuk.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -285,6 +294,48 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="dwtDistributionsFigure" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="arcticClimate" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/.conda/envs/arcticClimate/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/dwtDistributionsFigure.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="dwtPaperFigure" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="arcticClimate" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/.conda/envs/arcticClimate/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/dwtPaperFigure.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="era5metOceanDownloads" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="arcticClimate" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -298,6 +349,27 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/era5metOceanDownloads.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="expandedArcticHydrographs" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="arcticClimate" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/.conda/envs/arcticClimate/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/expandedArcticHydrographs.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -600,6 +672,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="pointHopeHindcastInput" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="arcticClimate" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/.conda/envs/arcticClimate/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pointHopeHindcastInput.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="potentialGencadeCopulas" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="arcticClimate" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -781,6 +874,27 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/runningFutureSlps.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="seaIceSimulations" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="arcticClimate" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/.conda/envs/arcticClimate/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/seaIceSimulations.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -1133,10 +1247,12 @@
       <item itemvalue="Python.clusterIceCoverage" />
       <item itemvalue="Python.clusterIcePointsRG" />
       <item itemvalue="Python.clusterSLParctic" />
-      <item itemvalue="Python.collectSimulations" />
+      <item itemvalue="Python.collectSimulationsTuk" />
       <item itemvalue="Python.combinedDailyClusters" />
       <item itemvalue="Python.downloadCFSR" />
       <item itemvalue="Python.downloadIce2" />
+      <item itemvalue="Python.dwtDistributionsFigure" />
+      <item itemvalue="Python.dwtPaperFigure" />
       <item itemvalue="Python.era5metOceanDownloads" />
       <item itemvalue="Python.fetchAreaProxyPurdhoe" />
       <item itemvalue="Python.fetchLength" />
@@ -1149,9 +1265,11 @@
       <item itemvalue="Python.mjoIWT" />
       <item itemvalue="Python.monthlyERA5" />
       <item itemvalue="Python.nc2bin_siconc" />
+      <item itemvalue="Python.seaIceSimulations" />
       <item itemvalue="Python.nsidc-downlad_NSIDC-0081.002_2023-10-03" />
       <item itemvalue="Python.plotingSeaIceClusters" />
       <item itemvalue="Python.pnaIWT" />
+      <item itemvalue="Python.pointHopeHindcastInput" />
       <item itemvalue="Python.potentialGencadeCopulas" />
       <item itemvalue="Python.potentialGencadeFutureHydrographsInterpolated" />
       <item itemvalue="Python.potentialGencadeHydrographsInterpolated" />
@@ -1166,6 +1284,7 @@
       <item itemvalue="Python.temperatureValidations" />
       <item itemvalue="Python.utqiagvikFutureWaves" />
       <item itemvalue="Python.waterLevelIndex" />
+      <item itemvalue="Python.expandedArcticHydrographs" />
       <item itemvalue="Python.waveAndWaterLevels" />
       <item itemvalue="Python.waveCharacteristicsFuture" />
       <item itemvalue="Python.waveDistributions" />

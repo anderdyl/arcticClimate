@@ -32,7 +32,9 @@ import xarray as xr
 # with open(r"normalizedWaveHydrographsWevok.pickle", "rb") as input_file:
 # with open(r"normalizedWaveHydrographsPointLay.pickle", "rb") as input_file:
 # with open(r"normalizedWaveHydrographsKivalina.pickle", "rb") as input_file:
-with open(r"normalizedWaveHydrographsUtqiagvik.pickle", "rb") as input_file:
+# with open(r"normalizedWaveHydrographsUtqiagvik.pickle", "rb") as input_file:
+with open(r"normalizedWaveHydrographsTuk.pickle", "rb") as input_file:
+
     normalizedWaveHydrographs = pickle.load(input_file)
 normalizedHydros = normalizedWaveHydrographs['normalizedHydros']
 bmuDataMin = normalizedWaveHydrographs['bmuDataMin']
@@ -47,7 +49,8 @@ bmuDataNormalized = normalizedWaveHydrographs['bmuDataNormalized']
 # with open(r"waveHydrographsWevok.pickle", "rb") as input_file:
 # with open(r"waveHydrographsPointLay.pickle", "rb") as input_file:
 # with open(r"waveHydrographsKivalina.pickle", "rb") as input_file:
-with open(r"waveHydrographsUtqiagvik.pickle", "rb") as input_file:
+# with open(r"waveHydrographsUtqiagvik.pickle", "rb") as input_file:
+with open(r"waveHydrographsTuk.pickle", "rb") as input_file:
     waveHydrographs = pickle.load(input_file)
 hydros = waveHydrographs['hydros']
 
@@ -58,7 +61,8 @@ hydros = waveHydrographs['hydros']
 # with open(r"hydrographCopulaDataWevok.pickle", "rb") as input_file:
 # with open(r"hydrographCopulaDataPointLay.pickle", "rb") as input_file:
 # with open(r"hydrographCopulaDataKivalina.pickle", "rb") as input_file:
-with open(r"hydrographCopulaDataUtqiagvik.pickle", "rb") as input_file:
+# with open(r"hydrographCopulaDataUtqiagvik.pickle", "rb") as input_file:
+with open(r"hydrographCopulaDataTuk.pickle", "rb") as input_file:
     hydrographCopulaData = pickle.load(input_file)
 copulaData = hydrographCopulaData['copulaData']
 
@@ -69,7 +73,8 @@ copulaData = hydrographCopulaData['copulaData']
 # with open(r"historicalDataWevok.pickle", "rb") as input_file:
 # with open(r"historicalDataPointLay.pickle", "rb") as input_file:
 # with open(r"historicalDataKivalina.pickle", "rb") as input_file:
-with open(r"historicalDataUtqiagvik.pickle", "rb") as input_file:
+# with open(r"historicalDataUtqiagvik.pickle", "rb") as input_file:
+with open(r"historicalDataTuk.pickle", "rb") as input_file:
     historicalData = pickle.load(input_file)
 
 grouped = historicalData['grouped']
@@ -606,8 +611,10 @@ gevCopulaSims = list()
 for i in range(len(np.unique(bmuGroup))):
     tempCopula = np.asarray(copulaData[i])
     if len(tempCopula) == 0:
-        # Hsmax, Hsmin, Tpmax, Tpmin, Dmmean, u10max, u10min, v10max, v10min, Ssrmean, T2mmean, Fetch, NTRmean, Sstmean,T2mMax,T2mMin time, kk
-        data2 = [[np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]]
+        # # Hsmax, Hsmin, Tpmax, Tpmin, Dmmean, u10max, u10min, v10max, v10min, Ssrmean, T2mmean, Fetch, NTRmean, Sstmean,T2mMax,T2mMin time, kk
+        # data2 = [[np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]]
+        # Hsmax, Hsmin, Tpmax, Tpmin, Dmmean, u10max, u10min, v10max, v10min, T2mmean, Fetch, NTRmean, T2mMax,T2mMin time, kk
+        data2 = [[np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan,np.nan]]
         data = data2
     else:
         dataHs = np.array([sub[0] for sub in copulaData[i]])
@@ -622,17 +629,17 @@ for i in range(len(np.unique(bmuGroup))):
         #
         #     kernels = ['KDE', 'KDE', 'KDE', 'KDE', 'KDE', 'KDE', ]
         # else:
-        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
+        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
     elif len(data2) == 3 or len(data2) == 2:
-        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
+        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
         data2 = np.vstack((data2,data2-data2*0.1))
     else:
-        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
+        kernels = ['KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE','KDE']
 
     if len(data2) <= 1:
-        samples5 = np.zeros((100000,15))
+        samples5 = np.zeros((100000,13))
     else:
-        samples = CopulaSimulation(data2[:,0:16],kernels,100000)
+        samples = CopulaSimulation(data2[:,0:14],kernels,100000)
 
         negIndex1 = np.where(samples[:,0] > 0.1)
         samples2 = samples[negIndex1]
@@ -696,7 +703,8 @@ for i in range(len(np.unique(bmuGroup))):
 # gevCopulaSimsPickle = 'gevCopulaSims100000wevok.pickle'
 # gevCopulaSimsPickle = 'gevCopulaSims100000pointLay.pickle'
 # gevCopulaSimsPickle = 'gevCopulaSims100000kivalina.pickle'
-gevCopulaSimsPickle = 'gevCopulaSims100000utqiagvik.pickle'
+# gevCopulaSimsPickle = 'gevCopulaSims100000utqiagvik.pickle'
+gevCopulaSimsPickle = 'gevCopulaSims100000Tuk.pickle'
 
 outputgevCopulaSims = {}
 outputgevCopulaSims['gevCopulaSims'] = gevCopulaSims
